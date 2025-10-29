@@ -359,7 +359,16 @@ export default function App() {
   <CardTitle className="mb-2">Контакты</CardTitle>
   <div className="text-sm space-y-1">
     <p>E-mail: <a className="underline" href="genndybogdanov@gmail.com">henry@example.com</a></p>
-    <p>Medium: <a className="underline" href="https://medium.com/@gbogdanov" target="_blank">@you</a></p>
+   <p>
+  <a
+    className="underline hover:text-slate-900"
+    href="https://medium.com/@gbogdanov"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    Medium
+  </a>
+</p>
     <p>Substack: <a className="underline" href="https://substack.com/@gbogdanov" target="_blank">@you</a></p>
     <p>YouTube: <a className="underline" href=" - - -" target="_blank">@you</a></p>
   </div>
@@ -400,31 +409,9 @@ export default function App() {
       </main>
 
       {/* Подвал */}
-      <footer className="mt-12 border-t">
-        <div className="max-w-6xl mx-auto px-4 py-8 text-sm text-slate-600 grid md:grid-cols-3 gap-6">
-          <div>
-            <p className="font-semibold">© {new Date().getFullYear()} Henry Bogdanov</p>
-            <p>Русский язык как иностранный — курсы, книги, аудио.</p>
-          </div>
-          <div>
-            <p className="font-semibold mb-2">Помощь</p>
-            <ul className="space-y-1">
-              <li><a className="underline" href="#" onClick={(e) => e.preventDefault()}>FAQ</a></li>
-              <li><a className="underline" href="#" onClick={(e) => e.preventDefault()}>Политика конфиденциальности</a></li>
-              <li><a className="underline" href="#" onClick={(e) => e.preventDefault()}>Условия использования</a></li>
-            </ul>
-          </div>
-          <div>
-            <p className="font-semibold mb-2">Контакты</p>
-            <ul className="space-y-1">
-              <li>E‑mail: <a className="underline" href="genndybogdanov@gmail.com">henry@example.com</a></li>
-              <li>Medium: <a className="underline" href="https://medium.com/@gbogdanov" target="_blank">@you</a></li>
-              <li>Substack: <a className="underline" href="https://substack.com/@gbogdanov" target="_blank">@you</a></li>
-              <li>YouTube: <a className="underline" href=" - 2 -" target="_blank">@you</a></li>          
-            </ul>
-          </div>
-        </div>
-      </footer>
+     <footer className="py-6 text-center text-xs text-slate-500 border-t">
+  © {new Date().getFullYear()} Henry Bogdanov
+</footer>
     </div>
   )
 }
