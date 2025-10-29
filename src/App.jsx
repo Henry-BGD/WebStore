@@ -358,9 +358,10 @@ export default function App() {
 <Card className="p-5 border border-slate-200">
   <CardTitle className="mb-2">Контакты</CardTitle>
   <div className="text-sm space-y-1">
-    <p>E-mail: <a className="underline" href="mailto:henry@example.com">henry@example.com</a></p>
-    <p>Medium: <a className="underline" href="https://medium.com/@you" target="_blank">@you</a></p>
-    <p>YouTube: <a className="underline" href="https://youtube.com/@you" target="_blank">@you</a></p>
+    <p>E-mail: <a className="underline" href="genndybogdanov@gmail.com">henry@example.com</a></p>
+    <p>Medium: <a className="underline" href="https://medium.com/@gbogdanov" target="_blank">@you</a></p>
+    <p>Substack: <a className="underline" href="https://substack.com/@gbogdanov" target="_blank">@you</a></p>
+    <p>YouTube: <a className="underline" href=" - - -" target="_blank">@you</a></p>
   </div>
 </Card>
           </section>
@@ -416,9 +417,10 @@ export default function App() {
           <div>
             <p className="font-semibold mb-2">Контакты</p>
             <ul className="space-y-1">
-              <li>E‑mail: <a className="underline" href="mailto:henry@example.com">henry@example.com</a></li>
-              <li>Medium: <a className="underline" href="https://medium.com/@you" target="_blank">@you</a></li>
-              <li>YouTube: <a className="underline" href="https://youtube.com/@you" target="_blank">@you</a></li>
+              <li>E‑mail: <a className="underline" href="genndybogdanov@gmail.com">henry@example.com</a></li>
+              <li>Medium: <a className="underline" href="https://medium.com/@gbogdanov" target="_blank">@you</a></li>
+              <li>Substack: <a className="underline" href="https://substack.com/@gbogdanov" target="_blank">@you</a></li>
+              <li>YouTube: <a className="underline" href=" - 2 -" target="_blank">@you</a></li>          
             </ul>
           </div>
         </div>
