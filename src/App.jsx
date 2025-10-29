@@ -312,22 +312,75 @@ export default function App() {
     </div>
   </div>
 
-  {/* НИЖНЯЯ полоса: единая панель навигации (бывшие «Быстрые ссылки») */}
-  <nav className="border-t">
-    <div className="max-w-6xl mx-auto px-4 py-3 flex flex-wrap gap-3 md:justify-between">
-      <div className="flex flex-wrap gap-3 w-full md:w-auto justify-center">
-        <NavButton active={tab === "about"} onClick={() => setTab("about")}>
-          Обо мне
-        </NavButton>
-        <NavButton
-          active={tab === "products"}
-          onClick={() => setTab("products")}
-        >
-          Перейти к товарам
-        </NavButton>
-        <NavButton active={tab === "free"} onClick={() => setTab("free")}>
-          Свободные материалы
-        </NavButton>
+ {/* НИЖНЯЯ полоса: единая панель навигации */}
+<nav className="border-t">
+  <div className="max-w-6xl mx-auto px-4 py-3 flex flex-wrap gap-3 md:justify-between">
+    <div className="flex flex-wrap gap-3 w-full md:w-auto justify-center">
+      <NavButton active={tab === "about"} onClick={() => setTab("about")}>
+        Обо мне
+      </NavButton>
+      <NavButton active={tab === "products"} onClick={() => setTab("products")}>
+        Перейти к товарам
+      </NavButton>
+      <NavButton active={tab === "free-pdf"} onClick={() => setTab("free-pdf")}>
+        Бесплатные материалы (PDF)
+      </NavButton>
+      <NavButton active={tab === "free-audio"} onClick={() => setTab("free-audio")}>
+        Аудиокниги
+      </NavButton>
+      <NavButton active={tab === "links"} onClick={() => setTab("links")}>
+        Ссылки
+      </NavButton>
+    </div>
+  </div>
+</nav>
+
+{/* Контент */}
+<main className="max-w-6xl mx-auto px-4 py-8 space-y-10">
+
+  {tab === 'about' && (
+    /* ... твой существующий раздел "Обо мне" без изменений ... */
+  )}
+
+  {tab === 'products' && (
+    /* ... твой существующий раздел товаров без изменений ... */
+  )}
+
+  {/* Новая вкладка: PDF */}
+  {tab === 'free-pdf' && (
+    <section className="space-y-6">
+      <h2 className="text-2xl font-bold">Бесплатные материалы (PDF)</h2>
+      <p className="text-slate-700">
+        Здесь собраны все бесплатные PDF-файлы: грамматика, шпаргалки, памятки и мини-книги.
+      </p>
+      <div className="space-y-6">
+        {FREE_STUFF.filter((x) => x.type === 'pdf').map((x) => (
+          <FreeCard key={x.id} entry={x} />
+        ))}
+      </div>
+    </section>
+  )}
+
+  {/* Новая вкладка: Аудиокниги */}
+  {tab === 'free-audio' && (
+    <section className="space-y-6">
+      <h2 className="text-2xl font-bold">Аудиокниги</h2>
+      <p className="text-slate-700">
+        Слушайте главы онлайн или скачивайте целые аудиокниги — все материалы с параллельным текстом и озвучкой.
+      </p>
+      <div className="space-y-6">
+        {FREE_STUFF.filter((x) => x.type === 'audio').map((x) => (
+          <FreeCard key={x.id} entry={x} />
+        ))}
+      </div>
+    </section>
+  )}
+
+  {tab === 'links' && (
+    /* ... твой раздел ссылок без изменений ... */
+  )}
+
+</main>
         <NavButton active={tab === "links"} onClick={() => setTab("links")}>
           Ссылки
         </NavButton>
@@ -358,7 +411,9 @@ export default function App() {
 <Card className="p-5 border border-slate-200">
   <CardTitle className="mb-2">Контакты</CardTitle>
   <div className="text-sm space-y-1">
-    <p className="text-sm">genndybogdanov@gmail.com</p>
+    <p>
+  E-mail: <a className="underline" href="genndybogdanov@gmail.com">genndybogdanov@gmail.com</a>
+</p>
     <p>YouTube: <a className="underline" href="https://youtube.com-" target="_blank">NAME</a></p>
    <p>
   <a
