@@ -1,7 +1,6 @@
 import React, { useMemo, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from './components/ui/Card.jsx'
 import { Button } from './components/ui/Button.jsx'
-import { Tabs, TabsList, TabsTrigger, TabsContent } from './components/ui/Tabs.jsx'
 import { Input } from './components/ui/Input.jsx'
 import { Badge } from './components/ui/Badge.jsx'
 import { ShoppingCart, ExternalLink, Download, Play, Pause, BookOpen, FileText, Youtube } from 'lucide-react'
@@ -78,7 +77,7 @@ const LINKS = {
   ],
 }
 
-// ======== Утилиты ========
+// ======== Утилиты / мини-компоненты ========
 function NavButton({ active, onClick, children }) {
   return (
     <button
@@ -94,6 +93,7 @@ function NavButton({ active, onClick, children }) {
     </button>
   );
 }
+
 function currency(n) {
   try {
     return new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'USD' }).format(n)
@@ -294,109 +294,57 @@ export default function App() {
   return (
     <div className="min-h-screen">
       {/* Шапка */}
-<header className="sticky top-0 z-50 bg-white/70 backdrop-blur border-b">
-  {/* Верхняя полоса: логотип и подпись */}
-  <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-    <div className="flex items-center gap-3">
-      <img
-        src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=240&auto=format&fit=crop"
-        alt="logo"
-        className="w-9 h-9 rounded-xl"
-      />
-      <div>
-        <p className="font-semibold leading-tight">Henry Bogdanov</p>
-        <p className="text-xs opacity-70">
-          Русский как иностранный — курсы, книги, аудио
-        </p>
-      </div>
-    </div>
-  </div>
+      <header className="sticky top-0 z-50 bg-white/70 backdrop-blur border-b">
+        {/* Верхняя полоса: логотип и подпись */}
+        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <img
+              src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=240&auto=format&fit=crop"
+              alt="logo"
+              className="w-9 h-9 rounded-xl"
+            />
+            <div>
+              <p className="font-semibold leading-tight">Henry Bogdanov</p>
+              <p className="text-xs opacity-70">
+                Русский как иностранный — курсы, книги, аудио
+              </p>
+            </div>
+          </div>
+        </div>
 
- {/* НИЖНЯЯ полоса: единая панель навигации */}
-<nav className="border-t">
-  <div className="max-w-6xl mx-auto px-4 py-3 flex flex-wrap gap-3 md:justify-between">
-    <div className="flex flex-wrap gap-3 w-full md:w-auto justify-center">
-      <NavButton active={tab === "about"} onClick={() => setTab("about")}>
-        Обо мне
-      </NavButton>
-      <NavButton active={tab === "products"} onClick={() => setTab("products")}>
-        Перейти к товарам
-      </NavButton>
-      <NavButton active={tab === "free-pdf"} onClick={() => setTab("free-pdf")}>
-        Бесплатные материалы (PDF)
-      </NavButton>
-      <NavButton active={tab === "free-audio"} onClick={() => setTab("free-audio")}>
-        Аудиокниги
-      </NavButton>
-      <NavButton active={tab === "links"} onClick={() => setTab("links")}>
-        Ссылки
-      </NavButton>
-    </div>
-  </div>
-</nav>
-
-{/* Контент */}
-<main className="max-w-6xl mx-auto px-4 py-8 space-y-10">
-
-  {tab === 'about' && (
-    /* ... твой существующий раздел "Обо мне" без изменений ... */
-  )}
-
-  {tab === 'products' && (
-    /* ... твой существующий раздел товаров без изменений ... */
-  )}
-
-  {/* Новая вкладка: PDF */}
-  {tab === 'free-pdf' && (
-    <section className="space-y-6">
-      <h2 className="text-2xl font-bold">Бесплатные материалы (PDF)</h2>
-      <p className="text-slate-700">
-        Здесь собраны все бесплатные PDF-файлы: грамматика, шпаргалки, памятки и мини-книги.
-      </p>
-      <div className="space-y-6">
-        {FREE_STUFF.filter((x) => x.type === 'pdf').map((x) => (
-          <FreeCard key={x.id} entry={x} />
-        ))}
-      </div>
-    </section>
-  )}
-
-  {/* Новая вкладка: Аудиокниги */}
-  {tab === 'free-audio' && (
-    <section className="space-y-6">
-      <h2 className="text-2xl font-bold">Аудиокниги</h2>
-      <p className="text-slate-700">
-        Слушайте главы онлайн или скачивайте целые аудиокниги — все материалы с параллельным текстом и озвучкой.
-      </p>
-      <div className="space-y-6">
-        {FREE_STUFF.filter((x) => x.type === 'audio').map((x) => (
-          <FreeCard key={x.id} entry={x} />
-        ))}
-      </div>
-    </section>
-  )}
-
-  {tab === 'links' && (
-    /* ... твой раздел ссылок без изменений ... */
-  )}
-
-</main>
-        <NavButton active={tab === "links"} onClick={() => setTab("links")}>
-          Ссылки
-        </NavButton>
-      </div>
-    </div>
-  </nav>
-</header>
+        {/* НИЖНЯЯ полоса: единая панель навигации */}
+        <nav className="border-t">
+          <div className="max-w-6xl mx-auto px-4 py-3 flex flex-wrap gap-3 md:justify-between">
+            <div className="flex flex-wrap gap-3 w-full md:w-auto justify-center">
+              <NavButton active={tab === "about"} onClick={() => setTab("about")}>
+                Обо мне
+              </NavButton>
+              <NavButton active={tab === "products"} onClick={() => setTab("products")}>
+                Перейти к товарам
+              </NavButton>
+              <NavButton active={tab === "free-pdf"} onClick={() => setTab("free-pdf")}>
+                Бесплатные материалы (PDF)
+              </NavButton>
+              <NavButton active={tab === "free-audio"} onClick={() => setTab("free-audio")}>
+                Аудиокниги
+              </NavButton>
+              <NavButton active={tab === "links"} onClick={() => setTab("links")}>
+                Ссылки
+              </NavButton>
+            </div>
+          </div>
+        </nav>
+      </header>
 
       {/* Контент */}
       <main className="max-w-6xl mx-auto px-4 py-8 space-y-10">
-        {/* Простые вкладки (кнопки) */}
 
         {tab === 'about' && (
           <section className="grid md:grid-cols-3 gap-8 items-start">
             <div className="md:col-span-2 space-y-4">
-              <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">Здравствуйте! Я — Henry. Преподаватель РКИ и автор учебных материалов.</h1>
+              <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">
+                Здравствуйте! Я — Henry. Преподаватель РКИ и автор учебных материалов.
+              </h1>
               <p className="leading-relaxed text-slate-700">
                 Я помогаю англоговорящим быстрее и увереннее читать по-русски: делаю билингвальные книги с ударениями,
                 записываю аудиоверсии, объясняю грамматику простым языком и создаю курсы с практическими заданиями.
@@ -408,35 +356,38 @@ export default function App() {
                 <li>Покупка происходит на внешних площадках (Amazon/Gumroad и т.п.).</li>
               </ul>
             </div>
-<Card className="p-5 border border-slate-200">
-  <CardTitle className="mb-2">Контакты</CardTitle>
-  <div className="text-sm space-y-1">
-    <p>
-  E-mail: <a className="underline" href="genndybogdanov@gmail.com">genndybogdanov@gmail.com</a>
-</p>
-    <p>YouTube: <a className="underline" href="https://youtube.com-" target="_blank">NAME</a></p>
-   <p>
-  <a
-    className="underline hover:text-slate-900"
-    href="https://medium.com/@gbogdanov"
-    target="_blank"
-    rel="noopener noreferrer"
-  >
-    Medium
-  </a>
-</p>
-       <p>
-  <a
-    className="underline hover:text-slate-900"
-    href="https://substack.com/@gbogdanov"
-    target="_blank"
-    rel="noopener noreferrer"
-  >
-    Substack
-  </a>
-</p>
-  </div>
-</Card>
+
+            <Card className="p-5 border border-slate-200">
+              <CardTitle className="mb-2">Контакты</CardTitle>
+              <div className="text-sm space-y-1">
+                {/* Почта — как обычный текст, без ссылки */}
+                <p>E-mail: genndybogdanov@gmail.com</p>
+
+                <p>YouTube: <a className="underline" href="https://youtube.com-" target="_blank" rel="noreferrer">NAME</a></p>
+
+                <p>
+                  <a
+                    className="underline hover:text-slate-900"
+                    href="https://medium.com/@gbogdanov"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Medium
+                  </a>
+                </p>
+
+                <p>
+                  <a
+                    className="underline hover:text-slate-900"
+                    href="https://substack.com/@gbogdanov"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Substack
+                  </a>
+                </p>
+              </div>
+            </Card>
           </section>
         )}
 
@@ -445,7 +396,12 @@ export default function App() {
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
               <h2 className="text-2xl font-bold">Мои товары</h2>
               <div className="flex items-center gap-2">
-                <Input placeholder="Поиск по названию, формату, описанию…" value={query} onChange={(e) => setQuery(e.target.value)} className="w-full md:w-80" />
+                <Input
+                  placeholder="Поиск по названию, формату, описанию…"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  className="w-full md:w-80"
+                />
               </div>
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -454,12 +410,32 @@ export default function App() {
           </section>
         )}
 
-        {tab === 'free' && (
+        {/* Новая вкладка: PDF */}
+        {tab === 'free-pdf' && (
           <section className="space-y-6">
-            <h2 className="text-2xl font-bold">Бесплатные материалы</h2>
-            <p className="text-slate-700">PDF-файлы, аудиоистории, главы — слушайте онлайн или скачивайте.</p>
+            <h2 className="text-2xl font-bold">Бесплатные материалы (PDF)</h2>
+            <p className="text-slate-700">
+              Здесь собраны все бесплатные PDF-файлы: грамматика, шпаргалки, памятки и мини-книги.
+            </p>
             <div className="space-y-6">
-              {FREE_STUFF.map((x) => <FreeCard key={x.id} entry={x} />)}
+              {FREE_STUFF.filter((x) => x.type === 'pdf').map((x) => (
+                <FreeCard key={x.id} entry={x} />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Новая вкладка: Аудиокниги */}
+        {tab === 'free-audio' && (
+          <section className="space-y-6">
+            <h2 className="text-2xl font-bold">Аудиокниги</h2>
+            <p className="text-slate-700">
+              Слушайте главы онлайн или скачивайте целые аудиокниги — все материалы с параллельным текстом и озвучкой.
+            </p>
+            <div className="space-y-6">
+              {FREE_STUFF.filter((x) => x.type === 'audio').map((x) => (
+                <FreeCard key={x.id} entry={x} />
+              ))}
             </div>
           </section>
         )}
@@ -472,10 +448,10 @@ export default function App() {
         )}
       </main>
 
-      {/* Подвал */}
-     <footer className="py-6 text-center text-xs text-slate-500 border-t">
-  © {new Date().getFullYear()} Henry Bogdanov
-</footer>
+      {/* Подвал — минимализм */}
+      <footer className="py-6 text-center text-xs text-slate-500 border-t">
+        © {new Date().getFullYear()} Henry Bogdanov
+      </footer>
     </div>
   )
 }
