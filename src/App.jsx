@@ -358,7 +358,8 @@ export default function App() {
 <Card className="p-5 border border-slate-200">
   <CardTitle className="mb-2">Контакты</CardTitle>
   <div className="text-sm space-y-1">
-    <p>E-mail: <a className="underline" href="genndybogdanov@gmail.com">henry@example.com</a></p>
+    <p>E-mail: <a className="underline" href="genndybogdanov@gmail.com">genndybogdanov@gmail.com</a></p>
+    <p>YouTube: <a className="underline" href="https://youtube.com-" target="_blank">NAME</a></p>
    <p>
   <a
     className="underline hover:text-slate-900"
@@ -369,8 +370,16 @@ export default function App() {
     Medium
   </a>
 </p>
-    <p>Substack: <a className="underline" href="https://substack.com/@gbogdanov" target="_blank">@you</a></p>
-    <p>YouTube: <a className="underline" href=" - - -" target="_blank">@you</a></p>
+       <p>
+  <a
+    className="underline hover:text-slate-900"
+    href="https://substack.com/@gbogdanov"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    Substack
+  </a>
+</p>
   </div>
 </Card>
           </section>
