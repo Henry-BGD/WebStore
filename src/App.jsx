@@ -358,7 +358,7 @@ export default function App() {
 <Card className="p-5 border border-slate-200">
   <CardTitle className="mb-2">Контакты</CardTitle>
   <div className="text-sm space-y-1">
-    <p>E-mail: <a className="underline" href="genndybogdanov@gmail.com">genndybogdanov@gmail.com</a></p>
+    <p className="text-sm">genndybogdanov@gmail.com</p>
     <p>YouTube: <a className="underline" href="https://youtube.com-" target="_blank">NAME</a></p>
    <p>
   <a
