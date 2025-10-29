@@ -79,6 +79,21 @@ const LINKS = {
 }
 
 // ======== Утилиты ========
+function NavButton({ active, onClick, children }) {
+  return (
+    <button
+      onClick={onClick}
+      className={
+        "px-5 py-2.5 rounded-full text-sm border transition " +
+        (active
+          ? "bg-white shadow border-slate-300"
+          : "bg-white/60 hover:bg-white border-slate-200")
+      }
+    >
+      {children}
+    </button>
+  );
+}
 function currency(n) {
   try {
     return new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'USD' }).format(n)
