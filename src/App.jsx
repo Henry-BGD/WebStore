@@ -294,41 +294,51 @@ export default function App() {
   return (
     <div className="min-h-screen">
       {/* Шапка */}
-      <header className="sticky top-0 z-50 backdrop-blur bg-white/70 border-b">
-        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <img src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=240&auto=format&fit=crop" alt="logo" className="w-9 h-9 rounded-xl" />
-            <div>
-              <p className="font-semibold leading-tight">Henry Bogdanov</p>
-              <p className="text-xs opacity-70">Русский как иностранный — курсы, книги, аудио</p>
-            </div>
-          </div>
+<header className="sticky top-0 z-50 bg-white/70 backdrop-blur border-b">
+  {/* Верхняя полоса: логотип и подпись */}
+  <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+    <div className="flex items-center gap-3">
+      <img
+        src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=240&auto=format&fit=crop"
+        alt="logo"
+        className="w-9 h-9 rounded-xl"
+      />
+      <div>
+        <p className="font-semibold leading-tight">Henry Bogdanov</p>
+        <p className="text-xs opacity-70">
+          Русский как иностранный — курсы, книги, аудио
+        </p>
+      </div>
+    </div>
+  </div>
 
-          <div className="hidden md:block">
-            <Tabs value={tab} onValueChange={setTab}>
-              <TabsList>
-                <TabsTrigger value="about" valueProp />
-                <TabsTrigger value="products" valueProp />
-                <TabsTrigger value="free" valueProp />
-                <TabsTrigger value="links" valueProp />
-              </TabsList>
-            </Tabs>
-            <div className="hidden">
-              {/* just to silence unused */}
-            </div>
-          </div>
-        </div>
-      </header>
+  {/* НИЖНЯЯ полоса: единая панель навигации (бывшие «Быстрые ссылки») */}
+  <nav className="border-t">
+    <div className="max-w-6xl mx-auto px-4 py-3 flex flex-wrap gap-3 md:justify-between">
+      <div className="flex flex-wrap gap-3 w-full md:w-auto justify-center">
+        <NavButton active={tab === "about"} onClick={() => setTab("about")}>
+          Обо мне
+        </NavButton>
+        <NavButton
+          active={tab === "products"}
+          onClick={() => setTab("products")}
+        >
+          Перейти к товарам
+        </NavButton>
+        <NavButton active={tab === "free"} onClick={() => setTab("free")}>
+          Свободные материалы
+        </NavButton>
+        <NavButton active={tab === "links"} onClick={() => setTab("links")}>
+          Ссылки
+        </NavButton>
+      </div>
+    </div>
+  </nav>
+</header>
 
       {/* Контент */}
       <main className="max-w-6xl mx-auto px-4 py-8 space-y-10">
         {/* Простые вкладки (кнопки) */}
-        <div className="md:hidden flex gap-2">
-          <Button variant={tab==='about'?'solid':'outline'} onClick={() => setTab('about')}>Обо мне</Button>
-          <Button variant={tab==='products'?'solid':'outline'} onClick={() => setTab('products')}>Товары</Button>
-          <Button variant={tab==='free'?'solid':'outline'} onClick={() => setTab('free')}>Бесплатно</Button>
-          <Button variant={tab==='links'?'solid':'outline'} onClick={() => setTab('links')}>Ссылки</Button>
-        </div>
 
         {tab === 'about' && (
           <section className="grid md:grid-cols-3 gap-8 items-start">
@@ -345,14 +355,14 @@ export default function App() {
                 <li>Покупка происходит на внешних площадках (Amazon/Gumroad и т.п.).</li>
               </ul>
             </div>
-            <Card className="p-5 border border-slate-200">
-              <CardTitle className="mb-2">Быстрые ссылки</CardTitle>
-              <div className="space-y-2">
-                <Button variant="outline" onClick={() => setTab('products')} className="w-full">Перейти к товарам</Button>
-                <Button variant="outline" onClick={() => setTab('free')} className="w-full">Свободные материалы</Button>
-                <Button onClick={() => setTab('links')} className="w-full">Medium / YouTube</Button>
-              </div>
-            </Card>
+<Card className="p-5 border border-slate-200">
+  <CardTitle className="mb-2">Контакты</CardTitle>
+  <div className="text-sm space-y-1">
+    <p>E-mail: <a className="underline" href="mailto:henry@example.com">henry@example.com</a></p>
+    <p>Medium: <a className="underline" href="https://medium.com/@you" target="_blank">@you</a></p>
+    <p>YouTube: <a className="underline" href="https://youtube.com/@you" target="_blank">@you</a></p>
+  </div>
+</Card>
           </section>
         )}
 
