@@ -69,12 +69,12 @@ const FREE_STUFF = [
 
 const LINKS = {
   medium: [
-    { title: 'How to read Russian faster (with stress marks)', url: 'https://medium.com/@you/how-to-read-russian-faster' },
-    { title: 'Case endings: quick visual guide', url: 'https://medium.com/@you/cases-visual-guide' },
+    { title: 'You’ll Never Learn a Language If You Ignore These Two Rules', url: 'https://medium.com/@gbogdanov/youll-never-learn-a-language-if-you-ignore-these-two-rules-0aa781eeb677?sk=2789a563a9f9197bd3a4353a773fa77b' },
+    { title: 'Test 1', url: 'https://medium.com/@you/cases-visual-guide' },
   ],
   youtube: [
-    { title: 'YouTube: Плейлист A1 грамматика', url: 'https://youtube.com/@you/playlists?list=A1' },
-    { title: 'YouTube: Мини-истории с субтитрами', url: 'https://youtube.com/@you/playlists?list=stories' },
+    { title: 'Test 1 YouTube: Плейлист A1 грамматика', url: 'https://youtube.com/@you/playlists?list=A1' },
+    { title: 'Test 2 YouTube: Мини-истории с субтитрами', url: 'https://youtube.com/@you/playlists?list=stories' },
   ],
 }
 
