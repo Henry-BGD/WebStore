@@ -69,12 +69,13 @@ const FREE_STUFF = [
 const LINKS = {
   medium: [
     { title: 'You’ll Never Learn a Language If You Ignore These Two Rules', url: 'https://medium.com/@gbogdanov/youll-never-learn-a-language-if-you-ignore-these-two-rules-0aa781eeb677?sk=2789a563a9f9197bd3a4353a773fa77b' },
-    { title: 'Test 1', url: 'https://medium.com/@you/cases-visual-guide' },
+    { title: 'Why You’re Learning Vocabulary Wrong — and How to Fix It', url: 'https://medium.com/@gbogdanov/why-youre-learning-vocabulary-wrong-and-how-to-fix-it-b577fbc9e37e?sk=482b7b51eaae50c26f8f3d898440c756' },
+    { title: 'Think English Is Enough? Here’s Why You’re Wrong', url: 'https://medium.com/@gbogdanov/if-you-know-only-one-language-you-have-a-big-problem-8831ea01df4d?sk=639842a8abba91591bff52a7c890eaee' },
   ],
-  youtube: [
+ false && ( youtube: [
     { title: 'Test 1 YouTube: Плейлист A1 грамматика', url: 'https://youtube.com/@you/playlists?list=A1' },
     { title: 'Test 2 YouTube: Мини-истории с субтитрами', url: 'https://youtube.com/@you/playlists?list=stories' },
-  ],
+  ],)
 }
 
 // ======== Утилиты / мини-компоненты ========
