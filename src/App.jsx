@@ -405,7 +405,7 @@ export default function App() {
                   <img
                     src="/Portrait_1.jpg"
                     alt="Henry — преподаватель русского"
-                    className="w-auto h-80 md:h-[400px] mx-auto object-cover rounded-2xl shadow aspect-[3/4]"
+                     className="w-auto h-40 md:h-48 mx-auto object-cover rounded-2xl shadow aspect-[3/4]"
                   />
                 </div>
                 <div className="md:col-span-2">
