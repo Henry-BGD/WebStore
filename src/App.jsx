@@ -24,28 +24,6 @@ const PRODUCTS = [
     badges: ['RU-EN', 'PDF', 'Аудио'],
     description: 'Параллельный перевод, грамматика, упражнения, аудио к каждому рассказу.',
   },
-  {
-    id: 'prod-course-a1',
-    title: 'Курс: Русский A1 для англоговорящих',
-    kind: 'Видеокурс',
-    price: 49.0,
-    image: 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?q=80&w=1200&auto=format&fit=crop',
-    externalUrl: 'https://example.com/landing-a1',
-    digitalSku: 'sku_course_a1',
-    badges: ['Видео', 'Тесты', 'Сертификат'],
-    description: 'Пошаговый курс с практикой, квизами и домашкой.',
-  },
-  {
-    id: 'prod-ebook-stories',
-    title: 'Мини-сборник: 10 коротких историй',
-    kind: 'E-Book (EPUB/PDF)',
-    price: 7.99,
-    image: 'https://images.unsplash.com/photo-1529148482759-b35b25c5f217?q=80&w=1200&auto=format&fit=crop',
-    externalUrl: 'https://amazon.example/mini-book',
-    digitalSku: 'sku_10stories',
-    badges: ['A1–A2', 'EPUB', 'PDF'],
-    description: 'Короткие тексты с глоссарием и заданиями.',
-  },
 ]
 
 const FREE_STUFF = [
@@ -314,9 +292,9 @@ export default function App() {
               className="w-9 h-9 rounded-xl"
             />
             <div>
-              <p className="font-semibold leading-tight">Henry Bogdanov</p>
+              <p className="font-semibold leading-tight">Genndy Bogdanov</p>
               <p className="text-xs opacity-70">
-                Русский как иностранный — курсы, книги, аудио
+                Учитель русского языка
               </p>
             </div>
           </div>
