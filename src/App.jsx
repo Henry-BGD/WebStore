@@ -398,7 +398,7 @@ export default function App() {
         {/* Лево: фото */}
         <div>
           <img
-            src="/Portrait_1.jpg""
+            src="/Portrait_1.jpg"
             alt="Henry — преподаватель русского"
             className="w-full h-56 md:h-48 object-cover rounded-2xl shadow"
           />
