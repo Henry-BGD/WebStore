@@ -397,11 +397,11 @@ export default function App() {
       <div className="grid md:grid-cols-3 gap-6 p-5 items-center">
         {/* Лево: фото */}
         <div>
-          <img
-            src="/Portrait_1.jpg"
-            alt="Henry — преподаватель русского"
-            className="w-full h-56 md:h-48 object-cover rounded-2xl shadow"
-          />
+         <img
+  src="/Portrait_1.jpg"
+  alt="Henry — преподаватель русского"
+  className="w-auto h-80 md:h-[400px] mx-auto object-cover rounded-2xl shadow aspect-[3/4]"
+/>
         </div>
 
         {/* Право: текст и ссылки */}
