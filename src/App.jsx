@@ -398,7 +398,7 @@ export default function App() {
         {/* Лево: фото */}
         <div>
           <img
-            src="https://images.unsplash.com/photo-1531123897727-8f129e1688ce?q=80&w=1200&auto=format&fit=crop"
+            src="/Portrait_1.jpg""
             alt="Henry — преподаватель русского"
             className="w-full h-56 md:h-48 object-cover rounded-2xl shadow"
           />
@@ -413,7 +413,7 @@ export default function App() {
             <li>
               <a
                 className="underline hover:text-slate-900"
-                href="https://preply.com/ТВОЙ-ПРОФИЛЬ"
+                href="https://preply.com/en/?pref=ODkzOTkyOQ==&id=1759522486.457389&ep=w1"
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -423,7 +423,7 @@ export default function App() {
             <li>
               <a
                 className="underline hover:text-slate-900"
-                href="https://www.italki.com/ТВОЙ-ПРОФИЛЬ"
+                href="https://www.italki.com/affshare?ref=af11775706"
                 target="_blank"
                 rel="noopener noreferrer"
               >
