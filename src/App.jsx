@@ -5,6 +5,12 @@ import { Input } from './components/ui/Input.jsx'
 import { Badge } from './components/ui/Badge.jsx'
 import { ShoppingCart, ExternalLink, Download, Play, Pause, BookOpen, FileText, Youtube } from 'lucide-react'
 
+// ======== Флаги видимости разделов ========
+const SHOW = {
+  youtube: false,  // ← скрыть блок YouTube
+  freePdf: false,  // ← скрыть вкладку/секцию PDF
+}
+
 // ======== Демо-данные (замените на реальные) ========
 const PRODUCTS = [
   {
@@ -49,7 +55,7 @@ const FREE_STUFF = [
     title: 'Аудиокнига: Лёгкие рассказы (демо)',
     cover: 'https://images.unsplash.com/photo-1510915361894-db8b60106cb1?q=80&w=1200&auto=format&fit=crop',
     description: 'Послушайте главы онлайн или скачайте архив целиком.',
-    zipUrl: '#', // замените на реальный архив
+    zipUrl: '#',
     tracks: [
       { id: 't1', title: 'Глава 1: Сливы', src: '#' },
       { id: 't2', title: 'Глава 2: Капитан', src: '#' },
@@ -72,10 +78,7 @@ const LINKS = {
     { title: 'Why You’re Learning Vocabulary Wrong — and How to Fix It', url: 'https://medium.com/@gbogdanov/why-youre-learning-vocabulary-wrong-and-how-to-fix-it-b577fbc9e37e?sk=482b7b51eaae50c26f8f3d898440c756' },
     { title: 'Think English Is Enough? Here’s Why You’re Wrong', url: 'https://medium.com/@gbogdanov/if-you-know-only-one-language-you-have-a-big-problem-8831ea01df4d?sk=639842a8abba91591bff52a7c890eaee' },
   ],
- false && ( youtube: [
-    { title: 'Test 1 YouTube: Плейлист A1 грамматика', url: 'https://youtube.com/@you/playlists?list=A1' },
-    { title: 'Test 2 YouTube: Мини-истории с субтитрами', url: 'https://youtube.com/@you/playlists?list=stories' },
-  ],)
+  youtube: [], // ← пусто, чтобы карточка не рендерилась
 }
 
 // ======== Утилиты / мини-компоненты ========
@@ -103,7 +106,6 @@ function currency(n) {
   }
 }
 
-// Имитация оформления заказа: здесь можно оставить только внешние ссылки (Amazon/Gumroad).
 function handleCheckout(url) {
   if (!url || url === '#') {
     alert('Скоро здесь будет ссылка на внешнюю витрину (Amazon/Gumroad/и т.п.).')
@@ -112,7 +114,6 @@ function handleCheckout(url) {
   window.open(url, '_blank')
 }
 
-// Простенький аудиоплеер по трекам
 function AudioTracks({ cover, tracks, zipUrl }) {
   const [current, setCurrent] = useState(null)
   const [isPlaying, setIsPlaying] = useState(false)
@@ -141,7 +142,6 @@ function AudioTracks({ cover, tracks, zipUrl }) {
                     if (current?.id === t.id && isPlaying) {
                       setIsPlaying(false); el.pause()
                     } else {
-                      // pause others
                       tracks.forEach(x => {
                         const other = document.getElementById(`audio-${x.id}`)
                         if (other && x.id !== t.id) other.pause()
@@ -248,34 +248,43 @@ function FreeCard({ entry }) {
 }
 
 function LinksSection() {
+  const hasMedium = (LINKS.medium?.length ?? 0) > 0
+  const hasYoutube = SHOW.youtube && (LINKS.youtube?.length ?? 0) > 0
+  if (!hasMedium && !hasYoutube) return null
+
   return (
-    <div className="grid md:grid-cols-2 gap-6">
-      <Card className="p-6 border border-slate-200">
-        <div className="flex items-center gap-2 mb-4">
-          <FileText className="w-5 h-5" />
-          <h3 className="font-semibold">Статьи на Medium</h3>
-        </div>
-        <ul className="space-y-2 list-disc list-inside">
-          {LINKS.medium.map((l) => (
-            <li key={l.url}>
-              <a className="underline" href={l.url} target="_blank" rel="noreferrer">{l.title}</a>
-            </li>
-          ))}
-        </ul>
-      </Card>
-      <Card className="p-6 border border-slate-200">
-        <div className="flex items-center gap-2 mb-4">
-          <Youtube className="w-5 h-5" />
-          <h3 className="font-semibold">YouTube канал</h3>
-        </div>
-        <ul className="space-y-2 list-disc list-inside">
-          {LINKS.youtube.map((l) => (
-            <li key={l.url}>
-              <a className="underline" href={l.url} target="_blank" rel="noreferrer">{l.title}</a>
-            </li>
-          ))}
-        </ul>
-      </Card>
+    <div className={`grid gap-6 ${hasMedium && hasYoutube ? 'md:grid-cols-2' : 'md:grid-cols-1'}`}>
+      {hasMedium && (
+        <Card className="p-6 border border-slate-200">
+          <div className="flex items-center gap-2 mb-4">
+            <FileText className="w-5 h-5" />
+            <h3 className="font-semibold">Статьи на Medium</h3>
+          </div>
+          <ul className="space-y-2 list-disc list-inside">
+            {LINKS.medium.map((l) => (
+              <li key={l.url}>
+                <a className="underline" href={l.url} target="_blank" rel="noreferrer">{l.title}</a>
+              </li>
+            ))}
+          </ul>
+        </Card>
+      )}
+
+      {hasYoutube && (
+        <Card className="p-6 border border-slate-200">
+          <div className="flex items-center gap-2 mb-4">
+            <Youtube className="w-5 h-5" />
+            <h3 className="font-semibold">YouTube канал</h3>
+          </div>
+          <ul className="space-y-2 list-disc list-inside">
+            {LINKS.youtube.map((l) => (
+              <li key={l.url}>
+                <a className="underline" href={l.url} target="_blank" rel="noreferrer">{l.title}</a>
+              </li>
+            ))}
+          </ul>
+        </Card>
+      )}
     </div>
   )
 }
@@ -323,9 +332,11 @@ export default function App() {
               <NavButton active={tab === "products"} onClick={() => setTab("products")}>
                 Перейти к товарам
               </NavButton>
-              <NavButton active={tab === "free-pdf"} onClick={() => setTab("free-pdf")}>
-                Бесплатные материалы (PDF)
-              </NavButton>
+              {SHOW.freePdf && (
+                <NavButton active={tab === "free-pdf"} onClick={() => setTab("free-pdf")}>
+                  Бесплатные материалы (PDF)
+                </NavButton>
+              )}
               <NavButton active={tab === "free-audio"} onClick={() => setTab("free-audio")}>
                 Аудиокниги
               </NavButton>
@@ -340,103 +351,94 @@ export default function App() {
       {/* Контент */}
       <main className="max-w-6xl mx-auto px-4 py-8 space-y-10">
 
-       {tab === 'about' && (
-  <section className="grid md:grid-cols-3 gap-8 items-start">
-    {/* Левая колонка: заголовок и описание */}
-    <div className="md:col-span-2 space-y-4">
-      <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">
-        Здравствуйте! Я — Henry. Преподаватель РКИ и автор учебных материалов.
-      </h1>
-      <p className="leading-relaxed text-slate-700">
-        Я помогаю англоговорящим быстрее и увереннее читать по-русски: делаю билингвальные книги с ударениями,
-        записываю аудиоверсии, объясняю грамматику простым языком и создаю курсы с практическими заданиями.
-        На этой странице — мои платные продукты и бесплатные материалы.
-      </p>
-      <ul className="list-disc list-inside text-slate-700 space-y-1">
-        <li>1000+ проведённых уроков, высокий рейтинг.</li>
-        <li>Материалы рассчитаны на уровни A1–B1.</li>
-        <li>Покупка происходит на внешних площадках (Amazon/Gumroad и т.п.).</li>
-      </ul>
-    </div>
+        {tab === 'about' && (
+          <section className="grid md:grid-cols-3 gap-8 items-start">
+            {/* Левая колонка */}
+            <div className="md:col-span-2 space-y-4">
+              <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">
+                Здравствуйте! Я — Henry. Преподаватель РКИ и автор учебных материалов.
+              </h1>
+              <p className="leading-relaxed text-slate-700">
+                Я помогаю англоговорящим быстрее и увереннее читать по-русски: делаю билингвальные книги с ударениями,
+                записываю аудиоверсии, объясняю грамматику простым языком и создаю курсы с практическими заданиями.
+                На этой странице — мои платные продукты и бесплатные материалы.
+              </p>
+              <ul className="list-disc list-inside text-slate-700 space-y-1">
+                <li>1000+ проведённых уроков, высокий рейтинг.</li>
+                <li>Материалы рассчитаны на уровни A1–B1.</li>
+                <li>Покупка происходит на внешних площадках (Amazon/Gumroad и т.п.).</li>
+              </ul>
+            </div>
 
-    {/* Правая колонка: контакты */}
-    <Card className="p-5 border border-slate-200">
-      <CardTitle className="mb-2">Контакты</CardTitle>
-      <div className="text-sm space-y-1">
-        <p>E-mail: genndybogdanov@gmail.com</p>
-        <p>
-          YouTube:{" "}
-          <a className="underline" href="https://youtube.com-" target="_blank" rel="noreferrer">
-            NAME
-          </a>
-        </p>
-        <p>
-          <a
-            className="underline hover:text-slate-900"
-            href="https://medium.com/@gbogdanov"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Medium
-          </a>
-        </p>
-        <p>
-          <a
-            className="underline hover:text-slate-900"
-            href="https://substack.com/@gbogdanov"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Substack
-          </a>
-        </p>
-      </div>
-    </Card>
+            {/* Правая колонка: контакты */}
+            <Card className="p-5 border border-slate-200">
+              <CardTitle className="mb-2">Контакты</CardTitle>
+              <div className="text-sm space-y-1">
+                <p>E-mail: genndybogdanov@gmail.com</p>
+                <p>
+                  <a
+                    className="underline hover:text-slate-900"
+                    href="https://medium.com/@gbogdanov"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Medium
+                  </a>
+                </p>
+                <p>
+                  <a
+                    className="underline hover:text-slate-900"
+                    href="https://substack.com/@gbogdanov"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Substack
+                  </a>
+                </p>
+              </div>
+            </Card>
 
-    {/* НИЖНИЙ ШИРОКИЙ БЛОК: фото + текст со ссылками (занимает всю ширину) */}
-    <Card className="md:col-span-3 border border-slate-200">
-      <div className="grid md:grid-cols-3 gap-6 p-5 items-center">
-        {/* Лево: фото */}
-        <div>
-         <img
-  src="/Portrait_1.jpg"
-  alt="Henry — преподаватель русского"
-  className="w-auto h-80 md:h-[400px] mx-auto object-cover rounded-2xl shadow aspect-[3/4]"
-/>
-        </div>
-
-        {/* Право: текст и ссылки */}
-        <div className="md:col-span-2">
-          <h3 className="text-xl font-semibold mb-2">
-            Учи русский язык со мной на платформах:
-          </h3>
-          <ul className="space-y-2 text-slate-700">
-            <li>
-              <a
-                className="underline hover:text-slate-900"
-                href="https://preply.com/en/?pref=ODkzOTkyOQ==&id=1759522486.457389&ep=w1"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Preply
-              </a>
-            </li>
-            <li>
-              <a
-                className="underline hover:text-slate-900"
-                href="https://www.italki.com/affshare?ref=af11775706"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                italki
-              </a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </Card>
-  </section>
-)}
+            {/* Низ: фото + ссылки на платформы */}
+            <Card className="md:col-span-3 border border-slate-200">
+              <div className="grid md:grid-cols-3 gap-6 p-5 items-center">
+                <div>
+                  <img
+                    src="/Portrait_1.jpg"
+                    alt="Henry — преподаватель русского"
+                    className="w-auto h-80 md:h-[400px] mx-auto object-cover rounded-2xl shadow aspect-[3/4]"
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <h3 className="text-xl font-semibold mb-2">
+                    Учи русский язык со мной на платформах:
+                  </h3>
+                  <ul className="space-y-2 text-slate-700">
+                    <li>
+                      <a
+                        className="underline hover:text-slate-900"
+                        href="https://preply.com/en/?pref=ODkzOTkyOQ==&id=1759522486.457389&ep=w1"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Preply
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        className="underline hover:text-slate-900"
+                        href="https://www.italki.com/affshare?ref=af11775706"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        italki
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </Card>
+          </section>
+        )}
 
         {tab === 'products' && (
           <section className="space-y-6">
@@ -457,8 +459,8 @@ export default function App() {
           </section>
         )}
 
-        {/* Новая вкладка: PDF */}
-        {tab === 'free-pdf' && (
+        {/* PDF — по флагу */}
+        {SHOW.freePdf && tab === 'free-pdf' && (
           <section className="space-y-6">
             <h2 className="text-2xl font-bold">Бесплатные материалы (PDF)</h2>
             <p className="text-slate-700">
@@ -472,7 +474,7 @@ export default function App() {
           </section>
         )}
 
-        {/* Новая вкладка: Аудиокниги */}
+        {/* Аудио */}
         {tab === 'free-audio' && (
           <section className="space-y-6">
             <h2 className="text-2xl font-bold">Аудиокниги</h2>
