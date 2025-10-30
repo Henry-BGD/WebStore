@@ -339,57 +339,103 @@ export default function App() {
       {/* Контент */}
       <main className="max-w-6xl mx-auto px-4 py-8 space-y-10">
 
-        {tab === 'about' && (
-          <section className="grid md:grid-cols-3 gap-8 items-start">
-            <div className="md:col-span-2 space-y-4">
-              <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">
-                Здравствуйте! Я — Henry. Преподаватель РКИ и автор учебных материалов.
-              </h1>
-              <p className="leading-relaxed text-slate-700">
-                Я помогаю англоговорящим быстрее и увереннее читать по-русски: делаю билингвальные книги с ударениями,
-                записываю аудиоверсии, объясняю грамматику простым языком и создаю курсы с практическими заданиями.
-                На этой странице — мои платные продукты и бесплатные материалы.
-              </p>
-              <ul className="list-disc list-inside text-slate-700 space-y-1">
-                <li>1000+ проведённых уроков, высокий рейтинг.</li>
-                <li>Материалы рассчитаны на уровни A1–B1.</li>
-                <li>Покупка происходит на внешних площадках (Amazon/Gumroad и т.п.).</li>
-              </ul>
-            </div>
+       {tab === 'about' && (
+  <section className="grid md:grid-cols-3 gap-8 items-start">
+    {/* Левая колонка: заголовок и описание */}
+    <div className="md:col-span-2 space-y-4">
+      <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">
+        Здравствуйте! Я — Henry. Преподаватель РКИ и автор учебных материалов.
+      </h1>
+      <p className="leading-relaxed text-slate-700">
+        Я помогаю англоговорящим быстрее и увереннее читать по-русски: делаю билингвальные книги с ударениями,
+        записываю аудиоверсии, объясняю грамматику простым языком и создаю курсы с практическими заданиями.
+        На этой странице — мои платные продукты и бесплатные материалы.
+      </p>
+      <ul className="list-disc list-inside text-slate-700 space-y-1">
+        <li>1000+ проведённых уроков, высокий рейтинг.</li>
+        <li>Материалы рассчитаны на уровни A1–B1.</li>
+        <li>Покупка происходит на внешних площадках (Amazon/Gumroad и т.п.).</li>
+      </ul>
+    </div>
 
-            <Card className="p-5 border border-slate-200">
-              <CardTitle className="mb-2">Контакты</CardTitle>
-              <div className="text-sm space-y-1">
-                {/* Почта — как обычный текст, без ссылки */}
-                <p>E-mail: genndybogdanov@gmail.com</p>
+    {/* Правая колонка: контакты */}
+    <Card className="p-5 border border-slate-200">
+      <CardTitle className="mb-2">Контакты</CardTitle>
+      <div className="text-sm space-y-1">
+        <p>E-mail: genndybogdanov@gmail.com</p>
+        <p>
+          YouTube:{" "}
+          <a className="underline" href="https://youtube.com-" target="_blank" rel="noreferrer">
+            NAME
+          </a>
+        </p>
+        <p>
+          <a
+            className="underline hover:text-slate-900"
+            href="https://medium.com/@gbogdanov"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Medium
+          </a>
+        </p>
+        <p>
+          <a
+            className="underline hover:text-slate-900"
+            href="https://substack.com/@gbogdanov"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Substack
+          </a>
+        </p>
+      </div>
+    </Card>
 
-                <p>YouTube: <a className="underline" href="https://youtube.com-" target="_blank" rel="noreferrer">NAME</a></p>
+    {/* НИЖНИЙ ШИРОКИЙ БЛОК: фото + текст со ссылками (занимает всю ширину) */}
+    <Card className="md:col-span-3 border border-slate-200">
+      <div className="grid md:grid-cols-3 gap-6 p-5 items-center">
+        {/* Лево: фото */}
+        <div>
+          <img
+            src="https://images.unsplash.com/photo-1531123897727-8f129e1688ce?q=80&w=1200&auto=format&fit=crop"
+            alt="Henry — преподаватель русского"
+            className="w-full h-56 md:h-48 object-cover rounded-2xl shadow"
+          />
+        </div>
 
-                <p>
-                  <a
-                    className="underline hover:text-slate-900"
-                    href="https://medium.com/@gbogdanov"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Medium
-                  </a>
-                </p>
-
-                <p>
-                  <a
-                    className="underline hover:text-slate-900"
-                    href="https://substack.com/@gbogdanov"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Substack
-                  </a>
-                </p>
-              </div>
-            </Card>
-          </section>
-        )}
+        {/* Право: текст и ссылки */}
+        <div className="md:col-span-2">
+          <h3 className="text-xl font-semibold mb-2">
+            Учи русский язык со мной на платформах:
+          </h3>
+          <ul className="space-y-2 text-slate-700">
+            <li>
+              <a
+                className="underline hover:text-slate-900"
+                href="https://preply.com/ТВОЙ-ПРОФИЛЬ"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Preply
+              </a>
+            </li>
+            <li>
+              <a
+                className="underline hover:text-slate-900"
+                href="https://www.italki.com/ТВОЙ-ПРОФИЛЬ"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                italki
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </Card>
+  </section>
+)}
 
         {tab === 'products' && (
           <section className="space-y-6">
