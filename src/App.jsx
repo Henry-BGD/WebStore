@@ -20,6 +20,7 @@ const PRODUCTS = [
     price: 14.99,
     image: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=1200&auto=format&fit=crop',
     externalUrl: 'https://amazon.example/your-book',
+    marketplaceLabel: 'Купить на Amazon',
     digitalSku: 'sku_tolstoy_lite',
     badges: ['RU-EN', 'PDF', 'Аудио'],
     description: 'Параллельный перевод, грамматика, упражнения, аудио к каждому рассказу.',
@@ -187,7 +188,7 @@ function ProductCard({ item }) {
           <div className="flex gap-2">
             <Button variant="outline" onClick={() => window.open(item.externalUrl, '_blank')}>
             <ExternalLink className="w-4 h-4" />
-            <span className="ml-1">{item.marketplaceLabel ?? 'Купить на витрине'}</span>
+            <span className="ml-1">{item.marketplaceLabel ?? 'Купить'}</span>
             </Button>
             <Button onClick={() => handleCheckout(item.externalUrl)}>
               <ShoppingCart className="w-4 h-4" />&nbsp;Купить на сайте
