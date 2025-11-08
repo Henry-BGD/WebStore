@@ -164,7 +164,8 @@ function AudioTracks({ cover, tracks, zipUrl }) {
 
 function ProductCard({ item }) {
   return (
-    <Card className="overflow-hidden border border-slate-200">
+    <Card className="overflow-hidden border border-slate-200 flex flex-col">
+      {/* Изображение */}
       <CardHeader className="p-0">
         <div className="relative">
           <img src={item.image} alt={item.title} className="w-full h-56 object-cover" />
@@ -177,24 +178,32 @@ function ProductCard({ item }) {
           </div>
         </div>
       </CardHeader>
-      <CardContent className="p-4 space-y-3">
-        <div className="space-y-1">
-          <CardTitle className="text-lg leading-snug">{item.title}</CardTitle>
-          <p className="text-sm opacity-80">{item.kind}</p>
+
+      {/* Контент */}
+      <CardContent className="p-4 flex flex-col flex-grow justify-between">
+        <div className="space-y-2">
+          <div className="space-y-1">
+            <CardTitle className="text-lg leading-snug">{item.title}</CardTitle>
+            <p className="text-sm opacity-80">{item.kind}</p>
+          </div>
+          <p className="text-sm text-slate-700">{item.description}</p>
         </div>
-        <p className="text-sm">{item.description}</p>
-        <div className="flex items-center justify-between pt-2">
+
+        {/* Нижняя панель */}
+        <div className="flex items-center justify-between pt-4 mt-auto">
           <span className="text-xl font-semibold">{currency(item.price)}</span>
-<div className="flex">
-  <Button variant="outline" onClick={() => window.open(item.externalUrl, '_blank')}>
-    <ExternalLink className="w-4 h-4" />
-    <span className="ml-1">{item.marketplaceLabel ?? 'Купить'}</span>
-  </Button>
-</div>
+          <Button
+            variant="outline"
+            onClick={() => window.open(item.externalUrl, '_blank')}
+            className="flex items-center gap-1"
+          >
+            <ExternalLink className="w-4 h-4" />
+            <span>{item.marketplaceLabel ?? 'Купить'}</span>
+          </Button>
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 function FreeCard({ entry }) {
