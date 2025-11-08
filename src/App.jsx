@@ -24,6 +24,19 @@ const PRODUCTS = [
     badges: ['RU-EN', 'PDF', 'Аудио'],
     description: 'Параллельный перевод, грамматика, упражнения, аудио к каждому рассказу.',
   },
+  {
+  id: 'prod-tee-samurai-black',
+  title: 'Футболка: Самурай (чёрная)',
+  kind: 'Футболка, heavy cotton',
+  price: 24.99,
+  image: 'https://images.unsplash.com/photo-1520975916090-3105956dac38?q=80&w=1200&auto=format&fit=crop', // мокап
+  externalUrl: 'https://www.etsy.com/listing/4397031433/japanese-samurai-warrior-t-shirt?ref=shop_home_feat_1&sr_prefetch=1&pf_from=shop_home&frs=1&logging_key=30998bb728bf6cac3d5447a9971f816214b7e253%3A4397031433',
+  // ссылка на Etsy
+  marketplaceLabel: 'Купить на Etsy',
+  digitalSku: 'tee_samurai_black_g5000', // опционально, для учёта
+  badges: ['Unisex', 'Heavy Cotton', 'S–XL'],
+  description: 'Минималистичный принт самурая. Плотная хлопковая футболка на каждый день.',
+}
 ]
 
 const FREE_STUFF = [
