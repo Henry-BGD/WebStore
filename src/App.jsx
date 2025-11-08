@@ -185,15 +185,12 @@ function ProductCard({ item }) {
         <p className="text-sm">{item.description}</p>
         <div className="flex items-center justify-between pt-2">
           <span className="text-xl font-semibold">{currency(item.price)}</span>
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={() => window.open(item.externalUrl, '_blank')}>
-            <ExternalLink className="w-4 h-4" />
-            <span className="ml-1">{item.marketplaceLabel ?? 'Купить'}</span>
-            </Button>
-            <Button onClick={() => handleCheckout(item.externalUrl)}>
-              <ShoppingCart className="w-4 h-4" />&nbsp;Купить на сайте
-            </Button>
-          </div>
+<div className="flex">
+  <Button variant="outline" onClick={() => window.open(item.externalUrl, '_blank')}>
+    <ExternalLink className="w-4 h-4" />
+    <span className="ml-1">{item.marketplaceLabel ?? 'Купить'}</span>
+  </Button>
+</div>
         </div>
       </CardContent>
     </Card>
