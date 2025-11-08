@@ -186,7 +186,8 @@ function ProductCard({ item }) {
           <span className="text-xl font-semibold">{currency(item.price)}</span>
           <div className="flex gap-2">
             <Button variant="outline" onClick={() => window.open(item.externalUrl, '_blank')}>
-              <ExternalLink className="w-4 h-4" />&nbsp;Купить на Amazon
+            <ExternalLink className="w-4 h-4" />
+            <span className="ml-1">{item.marketplaceLabel ?? 'Купить на витрине'}</span>
             </Button>
             <Button onClick={() => handleCheckout(item.externalUrl)}>
               <ShoppingCart className="w-4 h-4" />&nbsp;Купить на сайте
