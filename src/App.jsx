@@ -9,28 +9,15 @@ import { ExternalLink, Download, Play, Pause } from "lucide-react";
 const PRODUCTS = [
   {
     id: "prod-ru-book-1",
-    title: "Билингвальная книга: Толстой — рассказы с ударениями",
-    kind: "Книга (PDF + аудио)",
-    price: 14.99,
+    title: "Short Russian Stories by Leo Tolstoy",
+    kind: "A1-B1 Level",
+    price: 12.99,
     image:
-      "https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=1200&auto=format&fit=crop",
+      "/Product_Leo.png",
     externalUrl: "https://amazon.example/your-book",
     marketplace: "amazon", // <- for automatic label
     badges: ["RU-EN", "PDF", "Аудио"],
-    description: "Параллельный перевод, грамматика, упражнения, аудио к каждому рассказу.",
-  },
-  {
-    id: "prod-tee-samurai-black",
-    title: "Футболка: Самурай (чёрная)",
-    kind: "Футболка, heavy cotton",
-    price: 24.99,
-    image:
-      "https://images.unsplash.com/photo-1520975916090-3105956dac38?q=80&w=1200&auto=format&fit=crop",
-    externalUrl:
-      "https://www.etsy.com/listing/4397031433/japanese-samurai-warrior-t-shirt?ref=shop_home_feat_1&sr_prefetch=1&pf_from=shop_home&frs=1&logging_key=30998bb728bf6cac3d5447a9971f816214b7e253%3A4397031433",
-    marketplace: "etsy", // <- for automatic label
-    badges: ["Unisex", "Heavy Cotton", "S–XL"],
-    description: "Минималистичный принт самурая. Плотная хлопковая футболка на каждый день.",
+    description: "Word-by-word translation, stress marks, grammar explanations, exersices, audio included.",
   },
 ];
 
@@ -562,7 +549,7 @@ export default function App() {
       </main>
 
       <footer className="py-6 text-center text-xs text-slate-500 border-t">
-        © {new Date().getFullYear()} Henry Bogdanov
+        © {new Date().getFullYear()} Genndy Bogdanov
       </footer>
     </div>
   );
