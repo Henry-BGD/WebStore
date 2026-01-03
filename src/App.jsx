@@ -40,29 +40,20 @@ const PRODUCTS = [
 }
 ]
 
-const FREE_STUFF = [
+const AUDIO_BOOKS = [
   {
-    id: 'fs-audio-1',
-    type: 'audio',
-    title: 'Аудиокнига: Лёгкие рассказы (демо)',
-    cover: 'https://images.unsplash.com/photo-1510915361894-db8b60106cb1?q=80&w=1200&auto=format&fit=crop',
-    description: 'Послушайте главы онлайн или скачайте архив целиком.',
-    zipUrl: '#',
+    id: "tolstoy-short-stories",
+    title: "Russian Short Stories by Leo Tolstoy",
+    cover: "/covers/tolstoy.jpg", // положи картинку в public/covers/tolstoy.jpg
+    description: "Короткие рассказы с параллельным текстом и озвучкой.",
     tracks: [
-      { id: 't1', title: 'Глава 1: Сливы', src: '#' },
-      { id: 't2', title: 'Глава 2: Капитан', src: '#' },
-      { id: 't3', title: 'Глава 3: Письмо', src: '#' },
+      { id: "kostochka", title: "Косточка (The Pit)", src: "/audio/kostochka.mp3" },
+      { id: "kotenok", title: "Котёнок (The Kitten)", src: "/audio/kotenok.mp3" },
+      { id: "slivy", title: "Сливы (Plums)", src: "/audio/slivy.mp3" },
     ],
   },
-  {
-    id: 'fs-pdf-1',
-    type: 'pdf',
-    title: 'PDF: Памятка по русской пунктуации (мини)',
-    description: 'Кратко о кавычках, тире, запятых и многоточии.',
-    thumb: 'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=1200&auto=format&fit=crop',
-    fileUrl: '#',
-  },
-]
+  // добавишь вторую книгу — просто копируешь объект и меняешь поля
+];
 
 const LINKS = {
   medium: [
@@ -288,6 +279,68 @@ function LinksSection() {
   )
 }
 
+function AudioBookTile({ book, onOpen }) {
+  return (
+    <button
+      onClick={() => onOpen(book.id)}
+      className="w-full text-left"
+    >
+      <Card className="p-4 border border-slate-200 hover:shadow transition">
+        <div className="flex gap-4 items-center">
+          <img
+            src={book.cover}
+            alt={book.title}
+            className="w-16 h-16 rounded-xl object-cover flex-none"
+          />
+          <div className="min-w-0">
+            <p className="font-semibold truncate">{book.title}</p>
+            {book.description && (
+              <p className="text-sm text-slate-600 line-clamp-2">{book.description}</p>
+            )}
+          </div>
+        </div>
+      </Card>
+    </button>
+  );
+}
+
+function TrackRow({ track, activeId, isPlaying, onToggle }) {
+  const active = activeId === track.id && isPlaying;
+
+  return (
+    <Card className="border border-slate-200">
+      <CardContent className="p-4 flex items-center justify-between gap-3">
+        <div className="min-w-0">
+          <p className="font-medium truncate">{track.title}</p>
+        </div>
+
+        <div className="flex items-center gap-2 flex-none">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onToggle(track)}
+            className="flex items-center gap-2"
+          >
+            {active ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+            {active ? "Пауза" : "Слушать"}
+          </Button>
+
+          {track.src && (
+            <a href={track.src} download className="inline-flex">
+              <Button size="sm" className="flex items-center gap-2">
+                <Download className="w-4 h-4" />
+                Скачать
+              </Button>
+            </a>
+          )}
+        </div>
+
+        <audio id={`audio-${track.id}`} src={track.src} preload="none" />
+      </CardContent>
+    </Card>
+  );
+}
+
 export default function App() {
   const [tab, setTab] = useState('about')
   const [query, setQuery] = useState('')
@@ -299,6 +352,37 @@ export default function App() {
       [p.title, p.kind, p.description, ...(p.badges || [])].join(' ').toLowerCase().includes(q)
     )
   }, [query])
+
+const [audioBookId, setAudioBookId] = useState(null);
+const [currentTrackId, setCurrentTrackId] = useState(null);
+const [isPlaying, setIsPlaying] = useState(false);
+
+  const selectedBook = useMemo(
+  () => AUDIO_BOOKS.find((b) => b.id === audioBookId) || null,
+  [audioBookId]
+);
+
+function toggleTrack(track) {
+  const el = document.getElementById(`audio-${track.id}`);
+  if (!el) return;
+
+  // стопим все остальные
+  AUDIO_BOOKS.forEach((b) =>
+    b.tracks.forEach((t) => {
+      const other = document.getElementById(`audio-${t.id}`);
+      if (other && t.id !== track.id) other.pause();
+    })
+  );
+
+  if (currentTrackId === track.id && isPlaying) {
+    el.pause();
+    setIsPlaying(false);
+  } else {
+    el.play();
+    setCurrentTrackId(track.id);
+    setIsPlaying(true);
+  }
+}
 
   return (
     <div className="min-h-screen">
@@ -472,19 +556,68 @@ export default function App() {
         )}
 
         {/* Аудио */}
-        {tab === 'free-audio' && (
-          <section className="space-y-6">
-            <h2 className="text-2xl font-bold">Аудиокниги</h2>
-            <p className="text-slate-700">
-              Слушайте главы онлайн или скачивайте целые аудиокниги — все материалы с параллельным текстом и озвучкой.
-            </p>
-            <div className="space-y-6">
-              {FREE_STUFF.filter((x) => x.type === 'audio').map((x) => (
-                <FreeCard key={x.id} entry={x} />
-              ))}
-            </div>
-          </section>
-        )}
+{tab === "free-audio" && (
+  <section className="space-y-6">
+    {!audioBookId && (
+      <>
+        <h2 className="text-2xl font-bold">Аудиокниги</h2>
+        <p className="text-slate-700">
+          Выберите книгу — откроется список глав с прослушиванием и скачиванием.
+        </p>
+
+        <div className="grid md:grid-cols-2 gap-4">
+          {AUDIO_BOOKS.map((book) => (
+            <AudioBookTile key={book.id} book={book} onOpen={setAudioBookId} />
+          ))}
+        </div>
+      </>
+    )}
+
+    {audioBookId && selectedBook && (
+      <>
+        <div className="flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <h2 className="text-2xl font-bold truncate">{selectedBook.title}</h2>
+            {selectedBook.description && (
+              <p className="text-slate-700">{selectedBook.description}</p>
+            )}
+          </div>
+
+          <Button
+            variant="outline"
+            onClick={() => {
+              setAudioBookId(null);
+              setCurrentTrackId(null);
+              setIsPlaying(false);
+            }}
+          >
+            ← Назад
+          </Button>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-6 items-start">
+          <img
+            src={selectedBook.cover}
+            alt={selectedBook.title}
+            className="w-full aspect-square object-cover rounded-2xl shadow md:col-span-1"
+          />
+
+          <div className="md:col-span-2 space-y-3">
+            {selectedBook.tracks.map((t) => (
+              <TrackRow
+                key={t.id}
+                track={t}
+                activeId={currentTrackId}
+                isPlaying={isPlaying}
+                onToggle={toggleTrack}
+              />
+            ))}
+          </div>
+        </div>
+      </>
+    )}
+  </section>
+)}
 
         {tab === 'links' && (
           <section className="space-y-6">
