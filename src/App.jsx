@@ -364,6 +364,21 @@ const [isPlaying, setIsPlaying] = useState(false);
 
 function toggleTrack(track) {
   const el = document.getElementById(`audio-${track.id}`);
+
+  function downloadAllAudio() {
+  if (!selectedBook?.tracks?.length) return;
+
+  selectedBook.tracks.forEach((t) => {
+    if (!t.src) return;
+    const a = document.createElement("a");
+    a.href = t.src;
+    a.download = "";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  });
+}
+  
   if (!el) return;
 
   // стопим все остальные
@@ -420,15 +435,18 @@ function toggleTrack(track) {
                   Бесплатные материалы (PDF)
                 </NavButton>
               )}
-              <NavButton active={tab === "free-audio"} onClick={() => setTab("free-audio")}>
-                Аудиокниги
-              </NavButton>
               <NavButton active={tab === "links"} onClick={() => setTab("links")}>
                 Ссылки
               </NavButton>
-              <NavButton active={tab === "free-audio"} onClick={() => { setTab("free-audio"); setAudioBookId(null); }}>
-              Аудиокниги
-              </NavButton>
+             <NavButton
+  active={tab === "free-audio"}
+  onClick={() => {
+    setTab("free-audio");
+    setAudioBookId(null);
+  }}
+>
+  Аудиокниги
+</NavButton>
             </div>
           </div>
         </nav>
@@ -576,54 +594,53 @@ function toggleTrack(track) {
       </>
     )}
 
-    {audioBookId && selectedBook && (
-      <>
-        <div className="flex items-start justify-between gap-4 mb-6">
-  {/* Заголовок */}
-  <div>
-    <h1 className="text-3xl font-bold">
-      Russian Short Stories by Leo Tolstoy
-    </h1>
-    <p className="text-slate-600">
-      Короткие рассказы с параллельным текстом и озвучкой.
-    </p>
-  </div>
+  {audioBookId && selectedBook && (
+  <>
+    <div className="flex items-start justify-between gap-4 mb-6">
+      {/* Заголовок */}
+      <div>
+        <h1 className="text-3xl font-bold">{selectedBook.title}</h1>
+        <p className="text-slate-600">{selectedBook.description}</p>
+      </div>
 
-  {/* Кнопки справа */}
-  <div className="flex gap-3 shrink-0">
-    <Button
-      variant="outline"
-      onClick={() => window.history.back()}
-      className="flex gap-2"
-    >
-      ← Назад
-    </Button>
+      {/* Кнопки справа */}
+      <div className="flex gap-3 shrink-0">
+        <Button
+          variant="outline"
+          onClick={() => setAudioBookId(null)}
+          className="flex gap-2"
+        >
+          ← Назад
+        </Button>
 
-    <Button
-      onClick={downloadAllAudio}
-      className="flex gap-2"
-    >
-      ⬇ Скачать всё
-    </Button>
-  </div>
-</div>
+        <Button onClick={downloadAllAudio} className="flex gap-2">
+          <Download className="w-4 h-4" />
+          Скачать всё
+        </Button>
+      </div>
+    </div>
 
-        function downloadAllAudio() {
-  const files = [
-    '/audio/kostochka.mp3',
-    '/audio/kotenok.mp3',
-    '/audio/slivy.mp3',
-  ]
+    <div className="grid md:grid-cols-3 gap-6 items-start">
+      <img
+        src={selectedBook.cover}
+        alt={selectedBook.title}
+        className="w-full aspect-square object-cover rounded-2xl shadow md:col-span-1"
+      />
 
-  files.forEach((url) => {
-    const a = document.createElement('a')
-    a.href = url
-    a.download = ''
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-  })
-}
+      <div className="md:col-span-2 space-y-3">
+        {selectedBook.tracks.map((t) => (
+          <TrackRow
+            key={t.id}
+            track={t}
+            activeId={currentTrackId}
+            isPlaying={isPlaying}
+            onToggle={toggleTrack}
+          />
+        ))}
+      </div>
+    </div>
+  </>
+)}
 
         <div className="grid md:grid-cols-3 gap-6 items-start">
           <img
