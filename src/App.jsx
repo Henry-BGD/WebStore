@@ -511,24 +511,6 @@ export default function App() {
   </>
 )}
 
-                <div className="grid md:grid-cols-3 gap-6 items-start">
-                  <img
-                    src={selectedBook.cover}
-                    alt={selectedBook.title}
-                    className="w-full aspect-square object-cover rounded-2xl shadow md:col-span-1"
-                  />
-
-                  <div className="md:col-span-2 space-y-3">
-                    {selectedBook.tracks.map((t) => (
-                      <TrackRow key={t.id} track={t} activeId={currentTrackId} isPlaying={isPlaying} onToggle={toggleTrack} />
-                    ))}
-                  </div>
-                </div>
-              </>
-            )}
-          </section>
-        )}
-
         {tab === 'links' && (
           <section className="space-y-6">
             <h2 className="text-2xl font-bold">Ссылки на статьи и видео</h2>
