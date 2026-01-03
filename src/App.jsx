@@ -461,41 +461,55 @@ export default function App() {
               </>
             )}
 
-            {audioBookId && selectedBook && (
-              <>
-                <div className="flex items-start justify-between gap-4 mb-6">
-                  <div>
-                    <h1 className="text-3xl font-bold">{selectedBook.title}</h1>
-                    <p className="text-slate-600">{selectedBook.description}</p>
-                  </div>
+         {audioBookId && selectedBook && (
+  <>
+    <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+      {/* Кнопки: сверху на мобиле, справа на десктопе */}
+      <div className="order-1 flex w-full flex-wrap gap-3 justify-end md:order-2 md:w-auto">
+        <Button
+          variant="outline"
+          onClick={() => setAudioBookId(null)}
+          className="flex gap-2"
+        >
+          ← Назад
+        </Button>
 
-<div className="mb-6 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-  {/* Кнопки: сверху на мобиле, справа на десктопе */}
-  <div className="order-1 flex w-full flex-wrap gap-3 justify-end md:order-2 md:w-auto">
-    <Button
-      variant="outline"
-      onClick={() => setAudioBookId(null)}
-      className="flex gap-2"
-    >
-      ← Назад
-    </Button>
+        <Button onClick={downloadAllAudio} className="flex gap-2">
+          <Download className="w-4 h-4" />
+          Скачать всё
+        </Button>
+      </div>
 
-    <Button onClick={downloadAllAudio} className="flex gap-2">
-      <Download className="w-4 h-4" />
-      Скачать всё
-    </Button>
-  </div>
+      {/* Заголовок: под кнопками на мобиле, слева на десктопе */}
+      <div className="order-2 w-full md:order-1 md:max-w-[60%]">
+        <h1 className="text-3xl font-bold md:text-4xl">
+          {selectedBook.title}
+        </h1>
+        <p className="text-slate-600">{selectedBook.description}</p>
+      </div>
+    </div>
 
-  {/* Заголовок: под кнопками на мобиле, слева на десктопе */}
-  <div className="order-2 w-full md:order-1 md:max-w-[60%]">
-    <h1 className="text-3xl font-bold md:text-4xl">
-      {selectedBook.title}
-    </h1>
-    <p className="text-slate-600">
-      {selectedBook.description}
-    </p>
-  </div>
-</div>
+    <div className="grid md:grid-cols-3 gap-6 items-start">
+      <img
+        src={selectedBook.cover}
+        alt={selectedBook.title}
+        className="w-full aspect-square object-cover rounded-2xl shadow md:col-span-1"
+      />
+
+      <div className="md:col-span-2 space-y-3">
+        {selectedBook.tracks.map((t) => (
+          <TrackRow
+            key={t.id}
+            track={t}
+            activeId={currentTrackId}
+            isPlaying={isPlaying}
+            onToggle={toggleTrack}
+          />
+        ))}
+      </div>
+    </div>
+  </>
+)}
 
                 <div className="grid md:grid-cols-3 gap-6 items-start">
                   <img
