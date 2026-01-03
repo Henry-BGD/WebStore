@@ -426,6 +426,9 @@ function toggleTrack(track) {
               <NavButton active={tab === "links"} onClick={() => setTab("links")}>
                 Ссылки
               </NavButton>
+              <NavButton active={tab === "free-audio"} onClick={() => { setTab("free-audio"); setAudioBookId(null); }}>
+              Аудиокниги
+              </NavButton>
             </div>
           </div>
         </nav>
@@ -575,25 +578,52 @@ function toggleTrack(track) {
 
     {audioBookId && selectedBook && (
       <>
-        <div className="flex items-center justify-between gap-3">
-          <div className="min-w-0">
-            <h2 className="text-2xl font-bold truncate">{selectedBook.title}</h2>
-            {selectedBook.description && (
-              <p className="text-slate-700">{selectedBook.description}</p>
-            )}
-          </div>
+        <div className="flex items-start justify-between gap-4 mb-6">
+  {/* Заголовок */}
+  <div>
+    <h1 className="text-3xl font-bold">
+      Russian Short Stories by Leo Tolstoy
+    </h1>
+    <p className="text-slate-600">
+      Короткие рассказы с параллельным текстом и озвучкой.
+    </p>
+  </div>
 
-          <Button
-            variant="outline"
-            onClick={() => {
-              setAudioBookId(null);
-              setCurrentTrackId(null);
-              setIsPlaying(false);
-            }}
-          >
-            ← Назад
-          </Button>
-        </div>
+  {/* Кнопки справа */}
+  <div className="flex gap-3 shrink-0">
+    <Button
+      variant="outline"
+      onClick={() => window.history.back()}
+      className="flex gap-2"
+    >
+      ← Назад
+    </Button>
+
+    <Button
+      onClick={downloadAllAudio}
+      className="flex gap-2"
+    >
+      ⬇ Скачать всё
+    </Button>
+  </div>
+</div>
+
+        function downloadAllAudio() {
+  const files = [
+    '/audio/kostochka.mp3',
+    '/audio/kotenok.mp3',
+    '/audio/slivy.mp3',
+  ]
+
+  files.forEach((url) => {
+    const a = document.createElement('a')
+    a.href = url
+    a.download = ''
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+  })
+}
 
         <div className="grid md:grid-cols-3 gap-6 items-start">
           <img
