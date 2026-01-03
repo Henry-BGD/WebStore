@@ -469,25 +469,33 @@ export default function App() {
                     <p className="text-slate-600">{selectedBook.description}</p>
                   </div>
 
-                  <div className="flex gap-3 shrink-0">
-                    <Button
-                      variant="outline"
-                      onClick={() => {
-                        setAudioBookId(null)
-                        setCurrentTrackId(null)
-                        setIsPlaying(false)
-                      }}
-                      className="flex gap-2"
-                    >
-                      ← Назад
-                    </Button>
+<div className="mb-6 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+  {/* Кнопки: сверху на мобиле, справа на десктопе */}
+  <div className="order-1 flex w-full flex-wrap gap-3 justify-end md:order-2 md:w-auto">
+    <Button
+      variant="outline"
+      onClick={() => setAudioBookId(null)}
+      className="flex gap-2"
+    >
+      ← Назад
+    </Button>
 
-                    <Button onClick={downloadAllAudio} className="flex gap-2">
-                      <Download className="w-4 h-4" />
-                      Скачать всё
-                    </Button>
-                  </div>
-                </div>
+    <Button onClick={downloadAllAudio} className="flex gap-2">
+      <Download className="w-4 h-4" />
+      Скачать всё
+    </Button>
+  </div>
+
+  {/* Заголовок: под кнопками на мобиле, слева на десктопе */}
+  <div className="order-2 w-full md:order-1 md:max-w-[60%]">
+    <h1 className="text-3xl font-bold md:text-4xl">
+      {selectedBook.title}
+    </h1>
+    <p className="text-slate-600">
+      {selectedBook.description}
+    </p>
+  </div>
+</div>
 
                 <div className="grid md:grid-cols-3 gap-6 items-start">
                   <img
