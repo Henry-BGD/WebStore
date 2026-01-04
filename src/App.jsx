@@ -9,14 +9,14 @@ import { ExternalLink, Download, Play, Pause } from "lucide-react";
 const PRODUCTS = [
   {
     id: "prod-ru-book-1",
-    title: "Short Russian Stories by Leo Tolstoy",
+    title: "Russian Short Stories by Leo Tolstoy",
     kind: "A1-B1 Level",
     price: 12.99,
     image:
       "/Product_Leo.png",
     externalUrl: "https://amazon.example/your-book",
     marketplace: "amazon", // <- for automatic label
-    badges: ["RU-EN", "PDF", "Аудио"],
+    badges: ["RU-EN", "Paper Book", "Audio"],
     description: "Word-by-word translation, stress marks, grammar explanations, exersices, audio included.",
   },
 ];
@@ -24,13 +24,16 @@ const PRODUCTS = [
 const AUDIO_BOOKS = [
   {
     id: "tolstoy-short-stories",
-    title: "Russian Short Stories by Leo Tolstoy",
-    cover: "/covers/tolstoy.jpg", // put image into public/covers/tolstoy.jpg
-    description: "Короткие рассказы с параллельным текстом и озвучкой.",
+    title: "Russian Short Stories",
+    cover: "/Audio_External_Leo.png",
+    description: "by Leo Tolstoy",
     tracks: [
       { id: "kostochka", title: "Косточка (The Pit)", src: "/audio/kostochka.mp3" },
       { id: "kotenok", title: "Котёнок (The Kitten)", src: "/audio/kotenok.mp3" },
-      { id: "slivy", title: "Сливы (Plums)", src: "/audio/slivy.mp3" },
+      { id: "lebedy", title: "Лебеди (The Swans)", src: "/audio/lebedy.mp3" },
+      { id: "bears", title: "Три медведя (The Three Bears)", src: "/audio/bears.mp3" },
+      { id: "shark", title: "Акула (The Shark)", src: "/audio/shark.mp3" },
+      { id: "jump", title: "Прыжок (The Jump)", src: "/audio/jump.mp3" },
     ],
   },
 ];
@@ -40,7 +43,7 @@ const I18N = {
   en: {
     // Header / nav
     name: "Genndy Bogdanov",
-    tagline: "Russian language teacher",
+    tagline: "",
     nav_about: "About",
     nav_products: "Products",
     nav_audio: "Audiobooks",
