@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useRef, useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/Card.jsx";
 import { Button } from "./components/ui/Button.jsx";
 import { Input } from "./components/ui/Input.jsx";
@@ -12,12 +12,12 @@ const PRODUCTS = [
     title: "Russian Short Stories by Leo Tolstoy",
     kind: "A1-B1 Level",
     price: 12.99,
-    image:
-      "/Product_Leo.png",
+    image: "/Product_Leo.png",
     externalUrl: "https://amazon.example/your-book",
     marketplace: "amazon", // <- for automatic label
     badges: ["RU-EN", "Paper Book", "Audio"],
-    description: "Word-by-word translation, stress marks, grammar explanations, exersices, audio included.",
+    description:
+      "Word-by-word translation, stress marks, grammar explanations, exercises, audio included.",
   },
 ];
 
@@ -49,39 +49,29 @@ const I18N = {
     nav_audio: "Audiobooks",
 
     // About
-    about_title:
-      "Hi! I’m Genndy — a Russian language teacher and the author of learning materials",
-    about_p1:
-      "I help English speakers read Russian faster and with confidence. 1000+ lessons taught, high rating.",
-    //about_b1: "1000+ lessons taught, high rating.",
-    //about_b2: "Materials for levels A0–C2.",
+    about_title: "Hi! I’m Genndy — a Russian language teacher and the author of learning materials",
+    about_p1: "I help English speakers read Russian faster and with confidence. 1000+ lessons taught, high rating.",
     contacts: "Contacts",
     learn_with_me: "Learn Russian with me on:",
 
     // Products
-    // products_title: "My products",
     products_search: "Search by title or description…",
     buy_amazon: "Buy on Amazon",
     buy_etsy: "Buy on Etsy",
     buy_generic: "Buy",
 
     // Audio list
-    //audio_title: "Audiobooks",
     audio_choose: "Choose a book to listen to or download",
     back: "Back",
     download_all: "Download all",
-    //listen: "Listen",
-    listen: "",
-    //pause: "Pause",
-    pause: "",
-    //download: "Download",
-    download: "",
+    listen: "Listen",
+    pause: "Pause",
+    download: "Download",
   },
 
   ru: {
     // Header / nav
     name: "Genndy Bogdanov",
-    //tagline: "Учитель русского языка",
     nav_about: "Обо мне",
     nav_products: "Магазин",
     nav_audio: "Аудиокниги",
@@ -90,29 +80,22 @@ const I18N = {
     about_title: "Всем привет! Я — Геннадий. Преподаватель русского языка и автор учебных материалов.",
     about_p1:
       "Я помогаю англоговорящим быстрее и увереннее читать по-русски. 1000+ проведённых уроков, высокий рейтинг.",
-    //about_b1: "1000+ проведённых уроков, высокий рейтинг.",
-    //about_b2: "Материалы для уровней A0–C2.",
     contacts: "Контакты",
     learn_with_me: "Учи русский язык со мной на платформах:",
 
     // Products
-    // products_title: "Мои товары",
     products_search: "Поиск по названию или описанию…",
     buy_amazon: "Купить на Amazon",
     buy_etsy: "Купить на Etsy",
     buy_generic: "Купить",
 
     // Audio list
-    //audio_title: "Аудиокниги",
     audio_choose: "Выберите книгу, чтобы послушать или загрузить материалы",
     back: "Назад",
     download_all: "Скачать всё",
-    //listen: "Слушать",
-    //pause: "Пауза",
-    //download: "Скачать",
-    listen: "",
-    pause: "",
-    download: "",
+    listen: "Слушать",
+    pause: "Пауза",
+    download: "Скачать",
   },
 };
 
@@ -124,9 +107,7 @@ function NavPill({ active, onClick, children, size = "md" }) {
       onClick={onClick}
       className={
         `${padding} rounded-full border transition ` +
-        (active
-          ? "bg-white shadow border-slate-300"
-          : "bg-white/60 hover:bg-white border-slate-200")
+        (active ? "bg-white shadow border-slate-300" : "bg-white/60 hover:bg-white border-slate-200")
       }
       type="button"
     >
@@ -154,16 +135,10 @@ function AudioBookTile({ book, onOpen }) {
     <button onClick={() => onOpen(book.id)} className="w-full text-left" type="button">
       <Card className="p-4 border border-slate-200 hover:shadow transition">
         <div className="flex gap-4 items-center">
-          <img
-            src={book.cover}
-            alt={book.title}
-            className="w-16 h-16 rounded-xl object-cover flex-none"
-          />
+          <img src={book.cover} alt={book.title} className="w-16 h-16 rounded-xl object-cover flex-none" />
           <div className="min-w-0">
             <p className="font-semibold truncate">{book.title}</p>
-            {book.description && (
-              <p className="text-sm text-slate-600 line-clamp-2">{book.description}</p>
-            )}
+            {book.description && <p className="text-sm text-slate-600 line-clamp-2">{book.description}</p>}
           </div>
         </div>
       </Card>
@@ -171,8 +146,8 @@ function AudioBookTile({ book, onOpen }) {
   );
 }
 
-function TrackRow({ track, activeId, isPlaying, onToggle, t }) {
-  const active = activeId === track.id && isPlaying;
+function TrackRow({ track, isActive, isPlaying, onToggle, t }) {
+  const activeAndPlaying = isActive && isPlaying;
 
   return (
     <Card className="border border-slate-200">
@@ -189,21 +164,26 @@ function TrackRow({ track, activeId, isPlaying, onToggle, t }) {
             className="flex items-center gap-2"
             type="button"
           >
-            {active ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-            {active ? t("pause") : t("listen")}
+            {activeAndPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+            {activeAndPlaying ? t("pause") : t("listen")}
           </Button>
 
           {track.src && track.src !== "#" && (
-            <a href={track.src} download className="inline-flex">
-              <Button size="sm" className="flex items-center gap-2" type="button">
-                <Download className="w-4 h-4" />
-                {t("download")}
-              </Button>
+            <a
+              href={track.src}
+              download
+              className="inline-flex items-center justify-center rounded-md"
+              aria-label={`${t("download")}: ${track.title}`}
+            >
+              <span className="inline-flex">
+                <Button size="sm" className="flex items-center gap-2" type="button">
+                  <Download className="w-4 h-4" />
+                  {t("download")}
+                </Button>
+              </span>
             </a>
           )}
         </div>
-
-        <audio id={`audio-${track.id}`} src={track.src} preload="none" />
       </CardContent>
     </Card>
   );
@@ -234,18 +214,22 @@ function ProductCard({ item, t }) {
           <p className="text-sm text-slate-700">{item.description}</p>
         </div>
 
-        {/* Bottom bar pinned */}
         <div className="flex items-center justify-between pt-4 mt-auto">
           <span className="text-xl font-semibold">{currencyUSD(item.price)}</span>
-          <Button
-            variant="outline"
-            onClick={() => window.open(item.externalUrl, "_blank")}
-            className="flex items-center gap-1"
-            type="button"
+
+          {/* Safe external link (no window.open) */}
+          <a
+            href={item.externalUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex"
+            aria-label={productBuyLabel(item, t)}
           >
-            <ExternalLink className="w-4 h-4" />
-            <span>{productBuyLabel(item, t)}</span>
-          </Button>
+            <Button variant="outline" className="flex items-center gap-1" type="button">
+              <ExternalLink className="w-4 h-4" />
+              <span>{productBuyLabel(item, t)}</span>
+            </Button>
+          </a>
         </div>
       </CardContent>
     </Card>
@@ -268,7 +252,7 @@ export default function App() {
     }
   };
 
-  const [lang, setLang] = useState(detectLanguage());
+  const [lang, setLang] = useState(() => detectLanguage());
   const t = (key) => I18N[lang]?.[key] ?? I18N.en[key] ?? key;
 
   const switchLang = (next) => {
@@ -282,7 +266,10 @@ export default function App() {
   const [query, setQuery] = useState("");
 
   const [audioBookId, setAudioBookId] = useState(null);
-  const [currentTrackId, setCurrentTrackId] = useState(null);
+
+  // One global audio player
+  const audioRef = useRef(null);
+  const [currentTrack, setCurrentTrack] = useState(null); // track object
   const [isPlaying, setIsPlaying] = useState(false);
 
   const filteredProducts = useMemo(() => {
@@ -295,27 +282,60 @@ export default function App() {
 
   const selectedBook = useMemo(() => AUDIO_BOOKS.find((b) => b.id === audioBookId) || null, [audioBookId]);
 
-  function toggleTrack(track) {
-    const el = document.getElementById(`audio-${track.id}`);
-    if (!el) return;
+  // Sync state with audio events
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
 
-    // pause all others
-    AUDIO_BOOKS.forEach((b) =>
-      b.tracks.forEach((tr) => {
-        const other = document.getElementById(`audio-${tr.id}`);
-        if (other && tr.id !== track.id) other.pause();
-      })
-    );
+    const onPlay = () => setIsPlaying(true);
+    const onPause = () => setIsPlaying(false);
+    const onEnded = () => setIsPlaying(false);
 
-    if (currentTrackId === track.id && isPlaying) {
-      el.pause();
-      setIsPlaying(false);
-    } else {
-      el.play();
-      setCurrentTrackId(track.id);
-      setIsPlaying(true);
-    }
-  }
+    audio.addEventListener("play", onPlay);
+    audio.addEventListener("pause", onPause);
+    audio.addEventListener("ended", onEnded);
+
+    return () => {
+      audio.removeEventListener("play", onPlay);
+      audio.removeEventListener("pause", onPause);
+      audio.removeEventListener("ended", onEnded);
+    };
+  }, []);
+
+  const stopAudio = useCallback(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.pause();
+    // not strictly required, but clears buffer and prevents some edge cases
+    audio.currentTime = 0;
+  }, []);
+
+  const toggleTrack = useCallback(
+    async (track) => {
+      const audio = audioRef.current;
+      if (!audio || !track?.src || track.src === "#") return;
+
+      // If same track and currently playing -> pause
+      if (currentTrack?.id === track.id && !audio.paused) {
+        audio.pause();
+        return;
+      }
+
+      // If switching tracks
+      if (currentTrack?.id !== track.id) {
+        audio.src = track.src;
+        setCurrentTrack(track);
+      }
+
+      try {
+        await audio.play();
+      } catch (e) {
+        // Autoplay restrictions or other playback errors
+        console.warn("Audio play failed:", e);
+      }
+    },
+    [currentTrack]
+  );
 
   function downloadAllAudio() {
     if (!selectedBook?.tracks?.length) return;
@@ -331,8 +351,27 @@ export default function App() {
     });
   }
 
+  // If user leaves audio tab or goes back to list, stop playing
+  useEffect(() => {
+    if (tab !== "free-audio") {
+      stopAudio();
+      setCurrentTrack(null);
+      setAudioBookId(null);
+    }
+  }, [tab, stopAudio]);
+
+  useEffect(() => {
+    if (!audioBookId) {
+      stopAudio();
+      setCurrentTrack(null);
+    }
+  }, [audioBookId, stopAudio]);
+
   return (
     <div className="min-h-screen">
+      {/* Single global audio element */}
+      <audio ref={audioRef} preload="none" />
+
       {/* Header */}
       <header className="sticky top-0 z-50 bg-white/70 backdrop-blur border-b">
         {/* top row */}
@@ -394,10 +433,6 @@ export default function App() {
             <div className="md:col-span-2 space-y-4">
               <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">{t("about_title")}</h1>
               <p className="leading-relaxed text-slate-700">{t("about_p1")}</p>
-              <ul className="list-disc list-inside text-slate-700 space-y-1">
-                <li>{t("about_b1")}</li>
-                <li>{t("about_b2")}</li>
-              </ul>
             </div>
 
             <Card className="p-5 border border-slate-200">
@@ -470,8 +505,8 @@ export default function App() {
         {tab === "products" && (
           <section className="space-y-6">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-              <h2 className="text-2xl font-bold">{t("products_title")}</h2>
-              <div className="flex items-center gap-2">
+              {/* removed products_title completely */}
+              <div className="flex items-center gap-2 w-full justify-end">
                 <Input
                   placeholder={t("products_search")}
                   value={query}
@@ -494,7 +529,7 @@ export default function App() {
           <section className="space-y-6">
             {!audioBookId && (
               <>
-                <h2 className="text-2xl font-bold">{t("audio_title")}</h2>
+                {/* removed audio_title completely */}
                 <p className="text-slate-700">{t("audio_choose")}</p>
 
                 <div className="grid md:grid-cols-2 gap-4">
@@ -507,7 +542,6 @@ export default function App() {
 
             {audioBookId && selectedBook && (
               <>
-                {/* Mobile: buttons on top, title under; Desktop: title left, buttons right */}
                 <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                   <div className="order-1 flex w-full flex-wrap gap-3 justify-end md:order-2 md:w-auto">
                     <Button
@@ -543,7 +577,7 @@ export default function App() {
                       <TrackRow
                         key={tr.id}
                         track={tr}
-                        activeId={currentTrackId}
+                        isActive={currentTrack?.id === tr.id}
                         isPlaying={isPlaying}
                         onToggle={toggleTrack}
                         t={t}
