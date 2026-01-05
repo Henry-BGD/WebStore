@@ -483,14 +483,15 @@ export default function App() {
 {tab === "products" && (
   <section className="space-y-6">
     {/* Search is ALWAYS in the same place */}
-   <div className="w-full sm:max-w-md text-left">
-  <input
+<div className="w-full sm:max-w-md text-left">
+  <Input
     placeholder={t("products_search")}
     value={query}
     onChange={(e) => setQuery(e.target.value)}
-    className="block w-full border border-slate-300 rounded-md px-3 py-2"
+    className="w-full"
   />
 </div>
+
 
     {/* Products grid starts BELOW */}
     <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
