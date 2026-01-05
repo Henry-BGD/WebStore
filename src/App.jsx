@@ -50,11 +50,11 @@ const I18N = {
 
     // About
     about_title:
-      "Hi! I’m Genndy — a Russian language teacher and the author of learning materials.",
+      "Hi! I’m Genndy — a Russian language teacher and the author of learning materials",
     about_p1:
-      "I help English speakers read Russian faster and with confidence: bilingual books with audio, clear grammar explanations, and practical exercises.",
-    about_b1: "1000+ lessons taught, high rating.",
-    about_b2: "Materials for levels A0–C2.",
+      "I help English speakers read Russian faster and with confidence. 1000+ lessons taught, high rating.",
+    //about_b1: "1000+ lessons taught, high rating.",
+    //about_b2: "Materials for levels A0–C2.",
     contacts: "Contacts",
     learn_with_me: "Learn Russian with me on:",
 
@@ -66,13 +66,16 @@ const I18N = {
     buy_generic: "Buy",
 
     // Audio list
-    audio_title: "Audiobooks",
-    audio_choose: "Choose a book — you’ll see chapters with listen & download.",
+    //audio_title: "Audiobooks",
+    audio_choose: "Choose a book to listen or download",
     back: "Back",
     download_all: "Download all",
-    listen: "Listen",
-    pause: "Pause",
-    download: "Download",
+    //listen: "Listen",
+    listen: "",
+    //pause: "Pause",
+    pause: "",
+    //download: "Download",
+    download: "",
   },
 
   ru: {
