@@ -403,7 +403,7 @@ export default function App() {
         </nav>
       </header>
 
-      <main className="flex-1 max-w-6xl mx-auto px-4 py-8 space-y-10">
+     <main className="flex-1 max-w-6xl mx-auto px-4 py-8 space-y-10 text-left">
         {/* ABOUT */}
         {tab === "about" && (
           <section className="grid md:grid-cols-3 gap-8 items-start">
