@@ -112,7 +112,7 @@ function NavPill({ active, onClick, children, size = "md" }) {
 
         // states
         active
-          ? "bg-blue-600 text-white border-blue-600 shadow-md font-semibold"
+          ? "bg-amber-100 text-amber-900 border-amber-300 shadow-md font-semibold"
           : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:border-slate-300",
       ].join(" ")}
     >
