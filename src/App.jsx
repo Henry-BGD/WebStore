@@ -95,14 +95,26 @@ const I18N = {
 // ================== UI HELPERS ==================
 function NavPill({ active, onClick, children, size = "md" }) {
   const padding = size === "sm" ? "px-3 py-1.5 text-xs" : "px-5 py-2.5 text-sm";
+
   return (
     <button
       onClick={onClick}
-      className={
-        `${padding} rounded-full border transition ` +
-        (active ? "bg-white shadow border-slate-300" : "bg-white/60 hover:bg-white border-slate-200")
-      }
       type="button"
+      className={[
+        padding,
+
+        // base
+        "rounded-full border transition-all duration-200 select-none",
+        "active:scale-[0.97]",
+
+        // accessibility
+        "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300",
+
+        // states
+        active
+          ? "bg-blue-600 text-white border-blue-600 shadow-md font-semibold"
+          : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:border-slate-300",
+      ].join(" ")}
     >
       {children}
     </button>
