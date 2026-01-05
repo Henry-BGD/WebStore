@@ -466,25 +466,30 @@ export default function App() {
           </section>
         )}
 
-        {/* PRODUCTS ✅ fixed: search tile matches card width */}
+        {/* PRODUCTS */}
         {tab === "products" && (
-          <section className="space-y-6">
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              <div>
-                <Input
-                  placeholder={t("products_search")}
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  className="w-full"
-                />
-              </div>
+  <section className="space-y-6">
+    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {/* SEARCH — first column, first row */}
+      <div>
+        <Input
+          placeholder={t("products_search")}
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          className="w-full"
+        />
+      </div>
 
-              {filteredProducts.map((p) => (
-                <ProductCard key={p.id} item={p} t={t} />
-              ))}
-            </div>
-          </section>
-        )}
+      {/* FILL THE REST OF THE FIRST ROW */}
+      <div className="hidden sm:block lg:col-span-2" />
+
+      {/* PRODUCTS — start from second row, first column */}
+      {filteredProducts.map((p) => (
+        <ProductCard key={p.id} item={p} t={t} />
+      ))}
+    </div>
+  </section>
+)}
 
         {/* AUDIO */}
         {tab === "free-audio" && (
