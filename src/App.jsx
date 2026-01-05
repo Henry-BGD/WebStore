@@ -479,27 +479,30 @@ export default function App() {
         )}
 
         {/* PRODUCTS */}
-        {tab === "products" && (
+        {/* PRODUCTS */}
+{tab === "products" && (
   <section className="space-y-6">
+    {/* Search is ALWAYS in the same place */}
+    <div className="w-full sm:max-w-md">
+      <Input
+        placeholder={t("products_search")}
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        className="w-full"
+      />
+    </div>
+
+    {/* Products grid starts BELOW */}
     <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      {/* SEARCH — first column, first row */}
-      <div>
-        <Input
-          placeholder={t("products_search")}
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          className="w-full"
-        />
-      </div>
-
-      {/* FILL THE REST OF THE FIRST ROW */}
-      <div className="hidden sm:block lg:col-span-2" />
-
-      {/* PRODUCTS — start from second row, first column */}
       {filteredProducts.map((p) => (
         <ProductCard key={p.id} item={p} t={t} />
       ))}
     </div>
+
+    {/* Optional: show a friendly message when nothing found */}
+    {filteredProducts.length === 0 && (
+      <p className="text-sm text-slate-500">No results.</p>
+    )}
   </section>
 )}
 
@@ -510,9 +513,10 @@ export default function App() {
   <div className="space-y-4">
     {/* Title */}
     <p className="text-slate-700 text-left">{t("audio_choose")}</p>
-    {/* Left-aligned container, wider cards */}
-    <div className="w-full">
-      <div className="grid gap-6 md:grid-cols-2 justify-items-start">
+
+    {/* Grid pinned to the LEFT */}
+    <div className="w-full flex justify-start">
+      <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-6 items-start justify-start">
         {AUDIO_BOOKS.map((book) => (
           <div key={book.id} className="w-full">
             <AudioBookTile book={book} onOpen={setAudioBookId} />
