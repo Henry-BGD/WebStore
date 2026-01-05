@@ -45,7 +45,7 @@ const I18N = {
     name: "Genndy Bogdanov",
     tagline: "",
     nav_about: "About",
-    nav_products: "Products",
+    nav_products: "Store",
     nav_audio: "Audiobooks",
 
     // About
@@ -59,7 +59,7 @@ const I18N = {
     learn_with_me: "Learn Russian with me on:",
 
     // Products
-    products_title: "My products",
+    // products_title: "My products",
     products_search: "Search by title or description…",
     buy_amazon: "Buy on Amazon",
     buy_etsy: "Buy on Etsy",
@@ -96,7 +96,7 @@ const I18N = {
     learn_with_me: "Учи русский язык со мной на платформах:",
 
     // Products
-    products_title: "Мои товары",
+    // products_title: "Мои товары",
     products_search: "Поиск по названию или описанию…",
     buy_amazon: "Купить на Amazon",
     buy_etsy: "Купить на Etsy",
