@@ -112,7 +112,7 @@ function NavPill({ active, onClick, children, size = "md" }) {
 
         // states
         active
-          ? "bg-amber-100 text-amber-900 border-amber-300 shadow-md font-semibold"
+          ? "bg-slate-900 text-white border-slate-900 shadow-md font-semibold"
           : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:border-slate-300",
       ].join(" ")}
     >
@@ -351,7 +351,7 @@ export default function App() {
   }, [audioBookId, stopAudio]);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen flex flex-col">
       <audio ref={audioRef} preload="none" />
 
       <header className="sticky top-0 z-50 bg-white/70 backdrop-blur border-b">
@@ -403,7 +403,7 @@ export default function App() {
         </nav>
       </header>
 
-      <main className="max-w-6xl mx-auto px-4 py-8 space-y-10">
+      <main className="flex-1 max-w-6xl mx-auto px-4 py-8 space-y-10">
         {/* ABOUT */}
         {tab === "about" && (
           <section className="grid md:grid-cols-3 gap-8 items-start">
