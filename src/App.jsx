@@ -12,12 +12,11 @@ const PRODUCTS = [
     title: "Russian Short Stories by Leo Tolstoy",
     kind: "A1-B1 Level",
     price: 12.99,
-    image: "/Product_Leo.png", // ✅ public/Product_Leo.png
+    image: "/Product_Leo.png",
     externalUrl: "https://amazon.example/your-book",
     marketplace: "amazon",
     badges: ["RU-EN", "Paper Book", "Audio"],
-    description:
-      "Word-by-word translation, stress marks, grammar explanations, exercises, audio included.",
+    description: "Word-by-word translation, stress marks, grammar explanations, exercises, audio included.",
   },
 ];
 
@@ -25,7 +24,7 @@ const AUDIO_BOOKS = [
   {
     id: "tolstoy-short-stories",
     title: "Russian Short Stories",
-    cover: "/Audio_External_Leo.png", // ✅ public/Audio_External_Leo.png
+    cover: "/Audio_External_Leo.png",
     description: "by Leo Tolstoy",
     tracks: [
       { id: "kostochka", title: "Косточка (The Pit)", src: "/audio/kostochka.mp3" },
@@ -48,8 +47,7 @@ const I18N = {
     nav_audio: "Audiobooks",
 
     about_title: "Hi! I’m Genndy — a Russian language teacher and the author of learning materials",
-    about_p1:
-      "I help English speakers read Russian faster and with confidence. 1000+ lessons taught, high rating.",
+    about_p1: "I help English speakers read Russian faster and with confidence. 1000+ lessons taught, high rating.",
     contacts: "Contacts",
     learn_with_me: "Learn Russian with me on:",
 
@@ -70,8 +68,7 @@ const I18N = {
     nav_audio: "Аудиокниги",
 
     about_title: "Всем привет! Я — Геннадий. Преподаватель русского языка и автор учебных материалов.",
-    about_p1:
-      "Я помогаю англоговорящим быстрее и увереннее читать по-русски. 1000+ проведённых уроков, высокий рейтинг.",
+    about_p1: "Я помогаю англоговорящим быстрее и увереннее читать по-русски. 1000+ проведённых уроков, высокий рейтинг.",
     contacts: "Контакты",
     learn_with_me: "Учи русский язык со мной на платформах:",
 
@@ -96,15 +93,9 @@ function NavPill({ active, onClick, children, size = "md" }) {
       type="button"
       className={[
         padding,
-
-        // base
         "rounded-full border transition-all duration-200 select-none",
         "active:scale-[0.97]",
-
-        // accessibility
         "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300",
-
-        // states
         active
           ? "bg-slate-900 text-white border-slate-900 shadow-md font-semibold"
           : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:border-slate-300",
@@ -132,7 +123,7 @@ function productBuyLabel(item, t) {
 function AudioBookTile({ book, onOpen }) {
   return (
     <button onClick={() => onOpen(book.id)} className="block w-full text-left" type="button">
-      <Card className="p-5 border border-slate-200 hover:shadow-md transition w-full !mx-0">
+      <Card className="p-5 border border-slate-200 hover:shadow-md transition w-full">
         <div className="flex gap-4 items-center">
           <img src={book.cover} alt={book.title} className="w-16 h-16 rounded-xl object-cover flex-none" />
           <div className="min-w-0">
@@ -145,7 +136,7 @@ function AudioBookTile({ book, onOpen }) {
   );
 }
 
-function TrackRow({ track, isActive, isPlaying, onToggle, t }) {
+function TrackRow({ track, isActive, isPlaying, onToggle }) {
   const activeAndPlaying = isActive && isPlaying;
 
   return (
@@ -156,29 +147,21 @@ function TrackRow({ track, isActive, isPlaying, onToggle, t }) {
         </div>
 
         <div className="flex items-center gap-2 flex-none">
-        <Button
-  variant="outline"
-  size="sm"
-  onClick={() => onToggle(track)}
-  type="button"
-  aria-label={activeAndPlaying ? "Pause" : "Play"}
->
-  {activeAndPlaying ? (
-    <Pause className="w-4 h-4" />
-  ) : (
-    <Play className="w-4 h-4" />
-  )}
-</Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onToggle(track)}
+            type="button"
+            aria-label={activeAndPlaying ? "Pause" : "Play"}
+          >
+            {activeAndPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+          </Button>
 
           {track.src && track.src !== "#" && (
-            <a href={track.src} download className="inline-flex" aria-label={`${t("download")}: ${track.title}`}>
-             <Button
-  size="sm"
-  type="button"
-  aria-label="Download"
->
-  <Download className="w-4 h-4" />
-</Button>
+            <a href={track.src} download className="inline-flex" aria-label={`Download: ${track.title}`}>
+              <Button size="sm" type="button" aria-label="Download">
+                <Download className="w-4 h-4" />
+              </Button>
             </a>
           )}
         </div>
@@ -350,6 +333,9 @@ export default function App() {
     }
   }, [audioBookId, stopAudio]);
 
+  // ✅ inline styles that override any hidden mx-auto inside components
+  const pinLeftStyle = { marginLeft: 0, marginRight: "auto" };
+
   return (
     <div className="min-h-screen flex flex-col">
       <audio ref={audioRef} preload="none" />
@@ -403,7 +389,7 @@ export default function App() {
         </nav>
       </header>
 
-     <main className="flex-1 max-w-6xl mx-auto px-4 py-8 space-y-10 text-left">
+      <main className="flex-1 max-w-6xl mx-auto px-4 py-8 space-y-10 text-left">
         {/* ABOUT */}
         {tab === "about" && (
           <section className="grid md:grid-cols-3 gap-8 items-start">
@@ -417,22 +403,12 @@ export default function App() {
               <div className="text-sm space-y-1">
                 <p>E-mail: genndybogdanov@gmail.com</p>
                 <p>
-                  <a
-                    className="underline hover:text-slate-900"
-                    href="https://medium.com/@gbogdanov"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  <a className="underline hover:text-slate-900" href="https://medium.com/@gbogdanov" target="_blank" rel="noopener noreferrer">
                     Medium
                   </a>
                 </p>
                 <p>
-                  <a
-                    className="underline hover:text-slate-900"
-                    href="https://substack.com/@gbogdanov"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  <a className="underline hover:text-slate-900" href="https://substack.com/@gbogdanov" target="_blank" rel="noopener noreferrer">
                     Substack
                   </a>
                 </p>
@@ -452,22 +428,12 @@ export default function App() {
                   <h3 className="text-xl font-semibold mb-2">{t("learn_with_me")}</h3>
                   <ul className="space-y-2 text-slate-700">
                     <li>
-                      <a
-                        className="underline hover:text-slate-900"
-                        href="https://preply.com/en/?pref=ODkzOTkyOQ==&id=1759522486.457389&ep=w1"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
+                      <a className="underline hover:text-slate-900" href="https://preply.com/en/?pref=ODkzOTkyOQ==&id=1759522486.457389&ep=w1" target="_blank" rel="noopener noreferrer">
                         Preply
                       </a>
                     </li>
                     <li>
-                      <a
-                        className="underline hover:text-slate-900"
-                        href="https://www.italki.com/affshare?ref=af11775706"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
+                      <a className="underline hover:text-slate-900" href="https://www.italki.com/affshare?ref=af11775706" target="_blank" rel="noopener noreferrer">
                         italki
                       </a>
                     </li>
@@ -479,55 +445,52 @@ export default function App() {
         )}
 
         {/* PRODUCTS */}
-        {/* PRODUCTS */}
-{tab === "products" && (
-  <section className="space-y-6">
-    {/* Search is ALWAYS in the same place */}
-<div className="w-full sm:max-w-md text-left self-start mx-0">
-  <Input
-    placeholder={t("products_search")}
-    value={query}
-    onChange={(e) => setQuery(e.target.value)}
-    className="block w-full !mx-0"
-  />
-</div>
+        {tab === "products" && (
+          <section className="space-y-6">
+            {/* Search pinned left ALWAYS */}
+            <div className="flex w-full justify-start">
+              <div className="w-full sm:max-w-md" style={pinLeftStyle}>
+                <Input
+                  placeholder={t("products_search")}
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  className="block w-full"
+                  style={pinLeftStyle}
+                />
+              </div>
+            </div>
 
+            {/* Products grid below */}
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredProducts.map((p) => (
+                <ProductCard key={p.id} item={p} t={t} />
+              ))}
+            </div>
 
-    {/* Products grid starts BELOW */}
-    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      {filteredProducts.map((p) => (
-        <ProductCard key={p.id} item={p} t={t} />
-      ))}
-    </div>
-
-    {/* Optional: show a friendly message when nothing found */}
-    {filteredProducts.length === 0 && (
-      <p className="text-sm text-slate-500">No results.</p>
-    )}
-  </section>
-)}
+            {filteredProducts.length === 0 && <p className="text-sm text-slate-500">No results.</p>}
+          </section>
+        )}
 
         {/* AUDIO */}
         {tab === "free-audio" && (
           <section className="space-y-6">
-           {!audioBookId && (
-  <div className="space-y-4">
-    {/* Title */}
-    <p className="text-slate-700 text-left">{t("audio_choose")}</p>
+            {!audioBookId && (
+              <div className="space-y-4">
+                <p className="text-slate-700">{t("audio_choose")}</p>
 
-    {/* Grid pinned to the LEFT */}
-<div className="w-full text-left">
-  <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-6 items-start justify-items-start">
-        {AUDIO_BOOKS.map((book) => (
-          <div key={book.id} className="w-full">
-            <AudioBookTile book={book} onOpen={setAudioBookId} />
-          </div>
-        ))}
-      </div>
-    </div>
-  </div>
-)}
-            
+                {/* Grid pinned left ALWAYS */}
+                <div className="flex w-full justify-start">
+                  <div className="grid w-full grid-cols-1 lg:grid-cols-2 gap-6 justify-items-start">
+                    {AUDIO_BOOKS.map((book) => (
+                      <div key={book.id} className="w-full justify-self-start" style={pinLeftStyle}>
+                        <AudioBookTile book={book} onOpen={setAudioBookId} />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
             {audioBookId && selectedBook && (
               <>
                 <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
@@ -563,7 +526,6 @@ export default function App() {
                         isActive={currentTrack?.id === tr.id}
                         isPlaying={isPlaying}
                         onToggle={toggleTrack}
-                        t={t}
                       />
                     ))}
                   </div>
