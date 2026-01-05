@@ -341,7 +341,7 @@ export default function App() {
       <audio ref={audioRef} preload="none" />
 
       <header className="sticky top-0 z-50 bg-white/70 backdrop-blur border-b">
-        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+        <div className="w-full px-4 py-3 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
             <img
               src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=240&auto=format&fit=crop"
@@ -365,7 +365,7 @@ export default function App() {
         </div>
 
         <nav className="border-t">
-          <div className="max-w-6xl mx-auto px-4 py-3 flex flex-wrap gap-3 md:justify-between">
+          <div className="w-full px-4 py-3 flex flex-wrap gap-3 md:justify-between">
             <div className="flex flex-wrap gap-3 w-full md:w-auto justify-center">
               <NavPill active={tab === "about"} onClick={() => setTab("about")}>
                 {t("nav_about")}
@@ -389,7 +389,7 @@ export default function App() {
         </nav>
       </header>
 
-      <main className="flex-1 max-w-6xl mx-auto px-4 py-8 space-y-10 text-left">
+      <main className="flex-1 w-full px-4 py-8 space-y-10 text-left">
         {/* ABOUT */}
         {tab === "about" && (
           <section className="grid md:grid-cols-3 gap-8 items-start">
