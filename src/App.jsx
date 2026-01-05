@@ -12,9 +12,9 @@ const PRODUCTS = [
     title: "Russian Short Stories by Leo Tolstoy",
     kind: "A1-B1 Level",
     price: 12.99,
-    image: "Product_Leo.png",
+    image: "/Product_Leo.png", // ✅ public/Product_Leo.png
     externalUrl: "https://amazon.example/your-book",
-    marketplace: "amazon", // <- for automatic label
+    marketplace: "amazon",
     badges: ["RU-EN", "Paper Book", "Audio"],
     description:
       "Word-by-word translation, stress marks, grammar explanations, exercises, audio included.",
@@ -25,7 +25,7 @@ const AUDIO_BOOKS = [
   {
     id: "tolstoy-short-stories",
     title: "Russian Short Stories",
-    cover: "Audio_External_Leo.png",
+    cover: "/Audio_External_Leo.png", // ✅ public/Audio_External_Leo.png
     description: "by Leo Tolstoy",
     tracks: [
       { id: "kostochka", title: "Косточка (The Pit)", src: "/audio/kostochka.mp3" },
@@ -41,26 +41,23 @@ const AUDIO_BOOKS = [
 // ================== I18N ==================
 const I18N = {
   en: {
-    // Header / nav
     name: "Genndy Bogdanov",
     tagline: "",
     nav_about: "About",
     nav_products: "Store",
     nav_audio: "Audiobooks",
 
-    // About
     about_title: "Hi! I’m Genndy — a Russian language teacher and the author of learning materials",
-    about_p1: "I help English speakers read Russian faster and with confidence. 1000+ lessons taught, high rating.",
+    about_p1:
+      "I help English speakers read Russian faster and with confidence. 1000+ lessons taught, high rating.",
     contacts: "Contacts",
     learn_with_me: "Learn Russian with me on:",
 
-    // Products
     products_search: "Search by title or description…",
     buy_amazon: "Buy on Amazon",
     buy_etsy: "Buy on Etsy",
     buy_generic: "Buy",
 
-    // Audio list
     audio_choose: "Choose a book to listen to or download",
     back: "Back",
     download_all: "Download all",
@@ -70,26 +67,22 @@ const I18N = {
   },
 
   ru: {
-    // Header / nav
     name: "Genndy Bogdanov",
     nav_about: "Обо мне",
     nav_products: "Магазин",
     nav_audio: "Аудиокниги",
 
-    // About
     about_title: "Всем привет! Я — Геннадий. Преподаватель русского языка и автор учебных материалов.",
     about_p1:
       "Я помогаю англоговорящим быстрее и увереннее читать по-русски. 1000+ проведённых уроков, высокий рейтинг.",
     contacts: "Контакты",
     learn_with_me: "Учи русский язык со мной на платформах:",
 
-    // Products
     products_search: "Поиск по названию или описанию…",
     buy_amazon: "Купить на Amazon",
     buy_etsy: "Купить на Etsy",
     buy_generic: "Купить",
 
-    // Audio list
     audio_choose: "Выберите книгу, чтобы послушать или загрузить материалы",
     back: "Назад",
     download_all: "Скачать всё",
@@ -169,18 +162,11 @@ function TrackRow({ track, isActive, isPlaying, onToggle, t }) {
           </Button>
 
           {track.src && track.src !== "#" && (
-            <a
-              href={track.src}
-              download
-              className="inline-flex items-center justify-center rounded-md"
-              aria-label={`${t("download")}: ${track.title}`}
-            >
-              <span className="inline-flex">
-                <Button size="sm" className="flex items-center gap-2" type="button">
-                  <Download className="w-4 h-4" />
-                  {t("download")}
-                </Button>
-              </span>
+            <a href={track.src} download className="inline-flex" aria-label={`${t("download")}: ${track.title}`}>
+              <Button size="sm" className="flex items-center gap-2" type="button">
+                <Download className="w-4 h-4" />
+                {t("download")}
+              </Button>
             </a>
           )}
         </div>
@@ -217,14 +203,7 @@ function ProductCard({ item, t }) {
         <div className="flex items-center justify-between pt-4 mt-auto">
           <span className="text-xl font-semibold">{currencyUSD(item.price)}</span>
 
-          {/* Safe external link (no window.open) */}
-          <a
-            href={item.externalUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex"
-            aria-label={productBuyLabel(item, t)}
-          >
+          <a href={item.externalUrl} target="_blank" rel="noopener noreferrer" className="inline-flex">
             <Button variant="outline" className="flex items-center gap-1" type="button">
               <ExternalLink className="w-4 h-4" />
               <span>{productBuyLabel(item, t)}</span>
@@ -238,7 +217,6 @@ function ProductCard({ item, t }) {
 
 // ================== APP ==================
 export default function App() {
-  // language: auto-detect, fallback EN
   const detectLanguage = () => {
     try {
       const saved = localStorage.getItem("lang");
@@ -264,12 +242,11 @@ export default function App() {
 
   const [tab, setTab] = useState("about");
   const [query, setQuery] = useState("");
-
   const [audioBookId, setAudioBookId] = useState(null);
 
   // One global audio player
   const audioRef = useRef(null);
-  const [currentTrack, setCurrentTrack] = useState(null); // track object
+  const [currentTrack, setCurrentTrack] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
   const filteredProducts = useMemo(() => {
@@ -282,7 +259,6 @@ export default function App() {
 
   const selectedBook = useMemo(() => AUDIO_BOOKS.find((b) => b.id === audioBookId) || null, [audioBookId]);
 
-  // Sync state with audio events
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
@@ -306,7 +282,6 @@ export default function App() {
     const audio = audioRef.current;
     if (!audio) return;
     audio.pause();
-    // not strictly required, but clears buffer and prevents some edge cases
     audio.currentTime = 0;
   }, []);
 
@@ -315,13 +290,11 @@ export default function App() {
       const audio = audioRef.current;
       if (!audio || !track?.src || track.src === "#") return;
 
-      // If same track and currently playing -> pause
       if (currentTrack?.id === track.id && !audio.paused) {
         audio.pause();
         return;
       }
 
-      // If switching tracks
       if (currentTrack?.id !== track.id) {
         audio.src = track.src;
         setCurrentTrack(track);
@@ -330,7 +303,6 @@ export default function App() {
       try {
         await audio.play();
       } catch (e) {
-        // Autoplay restrictions or other playback errors
         console.warn("Audio play failed:", e);
       }
     },
@@ -351,7 +323,6 @@ export default function App() {
     });
   }
 
-  // If user leaves audio tab or goes back to list, stop playing
   useEffect(() => {
     if (tab !== "free-audio") {
       stopAudio();
@@ -369,12 +340,9 @@ export default function App() {
 
   return (
     <div className="min-h-screen">
-      {/* Single global audio element */}
       <audio ref={audioRef} preload="none" />
 
-      {/* Header */}
       <header className="sticky top-0 z-50 bg-white/70 backdrop-blur border-b">
-        {/* top row */}
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
             <img
@@ -388,7 +356,6 @@ export default function App() {
             </div>
           </div>
 
-          {/* language pills (NavButton style) */}
           <div className="flex items-center gap-2 shrink-0">
             <NavPill size="sm" active={lang === "ru"} onClick={() => switchLang("ru")}>
               RU
@@ -399,7 +366,6 @@ export default function App() {
           </div>
         </div>
 
-        {/* nav row */}
         <nav className="border-t">
           <div className="max-w-6xl mx-auto px-4 py-3 flex flex-wrap gap-3 md:justify-between">
             <div className="flex flex-wrap gap-3 w-full md:w-auto justify-center">
@@ -425,7 +391,6 @@ export default function App() {
         </nav>
       </header>
 
-      {/* Content */}
       <main className="max-w-6xl mx-auto px-4 py-8 space-y-10">
         {/* ABOUT */}
         {tab === "about" && (
@@ -466,7 +431,7 @@ export default function App() {
               <div className="grid md:grid-cols-3 gap-6 p-5 items-center">
                 <div>
                   <img
-                    src="Portrait_1.jpg"
+                    src="/Portrait_1.jpg"
                     alt="Portrait"
                     className="w-auto h-40 md:h-48 mx-auto object-cover rounded-2xl shadow aspect-[3/4]"
                   />
@@ -501,33 +466,31 @@ export default function App() {
           </section>
         )}
 
-        {/* PRODUCTS */}
-<section className="space-y-6">
-  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-    {/* SEARCH */}
-    <div className="lg:col-span-1">
-      <Input
-        placeholder={t("products_search")}
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        className="w-full"
-      />
-    </div>
-  </div>
+        {/* PRODUCTS ✅ fixed: search tile matches card width */}
+        {tab === "products" && (
+          <section className="space-y-6">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div>
+                <Input
+                  placeholder={t("products_search")}
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  className="w-full"
+                />
+              </div>
 
-  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-    {filteredProducts.map((p) => (
-      <ProductCard key={p.id} item={p} t={t} />
-    ))}
-  </div>
-</section>
+              {filteredProducts.map((p) => (
+                <ProductCard key={p.id} item={p} t={t} />
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* AUDIO */}
         {tab === "free-audio" && (
           <section className="space-y-6">
             {!audioBookId && (
               <>
-                {/* removed audio_title completely */}
                 <p className="text-slate-700">{t("audio_choose")}</p>
 
                 <div className="grid md:grid-cols-2 gap-4">
@@ -542,12 +505,7 @@ export default function App() {
               <>
                 <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                   <div className="order-1 flex w-full flex-wrap gap-3 justify-end md:order-2 md:w-auto">
-                    <Button
-                      variant="outline"
-                      onClick={() => setAudioBookId(null)}
-                      className="flex gap-2"
-                      type="button"
-                    >
+                    <Button variant="outline" onClick={() => setAudioBookId(null)} className="flex gap-2" type="button">
                       ← {t("back")}
                     </Button>
 
