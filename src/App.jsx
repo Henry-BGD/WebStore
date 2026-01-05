@@ -132,7 +132,7 @@ function productBuyLabel(item, t) {
 function AudioBookTile({ book, onOpen }) {
   return (
     <button onClick={() => onOpen(book.id)} className="w-full text-left" type="button">
-      <Card className="p-5 border border-slate-200 hover:shadow-md transition w-full">
+      <Card className="p-5 border border-slate-200 hover:shadow-md transition w-full !mx-0">
         <div className="flex gap-4 items-center">
           <img src={book.cover} alt={book.title} className="w-16 h-16 rounded-xl object-cover flex-none" />
           <div className="min-w-0">
