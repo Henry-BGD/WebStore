@@ -60,14 +60,14 @@ const I18N = {
 
     // Products
     products_title: "My products",
-    products_search: "Search by title, format, description…",
+    products_search: "Search by title or description…",
     buy_amazon: "Buy on Amazon",
     buy_etsy: "Buy on Etsy",
     buy_generic: "Buy",
 
     // Audio list
     //audio_title: "Audiobooks",
-    audio_choose: "Choose a book to listen or download",
+    audio_choose: "Choose a book to listen to or download",
     back: "Back",
     download_all: "Download all",
     //listen: "Listen",
@@ -83,7 +83,7 @@ const I18N = {
     name: "Genndy Bogdanov",
     //tagline: "Учитель русского языка",
     nav_about: "Обо мне",
-    nav_products: "Перейти к товарам",
+    nav_products: "Магазин",
     nav_audio: "Аудиокниги",
 
     // About
@@ -97,14 +97,14 @@ const I18N = {
 
     // Products
     products_title: "Мои товары",
-    products_search: "Поиск по названию, формату, описанию…",
+    products_search: "Поиск по названию или описанию…",
     buy_amazon: "Купить на Amazon",
     buy_etsy: "Купить на Etsy",
     buy_generic: "Купить",
 
     // Audio list
     //audio_title: "Аудиокниги",
-    audio_choose: "Выберите книгу, чтобы послушать или загрузить материалы.",
+    audio_choose: "Выберите книгу, чтобы послушать или загрузить материалы",
     back: "Назад",
     download_all: "Скачать всё",
     //listen: "Слушать",
