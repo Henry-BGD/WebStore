@@ -138,7 +138,7 @@ function productBuyLabel(item, t) {
 function AudioBookTile({ book, onOpen }) {
   return (
     <button onClick={() => onOpen(book.id)} className="w-full text-left" type="button">
-      <Card className="p-4 border border-slate-200 hover:shadow transition">
+      <Card className="p-5 border border-slate-200 hover:shadow-md transition w-full">
         <div className="flex gap-4 items-center">
           <img src={book.cover} alt={book.title} className="w-16 h-16 rounded-xl object-cover flex-none" />
           <div className="min-w-0">
@@ -506,18 +506,24 @@ export default function App() {
         {/* AUDIO */}
         {tab === "free-audio" && (
           <section className="space-y-6">
-            {!audioBookId && (
-              <>
-                <p className="text-slate-700">{t("audio_choose")}</p>
+           {!audioBookId && (
+  <div className="space-y-4">
+    {/* Title */}
+    <p className="text-slate-700">{t("audio_choose")}</p>
 
-                <div className="grid md:grid-cols-2 gap-4">
-                  {AUDIO_BOOKS.map((book) => (
-                    <AudioBookTile key={book.id} book={book} onOpen={setAudioBookId} />
-                  ))}
-                </div>
-              </>
-            )}
-
+    {/* Left-aligned container, wider cards */}
+    <div className="w-full">
+      <div className="grid gap-4 md:grid-cols-2 justify-items-start">
+        {AUDIO_BOOKS.map((book) => (
+          <div key={book.id} className="w-full max-w-xl">
+            <AudioBookTile book={book} onOpen={setAudioBookId} />
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+)}
+            
             {audioBookId && selectedBook && (
               <>
                 <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
