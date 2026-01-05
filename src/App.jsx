@@ -61,9 +61,6 @@ const I18N = {
     audio_choose: "Choose a book to listen to or download",
     back: "Back",
     download_all: "Download all",
-    listen: "Listen",
-    pause: "Pause",
-    download: "Download",
   },
 
   ru: {
@@ -86,9 +83,6 @@ const I18N = {
     audio_choose: "Выберите книгу, чтобы послушать или загрузить материалы",
     back: "Назад",
     download_all: "Скачать всё",
-    listen: "Слушать",
-    pause: "Пауза",
-    download: "Скачать",
   },
 };
 
@@ -162,23 +156,29 @@ function TrackRow({ track, isActive, isPlaying, onToggle, t }) {
         </div>
 
         <div className="flex items-center gap-2 flex-none">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onToggle(track)}
-            className="flex items-center gap-2"
-            type="button"
-          >
-            {activeAndPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-            {activeAndPlaying ? t("pause") : t("listen")}
-          </Button>
+        <Button
+  variant="outline"
+  size="sm"
+  onClick={() => onToggle(track)}
+  type="button"
+  aria-label={activeAndPlaying ? "Pause" : "Play"}
+>
+  {activeAndPlaying ? (
+    <Pause className="w-4 h-4" />
+  ) : (
+    <Play className="w-4 h-4" />
+  )}
+</Button>
 
           {track.src && track.src !== "#" && (
             <a href={track.src} download className="inline-flex" aria-label={`${t("download")}: ${track.title}`}>
-              <Button size="sm" className="flex items-center gap-2" type="button">
-                <Download className="w-4 h-4" />
-                {t("download")}
-              </Button>
+             <Button
+  size="sm"
+  type="button"
+  aria-label="Download"
+>
+  <Download className="w-4 h-4" />
+</Button>
             </a>
           )}
         </div>
@@ -509,13 +509,12 @@ export default function App() {
            {!audioBookId && (
   <div className="space-y-4">
     {/* Title */}
-    <p className="text-slate-700">{t("audio_choose")}</p>
-
+    <p className="text-slate-700 text-left">{t("audio_choose")}</p>
     {/* Left-aligned container, wider cards */}
     <div className="w-full">
-      <div className="grid gap-4 md:grid-cols-2 justify-items-start">
+      <div className="grid gap-6 md:grid-cols-2 justify-items-start">
         {AUDIO_BOOKS.map((book) => (
-          <div key={book.id} className="w-full max-w-xl">
+          <div key={book.id} className="w-full">
             <AudioBookTile book={book} onOpen={setAudioBookId} />
           </div>
         ))}
