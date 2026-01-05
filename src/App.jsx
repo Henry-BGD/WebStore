@@ -12,7 +12,7 @@ const PRODUCTS = [
     title: "Russian Short Stories by Leo Tolstoy",
     kind: "A1-B1 Level",
     price: 12.99,
-    image: "public/Product_Leo.png",
+    image: "Product_Leo.png",
     externalUrl: "https://amazon.example/your-book",
     marketplace: "amazon", // <- for automatic label
     badges: ["RU-EN", "Paper Book", "Audio"],
@@ -25,7 +25,7 @@ const AUDIO_BOOKS = [
   {
     id: "tolstoy-short-stories",
     title: "Russian Short Stories",
-    cover: "public/Audio_External_Leo.png",
+    cover: "Audio_External_Leo.png",
     description: "by Leo Tolstoy",
     tracks: [
       { id: "kostochka", title: "Косточка (The Pit)", src: "/audio/kostochka.mp3" },
@@ -466,7 +466,7 @@ export default function App() {
               <div className="grid md:grid-cols-3 gap-6 p-5 items-center">
                 <div>
                   <img
-                    src="public/Portrait_1.jpg"
+                    src="Portrait_1.jpg"
                     alt="Portrait"
                     className="w-auto h-40 md:h-48 mx-auto object-cover rounded-2xl shadow aspect-[3/4]"
                   />
@@ -506,7 +506,7 @@ export default function App() {
           <section className="space-y-6">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
               {/* removed products_title completely */}
-              <div className="flex items-center gap-2 w-full justify-end">
+              <div className="flex items-center gap-2 w-full">
                 <Input
                   placeholder={t("products_search")}
                   value={query}
