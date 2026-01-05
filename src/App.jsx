@@ -502,27 +502,25 @@ export default function App() {
         )}
 
         {/* PRODUCTS */}
-        {tab === "products" && (
-          <section className="space-y-6">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-              {/* removed products_title completely */}
-              <div className="flex items-center gap-2 w-full">
-                <Input
-                  placeholder={t("products_search")}
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  className="w-full md:w-80"
-                />
-              </div>
-            </div>
+<section className="space-y-6">
+  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    {/* SEARCH */}
+    <div className="lg:col-span-1">
+      <Input
+        placeholder={t("products_search")}
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        className="w-full"
+      />
+    </div>
+  </div>
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredProducts.map((p) => (
-                <ProductCard key={p.id} item={p} t={t} />
-              ))}
-            </div>
-          </section>
-        )}
+  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    {filteredProducts.map((p) => (
+      <ProductCard key={p.id} item={p} t={t} />
+    ))}
+  </div>
+</section>
 
         {/* AUDIO */}
         {tab === "free-audio" && (
