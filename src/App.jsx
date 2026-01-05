@@ -131,7 +131,7 @@ function productBuyLabel(item, t) {
 
 function AudioBookTile({ book, onOpen }) {
   return (
-    <button onClick={() => onOpen(book.id)} className="w-full text-left" type="button">
+    <button onClick={() => onOpen(book.id)} className="block w-full text-left" type="button">
       <Card className="p-5 border border-slate-200 hover:shadow-md transition w-full !mx-0">
         <div className="flex gap-4 items-center">
           <img src={book.cover} alt={book.title} className="w-16 h-16 rounded-xl object-cover flex-none" />
@@ -483,14 +483,14 @@ export default function App() {
 {tab === "products" && (
   <section className="space-y-6">
     {/* Search is ALWAYS in the same place */}
-    <div className="w-full sm:max-w-md">
-<input
-  placeholder={t("products_search")}
-  value={query}
-  onChange={(e) => setQuery(e.target.value)}
-  className="w-full sm:max-w-md border border-slate-300 rounded-md px-3 py-2"
-/>
-    </div>
+   <div className="w-full sm:max-w-md text-left">
+  <input
+    placeholder={t("products_search")}
+    value={query}
+    onChange={(e) => setQuery(e.target.value)}
+    className="block w-full border border-slate-300 rounded-md px-3 py-2"
+  />
+</div>
 
     {/* Products grid starts BELOW */}
     <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -516,7 +516,7 @@ export default function App() {
 
     {/* Grid pinned to the LEFT */}
     <div className="w-full flex justify-start">
-      <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-6 items-start justify-start">
+      <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-6 items-start justify-items-start">
         {AUDIO_BOOKS.map((book) => (
           <div key={book.id} className="w-full">
             <AudioBookTile book={book} onOpen={setAudioBookId} />
