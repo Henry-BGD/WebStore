@@ -483,12 +483,12 @@ export default function App() {
 {tab === "products" && (
   <section className="space-y-6">
     {/* Search is ALWAYS in the same place */}
-<div className="w-full sm:max-w-md text-left">
+<div className="w-full sm:max-w-md text-left self-start mx-0">
   <Input
     placeholder={t("products_search")}
     value={query}
     onChange={(e) => setQuery(e.target.value)}
-    className="w-full"
+    className="block w-full !mx-0"
   />
 </div>
 
@@ -516,8 +516,8 @@ export default function App() {
     <p className="text-slate-700 text-left">{t("audio_choose")}</p>
 
     {/* Grid pinned to the LEFT */}
-    <div className="w-full flex justify-start">
-      <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-6 items-start justify-items-start">
+<div className="w-full text-left">
+  <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-6 items-start justify-items-start">
         {AUDIO_BOOKS.map((book) => (
           <div key={book.id} className="w-full">
             <AudioBookTile book={book} onOpen={setAudioBookId} />
