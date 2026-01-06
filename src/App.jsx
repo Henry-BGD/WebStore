@@ -157,7 +157,11 @@ function EmptyState({ title, subtitle }) {
 
 function AudioBookTile({ book, onOpen }) {
   return (
-    <button onClick={() => onOpen(book.id)} className="w-full text-left" type="button">
+    <button
+  onClick={() => onOpen(book.id)}
+  className="w-full max-w-sm text-left"
+  type="button"
+>
       <Card className="p-4 border border-slate-200 hover:shadow transition">
         <div className="flex gap-4 items-center">
           <img src={book.cover} alt={book.title} className="w-16 h-16 rounded-xl object-cover flex-none" />
@@ -563,12 +567,12 @@ export default function App() {
 
               {/* Results */}
               {filteredProducts.length === 0 ? (
-                <div className="sm:col-span-2 lg:col-span-3">
-                  <EmptyState title={t("not_found")} subtitle={t("try_another")} />
-                </div>
-              ) : (
-                filteredProducts.map((p) => <ProductCard key={p.id} item={p} t={t} />)
-              )}
+  <div>
+    <EmptyState title={t("not_found")} subtitle={t("try_another")} />
+  </div>
+) : (
+  filteredProducts.map((p) => <ProductCard key={p.id} item={p} t={t} />)
+)}
             </div>
           </section>
         )}
@@ -583,7 +587,7 @@ export default function App() {
                 {AUDIO_BOOKS.length === 0 ? (
                   <EmptyState title={t("audio_empty")} />
                 ) : (
-                  <div className="grid md:grid-cols-2 gap-4">
+                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {AUDIO_BOOKS.map((book) => (
                       <AudioBookTile key={book.id} book={book} onOpen={setAudioBookId} />
                     ))}
