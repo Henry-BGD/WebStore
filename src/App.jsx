@@ -351,7 +351,7 @@ export default function App() {
   }, [audioBookId, stopAudio]);
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen">
       <audio ref={audioRef} preload="none" />
 
       <header className="sticky top-0 z-50 bg-white/70 backdrop-blur border-b">
@@ -403,7 +403,7 @@ export default function App() {
         </nav>
       </header>
 
-      <main className="flex-1 max-w-6xl mx-auto px-4 py-8 space-y-10">
+      <main className="max-w-6xl mx-auto px-4 py-8 space-y-10">
         {/* ABOUT */}
         {tab === "about" && (
           <section className="grid md:grid-cols-3 gap-8 items-start">
