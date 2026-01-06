@@ -350,58 +350,56 @@ export default function App() {
     }
   }, [audioBookId, stopAudio]);
 
-  return (
-    <div className="min-h-screen">
-      <audio ref={audioRef} preload="none" />
+return (
+  <div className="min-h-screen">
+    {/* GLOBAL AUDIO */}
+    <audio ref={audioRef} preload="none" />
 
-      <header className="sticky top-0 z-50 bg-white/70 backdrop-blur border-b">
-        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3 min-w-0">
-            <img
-              src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=240&auto=format&fit=crop"
-              alt="logo"
-              className="w-9 h-9 rounded-xl"
-            />
-            <div className="min-w-0">
-              <p className="font-semibold leading-tight truncate">{t("name")}</p>
-              <p className="text-xs opacity-70 truncate">{t("tagline")}</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 shrink-0">
-            <NavPill size="sm" active={lang === "ru"} onClick={() => switchLang("ru")}>
-              RU
-            </NavPill>
-            <NavPill size="sm" active={lang === "en"} onClick={() => switchLang("en")}>
-              ENG
-            </NavPill>
+    {/* HEADER */}
+    <header className="sticky top-0 z-50 bg-white/70 backdrop-blur border-b">
+      <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3 min-w-0">
+          <img
+            src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=240&auto=format&fit=crop"
+            alt="logo"
+            className="w-9 h-9 rounded-xl"
+          />
+          <div className="min-w-0">
+            <p className="font-semibold leading-tight truncate">{t("name")}</p>
+            <p className="text-xs opacity-70 truncate">{t("tagline")}</p>
           </div>
         </div>
 
-        <nav className="border-t">
-          <div className="max-w-6xl mx-auto px-4 py-3 flex flex-wrap gap-3 md:justify-between">
-            <div className="flex flex-wrap gap-3 w-full md:w-auto justify-center">
-              <NavPill active={tab === "about"} onClick={() => setTab("about")}>
-                {t("nav_about")}
-              </NavPill>
+        <div className="flex items-center gap-2 shrink-0">
+          <NavPill size="sm" active={lang === "ru"} onClick={() => switchLang("ru")}>
+            RU
+          </NavPill>
+          <NavPill size="sm" active={lang === "en"} onClick={() => switchLang("en")}>
+            ENG
+          </NavPill>
+        </div>
+      </div>
 
-              <NavPill active={tab === "products"} onClick={() => setTab("products")}>
-                {t("nav_products")}
-              </NavPill>
-
-              <NavPill
-                active={tab === "free-audio"}
-                onClick={() => {
-                  setTab("free-audio");
-                  setAudioBookId(null);
-                }}
-              >
-                {t("nav_audio")}
-              </NavPill>
-            </div>
-          </div>
-        </nav>
-      </header>
+      <nav className="border-t">
+        <div className="max-w-6xl mx-auto px-4 py-3 flex flex-wrap gap-3 justify-center">
+          <NavPill active={tab === "about"} onClick={() => setTab("about")}>
+            {t("nav_about")}
+          </NavPill>
+          <NavPill active={tab === "products"} onClick={() => setTab("products")}>
+            {t("nav_products")}
+          </NavPill>
+          <NavPill
+            active={tab === "free-audio"}
+            onClick={() => {
+              setTab("free-audio");
+              setAudioBookId(null);
+            }}
+          >
+            {t("nav_audio")}
+          </NavPill>
+        </div>
+      </nav>
+    </header>
 
       <main className="max-w-6xl mx-auto px-4 py-8 space-y-10">
         {/* ABOUT */}
@@ -564,9 +562,11 @@ export default function App() {
         )}
       </main>
 
-      <footer className="py-6 text-center text-xs text-slate-500 border-t">
+      <footer className="fixed bottom-0 left-0 right-0 z-50 border-t bg-white/90 backdrop-blur">
+      <div className="max-w-6xl mx-auto px-4 py-4 text-center text-xs text-slate-500">
         © {new Date().getFullYear()} Genndy Bogdanov
-      </footer>
+      </div>
+    </footer>
     </div>
   );
 }
