@@ -3,7 +3,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/Card.j
 import { Button } from "./components/ui/Button.jsx";
 import { Input } from "./components/ui/Input.jsx";
 import { Badge } from "./components/ui/Badge.jsx";
-import { ExternalLink, Download, Play, Pause } from "lucide-react";
+import { ExternalLink, Download, Play, Pause, X, Search } from "lucide-react";
+
+// ================== LAYOUT ==================
+/**
+ * Variant B: column is NOT centered; it is slightly shifted left on desktop.
+ * - no mx-auto
+ * - adaptive left margin
+ */
+const CONTAINER = "w-full max-w-6xl px-4 sm:ml-6 lg:ml-10";
+const TOPBAR_H = "min-h-[64px]";
 
 // ================== DATA ==================
 const PRODUCTS = [
@@ -16,8 +25,7 @@ const PRODUCTS = [
     externalUrl: "https://amazon.example/your-book",
     marketplace: "amazon",
     badges: ["RU-EN", "Paper Book", "Audio"],
-    description:
-      "Word-by-word translation, stress marks, grammar explanations, exercises, audio included.",
+    description: "Word-by-word translation, stress marks, grammar explanations, exercises, audio included.",
   },
 ];
 
@@ -48,17 +56,20 @@ const I18N = {
     nav_audio: "Audiobooks",
 
     about_title: "Hi! I’m Genndy — a Russian language teacher and the author of learning materials",
-    about_p1:
-      "I help English speakers read Russian faster and with confidence. 1000+ lessons taught, high rating.",
+    about_p1: "I help English speakers read Russian faster and with confidence. 1000+ lessons taught, high rating.",
     contacts: "Contacts",
     learn_with_me: "Learn Russian with me on:",
 
     products_search: "Search by title or description…",
+    search_clear: "Clear",
+    not_found: "Nothing found",
+    try_another: "Try another search query.",
     buy_amazon: "Buy on Amazon",
     buy_etsy: "Buy on Etsy",
     buy_generic: "Buy",
 
     audio_choose: "Choose a book to listen to or download",
+    audio_empty: "No audiobooks available yet.",
     back: "Back",
     download_all: "Download all",
     listen: "Listen",
@@ -68,22 +79,26 @@ const I18N = {
 
   ru: {
     name: "Genndy Bogdanov",
+    tagline: "",
     nav_about: "Обо мне",
     nav_products: "Магазин",
     nav_audio: "Аудиокниги",
 
     about_title: "Всем привет! Я — Геннадий. Преподаватель русского языка и автор учебных материалов.",
-    about_p1:
-      "Я помогаю англоговорящим быстрее и увереннее читать по-русски. 1000+ проведённых уроков, высокий рейтинг.",
+    about_p1: "Я помогаю англоговорящим быстрее и увереннее читать по-русски. 1000+ проведённых уроков, высокий рейтинг.",
     contacts: "Контакты",
     learn_with_me: "Учи русский язык со мной на платформах:",
 
     products_search: "Поиск по названию или описанию…",
+    search_clear: "Очистить",
+    not_found: "Не найдено",
+    try_another: "Попробуйте другой запрос.",
     buy_amazon: "Купить на Amazon",
     buy_etsy: "Купить на Etsy",
     buy_generic: "Купить",
 
     audio_choose: "Выберите книгу, чтобы послушать или загрузить материалы",
+    audio_empty: "Пока нет доступных аудиокниг.",
     back: "Назад",
     download_all: "Скачать всё",
     listen: "Слушать",
@@ -102,15 +117,9 @@ function NavPill({ active, onClick, children, size = "md" }) {
       type="button"
       className={[
         padding,
-
-        // base
         "rounded-full border transition-all duration-200 select-none",
         "active:scale-[0.97]",
-
-        // accessibility
         "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300",
-
-        // states
         active
           ? "bg-blue-600 text-white border-blue-600 shadow-md font-semibold"
           : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:border-slate-300",
@@ -133,6 +142,17 @@ function productBuyLabel(item, t) {
   if (item.marketplace === "amazon") return t("buy_amazon");
   if (item.marketplace === "etsy") return t("buy_etsy");
   return t("buy_generic");
+}
+
+function EmptyState({ title, subtitle }) {
+  return (
+    <Card className="border border-slate-200">
+      <CardContent className="p-6">
+        <p className="font-semibold">{title}</p>
+        {subtitle && <p className="text-sm text-slate-600 mt-1">{subtitle}</p>}
+      </CardContent>
+    </Card>
+  );
 }
 
 function AudioBookTile({ book, onOpen }) {
@@ -229,6 +249,7 @@ function ProductCard({ item, t }) {
 
 // ================== APP ==================
 export default function App() {
+  // -------- language --------
   const detectLanguage = () => {
     try {
       const saved = localStorage.getItem("lang");
@@ -252,14 +273,27 @@ export default function App() {
     } catch {}
   };
 
-  const [tab, setTab] = useState("about");
-  const [query, setQuery] = useState("");
-  const [audioBookId, setAudioBookId] = useState(null);
+  // -------- tab --------
+  const detectTab = () => {
+    try {
+      const saved = localStorage.getItem("tab");
+      if (saved === "about" || saved === "products" || saved === "free-audio") return saved;
+    } catch {}
+    return "about";
+  };
 
-  // One global audio player
-  const audioRef = useRef(null);
-  const [currentTrack, setCurrentTrack] = useState(null);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [tab, setTab] = useState(() => detectTab());
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("tab", tab);
+    } catch {}
+    // Small UX polish: go to top when switching tabs
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [tab]);
+
+  // -------- store search --------
+  const [query, setQuery] = useState("");
 
   const filteredProducts = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -269,7 +303,17 @@ export default function App() {
     );
   }, [query]);
 
+  const clearQuery = () => setQuery("");
+
+  // -------- audiobooks --------
+  const [audioBookId, setAudioBookId] = useState(null);
+
   const selectedBook = useMemo(() => AUDIO_BOOKS.find((b) => b.id === audioBookId) || null, [audioBookId]);
+
+  // One global audio player
+  const audioRef = useRef(null);
+  const [currentTrack, setCurrentTrack] = useState(null);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -336,6 +380,7 @@ export default function App() {
   }
 
   useEffect(() => {
+    // when leaving Audio tab — stop player and reset selection
     if (tab !== "free-audio") {
       stopAudio();
       setCurrentTrack(null);
@@ -344,6 +389,7 @@ export default function App() {
   }, [tab, stopAudio]);
 
   useEffect(() => {
+    // when closing a book — stop
     if (!audioBookId) {
       stopAudio();
       setCurrentTrack(null);
@@ -351,63 +397,81 @@ export default function App() {
   }, [audioBookId, stopAudio]);
 
   return (
-    <div className="min-h-screen flex flex-col">
-    <audio ref={audioRef} preload="none" />
-          <header className="sticky top-0 z-50 bg-white/70 backdrop-blur border-b">
-  {/* TOP BAR */}
-  <div className="w-full">
-    <div className={`${CONTAINER} py-3 flex items-center justify-between gap-4`}>
-      <div className="flex items-center gap-3 min-w-0">
-        <img
-          src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=240&auto=format&fit=crop"
-          alt="logo"
-          className="w-9 h-9 rounded-xl"
-        />
-        <div className="min-w-0">
-          <p className="font-semibold leading-tight truncate">{t("name")}</p>
-          <p className="text-xs opacity-70 truncate">{t("tagline")}</p>
+    <div className="min-h-screen flex flex-col bg-white">
+      <a
+        href="#content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[9999] bg-white border rounded-lg px-3 py-2 shadow"
+      >
+        Skip to content
+      </a>
+
+      <audio ref={audioRef} preload="none" />
+
+      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur border-b">
+        {/* TOP BAR */}
+        <div className="w-full">
+          <div className={`${CONTAINER} py-3 flex items-center justify-between gap-4 ${TOPBAR_H}`}>
+            <div className="flex items-center gap-3 min-w-0">
+              <img
+                src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=240&auto=format&fit=crop"
+                alt="logo"
+                className="w-9 h-9 rounded-xl"
+              />
+              <div className="min-w-0">
+                <p className="font-semibold leading-tight truncate">{t("name")}</p>
+                <p className="text-xs opacity-70 truncate">{t("tagline")}</p>
+              </div>
+            </div>
+
+            {/* RU/ENG — fixed to the right edge of the header row */}
+            <div className="flex items-center gap-2 shrink-0">
+              <NavPill size="sm" active={lang === "ru"} onClick={() => switchLang("ru")}>
+                RU
+              </NavPill>
+              <NavPill size="sm" active={lang === "en"} onClick={() => switchLang("en")}>
+                ENG
+              </NavPill>
+            </div>
+          </div>
         </div>
-      </div>
 
-      {/* RU/ENG — справа */}
-      <div className="flex items-center gap-2 shrink-0">
-        <NavPill size="sm" active={lang === "ru"} onClick={() => switchLang("ru")}>
-          RU
-        </NavPill>
-        <NavPill size="sm" active={lang === "en"} onClick={() => switchLang("en")}>
-          ENG
-        </NavPill>
-      </div>
-    </div>
-  </div>
+        {/* NAV */}
+        <nav className="border-t">
+          <div className="w-full">
+            <div className={`${CONTAINER} py-3 flex items-center gap-3`}>
+              <NavPill
+                active={tab === "about"}
+                onClick={() => {
+                  setTab("about");
+                }}
+              >
+                {t("nav_about")}
+              </NavPill>
 
-  {/* NAV */}
-  <nav className="border-t">
-    <div className="w-full">
-      <div className={`${CONTAINER} py-3 flex items-center gap-3`}>
-        <NavPill active={tab === "about"} onClick={() => setTab("about")}>
-          {t("nav_about")}
-        </NavPill>
+              <NavPill
+                active={tab === "products"}
+                onClick={() => {
+                  setTab("products");
+                }}
+              >
+                {t("nav_products")}
+              </NavPill>
 
-        <NavPill active={tab === "products"} onClick={() => setTab("products")}>
-          {t("nav_products")}
-        </NavPill>
+              <NavPill
+                active={tab === "free-audio"}
+                onClick={() => {
+                  setTab("free-audio");
+                  setAudioBookId(null);
+                }}
+              >
+                {t("nav_audio")}
+              </NavPill>
+            </div>
+          </div>
+        </nav>
+      </header>
 
-        <NavPill
-          active={tab === "free-audio"}
-          onClick={() => {
-            setTab("free-audio");
-            setAudioBookId(null);
-          }}
-        >
-          {t("nav_audio")}
-        </NavPill>
-      </div>
-    </div>
-  </nav>
-</header>
-
-            <main className={`flex-1 ${CONTAINER} py-8 space-y-10`}>
+      <main id="content" className={`flex-1 ${CONTAINER} py-8 space-y-10`}>
         {/* ABOUT */}
         {tab === "about" && (
           <section className="grid md:grid-cols-3 gap-8 items-start">
@@ -421,22 +485,12 @@ export default function App() {
               <div className="text-sm space-y-1">
                 <p>E-mail: genndybogdanov@gmail.com</p>
                 <p>
-                  <a
-                    className="underline hover:text-slate-900"
-                    href="https://medium.com/@gbogdanov"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  <a className="underline hover:text-slate-900" href="https://medium.com/@gbogdanov" target="_blank" rel="noopener noreferrer">
                     Medium
                   </a>
                 </p>
                 <p>
-                  <a
-                    className="underline hover:text-slate-900"
-                    href="https://substack.com/@gbogdanov"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  <a className="underline hover:text-slate-900" href="https://substack.com/@gbogdanov" target="_blank" rel="noopener noreferrer">
                     Substack
                   </a>
                 </p>
@@ -449,7 +503,7 @@ export default function App() {
                   <img
                     src="/Portrait_1.jpg"
                     alt="Portrait"
-                    className="w-auto h-40 md:h-48 mx-auto object-cover rounded-2xl shadow aspect-[3/4]"
+                    className="w-auto h-40 md:h-48 object-cover rounded-2xl shadow aspect-[3/4]"
                   />
                 </div>
                 <div className="md:col-span-2">
@@ -466,12 +520,7 @@ export default function App() {
                       </a>
                     </li>
                     <li>
-                      <a
-                        className="underline hover:text-slate-900"
-                        href="https://www.italki.com/affshare?ref=af11775706"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
+                      <a className="underline hover:text-slate-900" href="https://www.italki.com/affshare?ref=af11775706" target="_blank" rel="noopener noreferrer">
                         italki
                       </a>
                     </li>
@@ -484,28 +533,45 @@ export default function App() {
 
         {/* PRODUCTS */}
         {tab === "products" && (
-  <section className="space-y-6">
-    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      {/* SEARCH — first column, first row */}
-      <div>
-        <Input
-          placeholder={t("products_search")}
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          className="w-full"
-        />
-      </div>
+          <section className="space-y-6">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* SEARCH — first column */}
+              <div className="relative">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <Input
+                  aria-label={t("products_search")}
+                  placeholder={t("products_search")}
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  className="w-full pl-9 pr-10"
+                />
+                {!!query && (
+                  <button
+                    type="button"
+                    onClick={clearQuery}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-lg hover:bg-slate-100"
+                    aria-label={t("search_clear")}
+                    title={t("search_clear")}
+                  >
+                    <X className="w-4 h-4 text-slate-500" />
+                  </button>
+                )}
+              </div>
 
-      {/* FILL THE REST OF THE FIRST ROW */}
-      <div className="hidden sm:block lg:col-span-2" />
+              {/* Fill rest of first row to keep grid alignment */}
+              <div className="hidden sm:block lg:col-span-2" />
 
-      {/* PRODUCTS — start from second row, first column */}
-      {filteredProducts.map((p) => (
-        <ProductCard key={p.id} item={p} t={t} />
-      ))}
-    </div>
-  </section>
-)}
+              {/* Results */}
+              {filteredProducts.length === 0 ? (
+                <div className="sm:col-span-2 lg:col-span-3">
+                  <EmptyState title={t("not_found")} subtitle={t("try_another")} />
+                </div>
+              ) : (
+                filteredProducts.map((p) => <ProductCard key={p.id} item={p} t={t} />)
+              )}
+            </div>
+          </section>
+        )}
 
         {/* AUDIO */}
         {tab === "free-audio" && (
@@ -514,11 +580,15 @@ export default function App() {
               <>
                 <p className="text-slate-700">{t("audio_choose")}</p>
 
-                <div className="grid md:grid-cols-2 gap-4">
-                  {AUDIO_BOOKS.map((book) => (
-                    <AudioBookTile key={book.id} book={book} onOpen={setAudioBookId} />
-                  ))}
-                </div>
+                {AUDIO_BOOKS.length === 0 ? (
+                  <EmptyState title={t("audio_empty")} />
+                ) : (
+                  <div className="grid md:grid-cols-2 gap-4">
+                    {AUDIO_BOOKS.map((book) => (
+                      <AudioBookTile key={book.id} book={book} onOpen={setAudioBookId} />
+                    ))}
+                  </div>
+                )}
               </>
             )}
 
@@ -550,16 +620,20 @@ export default function App() {
                   />
 
                   <div className="md:col-span-2 space-y-3">
-                    {selectedBook.tracks.map((tr) => (
-                      <TrackRow
-                        key={tr.id}
-                        track={tr}
-                        isActive={currentTrack?.id === tr.id}
-                        isPlaying={isPlaying}
-                        onToggle={toggleTrack}
-                        t={t}
-                      />
-                    ))}
+                    {selectedBook.tracks?.length ? (
+                      selectedBook.tracks.map((tr) => (
+                        <TrackRow
+                          key={tr.id}
+                          track={tr}
+                          isActive={currentTrack?.id === tr.id}
+                          isPlaying={isPlaying}
+                          onToggle={toggleTrack}
+                          t={t}
+                        />
+                      ))
+                    ) : (
+                      <EmptyState title={t("not_found")} subtitle={t("audio_empty")} />
+                    )}
                   </div>
                 </div>
               </>
@@ -567,10 +641,11 @@ export default function App() {
           </section>
         )}
       </main>
-      
-    <footer className="mt-auto py-6 text-center text-xs text-slate-500 border-t">
-      © {new Date().getFullYear()} Genndy Bogdanov
-    </footer>
+
+      {/* Sticky footer (doesn't jump): bottom if little content, after content if long */}
+      <footer className="mt-auto py-6 text-center text-xs text-slate-500 border-t">
+        © {new Date().getFullYear()} Genndy Bogdanov
+      </footer>
     </div>
   );
 }
