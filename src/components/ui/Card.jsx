@@ -1,26 +1,14 @@
-import React from "react";
+import React from 'react'
 
-export function Card({ className = "", ...props }) {
-  return (
-    <div
-      {...props}
-      className={[
-        // IMPORTANT: no mx-auto, no max-w, no place-items-center
-        "rounded-2xl bg-white text-slate-900 shadow-sm",
-        className,
-      ].join(" ")}
-    />
-  );
+export function Card({ className='', children, ...props }) {
+  return <div className={`bg-white rounded-2xl shadow-sm border border-slate-200 ${className}`} {...props}>{children}</div>
 }
-
-export function CardHeader({ className = "", ...props }) {
-  return <div {...props} className={["p-6 pb-3", className].join(" ")} />;
+export function CardHeader({ className='', children, ...props }) {
+  return <div className={`p-4 ${className}`} {...props}>{children}</div>
 }
-
-export function CardTitle({ className = "", ...props }) {
-  return <h3 {...props} className={["text-lg font-semibold leading-none tracking-tight", className].join(" ")} />;
+export function CardTitle({ className='', children, ...props }) {
+  return <h3 className={`font-semibold ${className}`} {...props}>{children}</h3>
 }
-
-export function CardContent({ className = "", ...props }) {
-  return <div {...props} className={["p-6 pt-0", className].join(" ")} />;
+export function CardContent({ className='', children, ...props }) {
+  return <div className={`p-4 ${className}`} {...props}>{children}</div>
 }
