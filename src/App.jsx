@@ -351,13 +351,12 @@ export default function App() {
   }, [audioBookId, stopAudio]);
 
   return (
-    <div className="min-h-screen">
-      <audio ref={audioRef} preload="none" />
-
-           <header className="sticky top-0 z-50 bg-white/70 backdrop-blur border-b">
+    <div className="min-h-screen flex flex-col">
+    <audio ref={audioRef} preload="none" />
+          <header className="sticky top-0 z-50 bg-white/70 backdrop-blur border-b">
   {/* TOP BAR */}
   <div className="w-full">
-    <div className="max-w-7xl mx-auto px-6 py-3 ...">
+    <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
       <div className="flex items-center gap-3 min-w-0">
         <img
           src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=240&auto=format&fit=crop"
@@ -370,6 +369,7 @@ export default function App() {
         </div>
       </div>
 
+      {/* RU/ENG — справа */}
       <div className="flex items-center gap-2 shrink-0">
         <NavPill size="sm" active={lang === "ru"} onClick={() => switchLang("ru")}>
           RU
@@ -384,7 +384,7 @@ export default function App() {
   {/* NAV */}
   <nav className="border-t">
     <div className="w-full">
-        <div className="max-w-7xl mx-auto px-6 py-3 ...">
+      <div className="max-w-6xl mx-auto px-4 py-3 flex items-center gap-3">
         <NavPill active={tab === "about"} onClick={() => setTab("about")}>
           {t("nav_about")}
         </NavPill>
@@ -407,7 +407,7 @@ export default function App() {
   </nav>
 </header>
 
-            <main className="max-w-6xl mx-auto px-4 py-8 space-y-10">
+            <main className="flex-1 max-w-6xl mx-auto px-4 py-8 space-y-10">
         {/* ABOUT */}
         {tab === "about" && (
           <section className="grid md:grid-cols-3 gap-8 items-start">
@@ -568,9 +568,9 @@ export default function App() {
         )}
       </main>
       
-      <footer className="py-6 text-center text-xs text-slate-500 border-t">
-        © {new Date().getFullYear()} Genndy Bogdanov
-      </footer>
+    <footer className="mt-auto py-6 text-center text-xs text-slate-500 border-t">
+      © {new Date().getFullYear()} Genndy Bogdanov
+    </footer>
     </div>
   );
 }
