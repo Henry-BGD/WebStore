@@ -508,7 +508,7 @@ export default function App() {
 )}
 
         {/* AUDIO */}
-{tab === "free-audio" && (
+        {tab === "free-audio" && (
   <section className="w-full space-y-6 text-left">
     {!audioBookId && (
       <div className="w-full">
@@ -521,15 +521,6 @@ export default function App() {
         </div>
       </div>
     )}
-
-    {audioBookId && selectedBook && (
-      <>
-        {/* оставь как есть */}
-      </>
-    )}
-  </section>
-)}
-
             {audioBookId && selectedBook && (
               <>
                 <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
