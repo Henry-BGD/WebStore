@@ -356,7 +356,7 @@ export default function App() {
           <header className="sticky top-0 z-50 bg-white/70 backdrop-blur border-b">
   {/* TOP BAR */}
   <div className="w-full">
-    <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+    <div className={`${CONTAINER} py-3 flex items-center justify-between gap-4`}>
       <div className="flex items-center gap-3 min-w-0">
         <img
           src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=240&auto=format&fit=crop"
@@ -384,7 +384,7 @@ export default function App() {
   {/* NAV */}
   <nav className="border-t">
     <div className="w-full">
-      <div className="max-w-6xl mx-auto px-4 py-3 flex items-center gap-3">
+      <div className={`${CONTAINER} py-3 flex items-center gap-3`}>
         <NavPill active={tab === "about"} onClick={() => setTab("about")}>
           {t("nav_about")}
         </NavPill>
@@ -407,7 +407,7 @@ export default function App() {
   </nav>
 </header>
 
-            <main className="flex-1 max-w-6xl mx-auto px-4 py-8 space-y-10">
+            <main className={`flex-1 ${CONTAINER} py-8 space-y-10`}>
         {/* ABOUT */}
         {tab === "about" && (
           <section className="grid md:grid-cols-3 gap-8 items-start">
@@ -509,18 +509,19 @@ export default function App() {
 
         {/* AUDIO */}
         {tab === "free-audio" && (
-  <section className="w-full space-y-6 text-left">
-    {!audioBookId && (
-      <div className="w-full">
-        <p className="text-slate-700 text-left">{t("audio_choose")}</p>
+          <section className="space-y-6">
+            {!audioBookId && (
+              <>
+                <p className="text-slate-700">{t("audio_choose")}</p>
 
-        <div className="grid md:grid-cols-2 gap-4 justify-items-start">
-          {AUDIO_BOOKS.map((book) => (
-            <AudioBookTile key={book.id} book={book} onOpen={setAudioBookId} />
-          ))}
-        </div>
-      </div>
-    )}
+                <div className="grid md:grid-cols-2 gap-4">
+                  {AUDIO_BOOKS.map((book) => (
+                    <AudioBookTile key={book.id} book={book} onOpen={setAudioBookId} />
+                  ))}
+                </div>
+              </>
+            )}
+
             {audioBookId && selectedBook && (
               <>
                 <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
