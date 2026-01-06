@@ -508,19 +508,27 @@ export default function App() {
 )}
 
         {/* AUDIO */}
-        {tab === "free-audio" && (
-          <section className="space-y-6">
-            {!audioBookId && (
-              <>
-                <p className="text-slate-700">{t("audio_choose")}</p>
+{tab === "free-audio" && (
+  <section className="w-full space-y-6 text-left">
+    {!audioBookId && (
+      <div className="w-full">
+        <p className="text-slate-700 text-left">{t("audio_choose")}</p>
 
-                <div className="grid md:grid-cols-2 gap-4">
-                  {AUDIO_BOOKS.map((book) => (
-                    <AudioBookTile key={book.id} book={book} onOpen={setAudioBookId} />
-                  ))}
-                </div>
-              </>
-            )}
+        <div className="grid md:grid-cols-2 gap-4 justify-items-start">
+          {AUDIO_BOOKS.map((book) => (
+            <AudioBookTile key={book.id} book={book} onOpen={setAudioBookId} />
+          ))}
+        </div>
+      </div>
+    )}
+
+    {audioBookId && selectedBook && (
+      <>
+        {/* оставь как есть */}
+      </>
+    )}
+  </section>
+)}
 
             {audioBookId && selectedBook && (
               <>
