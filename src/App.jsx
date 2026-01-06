@@ -357,7 +357,7 @@ export default function App() {
            <header className="sticky top-0 z-50 bg-white/70 backdrop-blur border-b">
   {/* TOP BAR */}
   <div className="w-full">
-    <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between gap-3">
+    <div className="max-w-7xl mx-auto px-6 py-3 ...">
       <div className="flex items-center gap-3 min-w-0">
         <img
           src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=240&auto=format&fit=crop"
@@ -384,7 +384,7 @@ export default function App() {
   {/* NAV */}
   <nav className="border-t">
     <div className="w-full">
-      <div className="max-w-7xl mx-auto px-6 py-3 flex flex-wrap gap-3 justify-center md:justify-start">
+        <div className="max-w-7xl mx-auto px-6 py-3 ...">
         <NavPill active={tab === "about"} onClick={() => setTab("about")}>
           {t("nav_about")}
         </NavPill>
@@ -407,104 +407,167 @@ export default function App() {
   </nav>
 </header>
 
-<main className="flex-1 w-full py-8 text-left">
-  <div className="max-w-7xl mx-auto px-6 space-y-10">
-    {/* ABOUT */}
-    {tab === "about" && (
-      <section className="grid md:grid-cols-3 gap-8 items-start">
-        <div className="md:col-span-2 space-y-4">
-          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">
-            {t("about_title")}
-          </h1>
-          <p className="leading-relaxed text-slate-700">
-            {t("about_p1")}
-          </p>
-        </div>
-
-        <Card className="p-5 border border-slate-200">
-          <CardTitle className="mb-2">{t("contacts")}</CardTitle>
-          <div className="text-sm space-y-1">
-            <p>E-mail: genndybogdanov@gmail.com</p>
-            <p>
-              <a
-                className="underline hover:text-slate-900"
-                href="https://medium.com/@gbogdanov"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Medium
-              </a>
-            </p>
-            <p>
-              <a
-                className="underline hover:text-slate-900"
-                href="https://substack.com/@gbogdanov"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Substack
-              </a>
-            </p>
-          </div>
-        </Card>
-      </section>
-    )}
-
-    {/* PRODUCTS */}
-    {tab === "products" && (
-      <section className="space-y-6">
-        <div className="w-full max-w-md">
-          <Input
-            placeholder={t("products_search")}
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            className="w-full"
-          />
-        </div>
-
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredProducts.map((p) => (
-            <ProductCard key={p.id} item={p} t={t} />
-          ))}
-        </div>
-
-        {filteredProducts.length === 0 && (
-          <p className="text-sm text-slate-500">No results.</p>
-        )}
-      </section>
-    )}
-
-    {/* AUDIO */}
-    {tab === "free-audio" && (
-      <section className="space-y-6">
-        {!audioBookId && (
-          <>
-            <p className="text-slate-700">{t("audio_choose")}</p>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {AUDIO_BOOKS.map((book) => (
-                <AudioBookTile
-                  key={book.id}
-                  book={book}
-                  onOpen={setAudioBookId}
-                />
-              ))}
+            <main className="max-w-6xl mx-auto px-4 py-8 space-y-10">
+        {/* ABOUT */}
+        {tab === "about" && (
+          <section className="grid md:grid-cols-3 gap-8 items-start">
+            <div className="md:col-span-2 space-y-4">
+              <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">{t("about_title")}</h1>
+              <p className="leading-relaxed text-slate-700">{t("about_p1")}</p>
             </div>
-          </>
+
+            <Card className="p-5 border border-slate-200">
+              <CardTitle className="mb-2">{t("contacts")}</CardTitle>
+              <div className="text-sm space-y-1">
+                <p>E-mail: genndybogdanov@gmail.com</p>
+                <p>
+                  <a
+                    className="underline hover:text-slate-900"
+                    href="https://medium.com/@gbogdanov"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Medium
+                  </a>
+                </p>
+                <p>
+                  <a
+                    className="underline hover:text-slate-900"
+                    href="https://substack.com/@gbogdanov"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Substack
+                  </a>
+                </p>
+              </div>
+            </Card>
+
+            <Card className="md:col-span-3 border border-slate-200">
+              <div className="grid md:grid-cols-3 gap-6 p-5 items-center">
+                <div>
+                  <img
+                    src="/Portrait_1.jpg"
+                    alt="Portrait"
+                    className="w-auto h-40 md:h-48 mx-auto object-cover rounded-2xl shadow aspect-[3/4]"
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <h3 className="text-xl font-semibold mb-2">{t("learn_with_me")}</h3>
+                  <ul className="space-y-2 text-slate-700">
+                    <li>
+                      <a
+                        className="underline hover:text-slate-900"
+                        href="https://preply.com/en/?pref=ODkzOTkyOQ==&id=1759522486.457389&ep=w1"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Preply
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        className="underline hover:text-slate-900"
+                        href="https://www.italki.com/affshare?ref=af11775706"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        italki
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </Card>
+          </section>
         )}
 
-        {audioBookId && selectedBook && (
-          <>
-            {/* остальной код аудиоплеера — без изменений */}
-          </>
+        {/* PRODUCTS */}
+        {tab === "products" && (
+  <section className="space-y-6">
+    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {/* SEARCH — first column, first row */}
+      <div>
+        <Input
+          placeholder={t("products_search")}
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          className="w-full"
+        />
+      </div>
+
+      {/* FILL THE REST OF THE FIRST ROW */}
+      <div className="hidden sm:block lg:col-span-2" />
+
+      {/* PRODUCTS — start from second row, first column */}
+      {filteredProducts.map((p) => (
+        <ProductCard key={p.id} item={p} t={t} />
+      ))}
+    </div>
+  </section>
+)}
+
+        {/* AUDIO */}
+        {tab === "free-audio" && (
+          <section className="space-y-6">
+            {!audioBookId && (
+              <>
+                <p className="text-slate-700">{t("audio_choose")}</p>
+
+                <div className="grid md:grid-cols-2 gap-4">
+                  {AUDIO_BOOKS.map((book) => (
+                    <AudioBookTile key={book.id} book={book} onOpen={setAudioBookId} />
+                  ))}
+                </div>
+              </>
+            )}
+
+            {audioBookId && selectedBook && (
+              <>
+                <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                  <div className="order-1 flex w-full flex-wrap gap-3 justify-end md:order-2 md:w-auto">
+                    <Button variant="outline" onClick={() => setAudioBookId(null)} className="flex gap-2" type="button">
+                      ← {t("back")}
+                    </Button>
+
+                    <Button onClick={downloadAllAudio} className="flex gap-2" type="button">
+                      <Download className="w-4 h-4" />
+                      {t("download_all")}
+                    </Button>
+                  </div>
+
+                  <div className="order-2 w-full md:order-1 md:max-w-[60%]">
+                    <h1 className="text-3xl font-bold md:text-4xl">{selectedBook.title}</h1>
+                    <p className="text-slate-600">{selectedBook.description}</p>
+                  </div>
+                </div>
+
+                <div className="grid md:grid-cols-3 gap-6 items-start">
+                  <img
+                    src={selectedBook.cover}
+                    alt={selectedBook.title}
+                    className="w-full aspect-square object-cover rounded-2xl shadow md:col-span-1"
+                  />
+
+                  <div className="md:col-span-2 space-y-3">
+                    {selectedBook.tracks.map((tr) => (
+                      <TrackRow
+                        key={tr.id}
+                        track={tr}
+                        isActive={currentTrack?.id === tr.id}
+                        isPlaying={isPlaying}
+                        onToggle={toggleTrack}
+                        t={t}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
+          </section>
         )}
-      </section>
-    )}
-  </div>
-</main>
-
-
-
+      </main>
+      
       <footer className="py-6 text-center text-xs text-slate-500 border-t">
         © {new Date().getFullYear()} Genndy Bogdanov
       </footer>
