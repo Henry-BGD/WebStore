@@ -710,16 +710,25 @@ export default function App() {
   </div>
 
   {/* Actions */}
-  <div className="order-1 md:order-2 flex w-full flex-wrap gap-3 justify-end md:w-auto">
-    <Button variant="outline" onClick={() => setAudioBookId(null)} className="flex gap-2" type="button">
-      ← {t("back")}
-    </Button>
+  <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-end">
+  <Button
+    variant="outline"
+    onClick={() => setAudioBookId(null)}
+    type="button"
+    className="md:!w-auto"
+  >
+    ← {t("back")}
+  </Button>
 
-    <Button onClick={downloadAllAudio} className="flex gap-2" type="button">
-      <Download className="w-4 h-4" />
-      {t("download_all")}
-    </Button>
-  </div>
+  <Button
+    onClick={downloadAllAudio}
+    type="button"
+    className="md:!w-auto"
+  >
+    <Download className="w-4 h-4" />
+    {t("download_all")}
+  </Button>
+</div>
 </div>
                 
                 <div className="grid md:grid-cols-3 gap-6 items-start">
