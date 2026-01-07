@@ -267,12 +267,6 @@ function TrackRow({
               ].join(" ")}
               aria-label="Seek"
             />
-
-            {/* маленькие подсказки слева/справа (современно и полезно) */}
-            <div className="flex justify-between text-[11px] text-slate-400 mt-1">
-              <span>{formatTime(safeTime)}</span>
-              <span>-{formatTime((safeDuration || 0) - safeTime)}</span>
-            </div>
           </div>
         )}
       </CardContent>
