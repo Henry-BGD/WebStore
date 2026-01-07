@@ -280,7 +280,7 @@ function ProductCard({ item, t }) {
       <CardHeader className="p-0 pb-2">
         <div className="relative">
           <img src={item.image} alt={item.title} className="w-full h-56 object-cover" />
-          <div className="absolute top-3 left-3 flex flex-wrap gap-2">
+          <div className="absolute top-1 left-3 flex flex-wrap gap-2">
             {item.badges?.map((b) => (
               <Badge key={b} className="backdrop-blur">
                 {b}
