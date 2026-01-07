@@ -277,7 +277,7 @@ function TrackRow({
 function ProductCard({ item, t }) {
   return (
     <Card className="overflow-hidden border border-slate-200 flex flex-col">
-      <CardHeader className="p-0">
+      <CardHeader className="p-0 pb-2">
         <div className="relative">
           <img src={item.image} alt={item.title} className="w-full h-56 object-cover" />
           <div className="absolute top-3 left-3 flex flex-wrap gap-2">
@@ -291,7 +291,7 @@ function ProductCard({ item, t }) {
       </CardHeader>
 
       <CardContent className="p-4 flex flex-col flex-grow justify-between">
-        <div className="space-y-2">
+        <div className="space-y-1">
           <div className="space-y-1">
             <CardTitle className="text-lg leading-snug">{item.title}</CardTitle>
             <p className="text-sm opacity-80">{item.kind}</p>
