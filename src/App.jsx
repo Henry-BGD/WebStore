@@ -574,11 +574,6 @@ export default function App() {
               <div className="text-sm space-y-1">
                 <p>E-mail: genndybogdanov@gmail.com</p>
                 <p>
-                  <a className="underline hover:text-slate-900" href="https://medium.com/@gbogdanov" target="_blank" rel="noopener noreferrer">
-                    Medium
-                  </a>
-                </p>
-                <p>
                   <a className="underline hover:text-slate-900" href="https://substack.com/@gbogdanov" target="_blank" rel="noopener noreferrer">
                     Substack
                   </a>
