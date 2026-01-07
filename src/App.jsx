@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState, useEffect, useCallback } from "react";
+const CONTAINER = "w-full max-w-6xlimport React, { useMemo, useRef, useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/Card.jsx";
 import { Button } from "./components/ui/Button.jsx";
 import { Input } from "./components/ui/Input.jsx";
@@ -11,7 +11,7 @@ import { ExternalLink, Download, Play, Pause, X, Search } from "lucide-react";
  * - no mx-auto
  * - adaptive left margin
  */
-const CONTAINER = "w-full max-w-6xl px-8";
+const CONTAINER = "w-full max-w-6xl mx-auto px-8";
 const TOPBAR_H = "min-h-[64px]";
 
 // ================== DATA ==================
