@@ -303,7 +303,12 @@ function ProductCard({ item, t }) {
           <span className="text-xl font-semibold">{currencyUSD(item.price)}</span>
 
           <a href={item.externalUrl} target="_blank" rel="noopener noreferrer" className="inline-flex">
-            <Button variant="outline" className="flex items-center gap-1" type="button">
+            <Button
+  variant="outline"
+  onClick={() => setAudioBookId(null)}
+  type="button"
+  className="w-full md:w-auto"
+>
               <ExternalLink className="w-4 h-4" />
               <span>{productBuyLabel(item, t)}</span>
             </Button>
@@ -697,15 +702,27 @@ export default function App() {
   </div>
 
   {/* Actions */}
-  <div className="order-1 md:order-2 flex w-full flex-wrap gap-3 justify-end md:w-auto">
+  <div
+  className="
+    order-1 md:order-2
+    flex flex-col gap-3
+    md:flex-row md:items-center md:gap-3
+    w-full md:w-auto
+    justify-end
+  "
+>
     <Button variant="outline" onClick={() => setAudioBookId(null)} className="flex gap-2" type="button">
       ← {t("back")}
     </Button>
 
-    <Button onClick={downloadAllAudio} className="flex gap-2" type="button">
-      <Download className="w-4 h-4" />
-      {t("download_all")}
-    </Button>
+<Button
+  onClick={downloadAllAudio}
+  type="button"
+  className="w-full md:w-auto"
+>
+  <Download className="w-4 h-4" />
+  {t("download_all")}
+</Button>
   </div>
 </div>
                 
