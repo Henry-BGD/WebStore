@@ -1,4 +1,4 @@
-const CONTAINER = "w-full max-w-6xlimport React, { useMemo, useRef, useState, useEffect, useCallback } from "react";
+import React, { useMemo, useRef, useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/Card.jsx";
 import { Button } from "./components/ui/Button.jsx";
 import { Input } from "./components/ui/Input.jsx";
