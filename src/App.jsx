@@ -578,11 +578,6 @@ export default function App() {
                     Medium
                   </a>
                 </p>
-                <p>
-                  <a className="underline hover:text-slate-900" href="https://substack.com/@gbogdanov" target="_blank" rel="noopener noreferrer">
-                    Substack
-                  </a>
-                </p>
               </div>
             </Card>
 
