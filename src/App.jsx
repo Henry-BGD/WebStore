@@ -7,12 +7,80 @@ import { ExternalLink, Download, Play, Pause, X, Search } from "lucide-react";
 
 // ================== LAYOUT ==================
 /**
- * Variant B: column is NOT centered; it is slightly shifted left on desktop.
- * - no mx-auto
- * - adaptive left margin
+ * Container (centered) + comfortable padding
  */
 const CONTAINER = "w-full max-w-6xl mx-auto px-8";
 const TOPBAR_H = "min-h-[64px]";
+
+// ================== SWIPE TABS HOOK ==================
+function useSwipeTabs({ enabled, onPrev, onNext, thresholdPx = 60, restraintPx = 40 }) {
+  const startX = useRef(0);
+  const startY = useRef(0);
+  const tracking = useRef(false);
+
+  const shouldIgnoreTarget = (target) => {
+    try {
+      return !!target?.closest?.('input, textarea, select, button, a, [data-no-swipe="true"]');
+    } catch {
+      return false;
+    }
+  };
+
+  const onTouchStart = useCallback(
+    (e) => {
+      if (!enabled) return;
+      const t = e.touches?.[0];
+      if (!t) return;
+
+      if (shouldIgnoreTarget(e.target)) return;
+
+      startX.current = t.clientX;
+      startY.current = t.clientY;
+      tracking.current = true;
+    },
+    [enabled]
+  );
+
+  const onTouchMove = useCallback(
+    (e) => {
+      if (!enabled || !tracking.current) return;
+
+      const t = e.touches?.[0];
+      if (!t) return;
+
+      const dx = t.clientX - startX.current;
+      const dy = t.clientY - startY.current;
+
+      // If user scrolls vertically → stop tracking (do not hijack scroll)
+      if (Math.abs(dy) > restraintPx && Math.abs(dy) > Math.abs(dx)) {
+        tracking.current = false;
+      }
+    },
+    [enabled, restraintPx]
+  );
+
+  const onTouchEnd = useCallback(
+    (e) => {
+      if (!enabled || !tracking.current) return;
+      tracking.current = false;
+
+      const t = e.changedTouches?.[0];
+      if (!t) return;
+
+      const dx = t.clientX - startX.current;
+      const dy = t.clientY - startY.current;
+
+      // ignore diagonal / vertical gestures
+      if (Math.abs(dy) > restraintPx) return;
+
+      if (dx > thresholdPx) onPrev?.(); // swipe right
+      else if (dx < -thresholdPx) onNext?.(); // swipe left
+    },
+    [enabled, onPrev, onNext, thresholdPx, restraintPx]
+  );
+
+  return { onTouchStart, onTouchMove, onTouchEnd };
+}
 
 // ================== DATA ==================
 const PRODUCTS = [
@@ -21,7 +89,7 @@ const PRODUCTS = [
     title: "Russian Short Stories by Leo Tolstoy",
     kind: "A1-B1 Level",
     price: 12.99,
-    image: "/Product_Leo.png", // ✅ public/Product_Leo.png
+    image: "/Product_Leo.png",
     externalUrl: "https://amazon.example/your-book",
     marketplace: "amazon",
     badges: ["RU-EN", "Paper Book", "Audio"],
@@ -33,7 +101,7 @@ const AUDIO_BOOKS = [
   {
     id: "tolstoy-short-stories",
     title: "Russian Short Stories",
-    cover: "/Audio_External_Leo.png", // ✅ public/Audio_External_Leo.png
+    cover: "/Audio_External_Leo.png",
     description: "by Leo Tolstoy",
     tracks: [
       { id: "kostochka", title: "Косточка (The Pit)", src: "/audio/kostochka.mp3" },
@@ -157,11 +225,7 @@ function EmptyState({ title, subtitle }) {
 
 function AudioBookTile({ book, onOpen }) {
   return (
-    <button
-  onClick={() => onOpen(book.id)}
-  className="w-full max-w-sm text-left"
-  type="button"
->
+    <button onClick={() => onOpen(book.id)} className="w-full max-w-sm text-left" type="button">
       <Card className="p-4 border border-slate-200 hover:shadow transition">
         <div className="flex gap-4 items-center">
           <img src={book.cover} alt={book.title} className="w-16 h-16 rounded-xl object-cover flex-none" />
@@ -182,18 +246,9 @@ function formatTime(sec) {
   return `${m}:${String(s).padStart(2, "0")}`;
 }
 
-function TrackRow({
-  track,
-  isActive,
-  isPlaying,
-  onToggle,
-  onSeek,
-  t,
-  currentTime,
-  duration,
-}) {
+function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime, duration }) {
   const activeAndPlaying = isActive && isPlaying;
-  const showScrubber = isActive; // можно сделать isActive && duration>0
+  const showScrubber = isActive;
 
   const safeDuration = Number.isFinite(duration) && duration > 0 ? duration : 0;
   const safeTime = Number.isFinite(currentTime) && currentTime >= 0 ? currentTime : 0;
@@ -205,7 +260,6 @@ function TrackRow({
           <div className="min-w-0">
             <p className="font-medium truncate">{track.title}</p>
 
-            {/* маленькая строка времени (без Listen/Pause текста) */}
             {showScrubber && (
               <p className="text-xs text-slate-500 mt-1">
                 {formatTime(safeTime)} / {formatTime(safeDuration)}
@@ -214,7 +268,7 @@ function TrackRow({
           </div>
 
           <div className="flex items-center gap-2 flex-none">
-            {/* PLAY/PAUSE — только иконка */}
+            {/* PLAY/PAUSE — icon only */}
             <button
               type="button"
               onClick={() => onToggle(track)}
@@ -230,7 +284,7 @@ function TrackRow({
               {activeAndPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
             </button>
 
-            {/* DOWNLOAD — только иконка */}
+            {/* DOWNLOAD — icon only */}
             {track.src && track.src !== "#" && (
               <a href={track.src} download className="inline-flex" aria-label={`${t("download")}: ${track.title}`}>
                 <button
@@ -249,7 +303,7 @@ function TrackRow({
           </div>
         </div>
 
-        {/* 2) SEEK BAR появляется при нажатии Play (когда трек активен) */}
+        {/* SEEK BAR (appears when track active) */}
         {showScrubber && (
           <div className="mt-3">
             <input
@@ -260,11 +314,7 @@ function TrackRow({
               value={Math.min(safeTime, safeDuration || safeTime)}
               onChange={(e) => onSeek(Number(e.target.value))}
               disabled={!safeDuration}
-              className={[
-                "w-full",
-                "accent-blue-600",
-                "disabled:opacity-40 disabled:cursor-not-allowed",
-              ].join(" ")}
+              className="w-full accent-blue-600 disabled:opacity-40 disabled:cursor-not-allowed"
               aria-label="Seek"
             />
           </div>
@@ -280,7 +330,7 @@ function ProductCard({ item, t }) {
       <CardHeader className="p-0 pb-2">
         <div className="relative">
           <img src={item.image} alt={item.title} className="w-full h-56 object-cover" />
-          <div className="absolute top-1 left-3 flex flex-wrap gap-2">
+          <div className="absolute top-0 left-3 flex flex-wrap gap-2">
             {item.badges?.map((b) => (
               <Badge key={b} className="backdrop-blur">
                 {b}
@@ -355,7 +405,6 @@ export default function App() {
     try {
       localStorage.setItem("tab", tab);
     } catch {}
-    // Small UX polish: go to top when switching tabs
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [tab]);
 
@@ -374,7 +423,6 @@ export default function App() {
 
   // -------- audiobooks --------
   const [audioBookId, setAudioBookId] = useState(null);
-
   const selectedBook = useMemo(() => AUDIO_BOOKS.find((b) => b.id === audioBookId) || null, [audioBookId]);
 
   // One global audio player
@@ -385,41 +433,42 @@ export default function App() {
   const [duration, setDuration] = useState(0);
 
   useEffect(() => {
-  const audio = audioRef.current;
-  if (!audio) return;
+    const audio = audioRef.current;
+    if (!audio) return;
 
-  const onPlay = () => setIsPlaying(true);
-  const onPause = () => setIsPlaying(false);
-  const onEnded = () => setIsPlaying(false);
+    const onPlay = () => setIsPlaying(true);
+    const onPause = () => setIsPlaying(false);
+    const onEnded = () => setIsPlaying(false);
 
-  const onTime = () => setCurrentTime(audio.currentTime || 0);
-  const onMeta = () => {
-    setDuration(Number.isFinite(audio.duration) ? audio.duration : 0);
-    setCurrentTime(audio.currentTime || 0);
-  };
+    const onTime = () => setCurrentTime(audio.currentTime || 0);
+    const onMeta = () => {
+      setDuration(Number.isFinite(audio.duration) ? audio.duration : 0);
+      setCurrentTime(audio.currentTime || 0);
+    };
 
-  audio.addEventListener("play", onPlay);
-  audio.addEventListener("pause", onPause);
-  audio.addEventListener("ended", onEnded);
-  audio.addEventListener("timeupdate", onTime);
-  audio.addEventListener("loadedmetadata", onMeta);
-  audio.addEventListener("durationchange", onMeta);
+    audio.addEventListener("play", onPlay);
+    audio.addEventListener("pause", onPause);
+    audio.addEventListener("ended", onEnded);
+    audio.addEventListener("timeupdate", onTime);
+    audio.addEventListener("loadedmetadata", onMeta);
+    audio.addEventListener("durationchange", onMeta);
 
-  return () => {
-    audio.removeEventListener("play", onPlay);
-    audio.removeEventListener("pause", onPause);
-    audio.removeEventListener("ended", onEnded);
-    audio.removeEventListener("timeupdate", onTime);
-    audio.removeEventListener("loadedmetadata", onMeta);
-    audio.removeEventListener("durationchange", onMeta);
-  };
-}, []);
+    return () => {
+      audio.removeEventListener("play", onPlay);
+      audio.removeEventListener("pause", onPause);
+      audio.removeEventListener("ended", onEnded);
+      audio.removeEventListener("timeupdate", onTime);
+      audio.removeEventListener("loadedmetadata", onMeta);
+      audio.removeEventListener("durationchange", onMeta);
+    };
+  }, []);
 
   const stopAudio = useCallback(() => {
     const audio = audioRef.current;
     if (!audio) return;
     audio.pause();
     audio.currentTime = 0;
+    setIsPlaying(false);
   }, []);
 
   const toggleTrack = useCallback(
@@ -447,12 +496,11 @@ export default function App() {
   );
 
   const seekTo = useCallback((sec) => {
-  const audio = audioRef.current;
-  if (!audio) return;
-
-  audio.currentTime = Math.max(0, sec || 0);
-  setCurrentTime(audio.currentTime);
-}, []);
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.currentTime = Math.max(0, sec || 0);
+    setCurrentTime(audio.currentTime);
+  }, []);
 
   function downloadAllAudio() {
     if (!selectedBook?.tracks?.length) return;
@@ -469,7 +517,6 @@ export default function App() {
   }
 
   useEffect(() => {
-    // when leaving Audio tab — stop player and reset selection
     if (tab !== "free-audio") {
       stopAudio();
       setCurrentTrack(null);
@@ -478,12 +525,56 @@ export default function App() {
   }, [tab, stopAudio]);
 
   useEffect(() => {
-    // when closing a book — stop
     if (!audioBookId) {
       stopAudio();
       setCurrentTrack(null);
     }
   }, [audioBookId, stopAudio]);
+
+  // -------- mobile detection (for swipe) --------
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const check = () => setIsMobile(window.matchMedia("(max-width: 768px)").matches);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
+  // -------- swipe tab navigation --------
+  const TABS_ORDER = ["about", "products", "free-audio"];
+
+  const goPrevTab = useCallback(() => {
+    setTab((prev) => {
+      const i = TABS_ORDER.indexOf(prev);
+      if (i <= 0) return prev;
+      const nextTab = TABS_ORDER[i - 1];
+
+      // If leaving audiobooks tab — close book selection, but do NOT forcibly stop audio here
+      // (stopAudio is handled by tab effect above when tab becomes not free-audio)
+      if (nextTab !== "free-audio") setAudioBookId(null);
+
+      return nextTab;
+    });
+  }, []);
+
+  const goNextTab = useCallback(() => {
+    setTab((prev) => {
+      const i = TABS_ORDER.indexOf(prev);
+      if (i === -1 || i >= TABS_ORDER.length - 1) return prev;
+      const nextTab = TABS_ORDER[i + 1];
+      if (nextTab !== "free-audio") setAudioBookId(null);
+      return nextTab;
+    });
+  }, []);
+
+  // ✅ NEW RULE:
+  // Swipe is enabled on mobile when audio is NOT playing (paused or stopped is OK),
+  // even inside an opened book.
+  const swipeHandlers = useSwipeTabs({
+    enabled: isMobile && !isPlaying,
+    onPrev: goPrevTab,
+    onNext: goNextTab,
+  });
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
@@ -512,7 +603,6 @@ export default function App() {
               </div>
             </div>
 
-            {/* RU/ENG — fixed to the right edge of the header row */}
             <div className="flex items-center gap-2 shrink-0">
               <NavPill size="sm" active={lang === "ru"} onClick={() => switchLang("ru")}>
                 RU
@@ -528,21 +618,11 @@ export default function App() {
         <nav className="border-t">
           <div className="w-full">
             <div className={`${CONTAINER} py-3 flex items-center gap-3`}>
-              <NavPill
-                active={tab === "about"}
-                onClick={() => {
-                  setTab("about");
-                }}
-              >
+              <NavPill active={tab === "about"} onClick={() => setTab("about")}>
                 {t("nav_about")}
               </NavPill>
 
-              <NavPill
-                active={tab === "products"}
-                onClick={() => {
-                  setTab("products");
-                }}
-              >
+              <NavPill active={tab === "products"} onClick={() => setTab("products")}>
                 {t("nav_products")}
               </NavPill>
 
@@ -560,7 +640,13 @@ export default function App() {
         </nav>
       </header>
 
-      <main id="content" className={`flex-1 ${CONTAINER} py-8 space-y-10`}>
+      <main
+        id="content"
+        className={`flex-1 ${CONTAINER} py-8 space-y-10`}
+        onTouchStart={swipeHandlers.onTouchStart}
+        onTouchMove={swipeHandlers.onTouchMove}
+        onTouchEnd={swipeHandlers.onTouchEnd}
+      >
         {/* ABOUT */}
         {tab === "about" && (
           <section className="grid md:grid-cols-3 gap-8 items-start">
@@ -574,12 +660,12 @@ export default function App() {
               <div className="text-sm space-y-1">
                 <p>E-mail: genndybogdanov@gmail.com</p>
                 <p>
-                  <a className="underline hover:text-slate-900" href="https://medium.com/@gbogdanov" target="_blank" rel="noopener noreferrer">
-                    Medium
-                  </a>
-                </p>
-                <p>
-                  <a className="underline hover:text-slate-900" href="https://substack.com/@gbogdanov" target="_blank" rel="noopener noreferrer">
+                  <a
+                    className="underline hover:text-slate-900"
+                    href="https://substack.com/@gbogdanov"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     Substack
                   </a>
                 </p>
@@ -609,7 +695,12 @@ export default function App() {
                       </a>
                     </li>
                     <li>
-                      <a className="underline hover:text-slate-900" href="https://www.italki.com/affshare?ref=af11775706" target="_blank" rel="noopener noreferrer">
+                      <a
+                        className="underline hover:text-slate-900"
+                        href="https://www.italki.com/affshare?ref=af11775706"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
                         italki
                       </a>
                     </li>
@@ -624,7 +715,7 @@ export default function App() {
         {tab === "products" && (
           <section className="space-y-6">
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {/* SEARCH — first column */}
+              {/* SEARCH */}
               <div className="relative">
                 <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 <Input
@@ -647,17 +738,15 @@ export default function App() {
                 )}
               </div>
 
-              {/* Fill rest of first row to keep grid alignment */}
               <div className="hidden sm:block lg:col-span-2" />
 
-              {/* Results */}
               {filteredProducts.length === 0 ? (
-  <div>
-    <EmptyState title={t("not_found")} subtitle={t("try_another")} />
-  </div>
-) : (
-  filteredProducts.map((p) => <ProductCard key={p.id} item={p} t={t} />)
-)}
+                <div>
+                  <EmptyState title={t("not_found")} subtitle={t("try_another")} />
+                </div>
+              ) : (
+                filteredProducts.map((p) => <ProductCard key={p.id} item={p} t={t} />)
+              )}
             </div>
           </section>
         )}
@@ -682,46 +771,41 @@ export default function App() {
             )}
 
             {audioBookId && selectedBook && (
-              <>              
-<div
-  className="
-    order-1 md:order-2
-    flex flex-col gap-3
-    md:flex-row md:items-center md:gap-3
-    w-full md:w-auto
-    justify-end
-  "
->
-  {/* Mobile: cover + title row */}
-  <div className="order-2 md:order-1 w-full">
-    <div className="flex items-center gap-4 md:block">
-      {/* mini cover ONLY on mobile */}
-      <img
-        src={selectedBook.cover}
-        alt={selectedBook.title}
-        className="w-20 h-20 rounded-2xl object-cover shadow flex-none md:hidden"
-      />
+              <>
+                {/* Title + actions (mobile mini-cover) */}
+                <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                  <div className="order-2 md:order-1 w-full">
+                    <div className="flex items-center gap-4 md:block">
+                      <img
+                        src={selectedBook.cover}
+                        alt={selectedBook.title}
+                        className="w-20 h-20 rounded-2xl object-cover shadow flex-none md:hidden"
+                      />
 
-      <div className="min-w-0">
-        <h1 className="text-3xl font-bold md:text-4xl leading-tight">{selectedBook.title}</h1>
-        <p className="text-slate-600">{selectedBook.description}</p>
-      </div>
-    </div>
-  </div>
+                      <div className="min-w-0">
+                        <h1 className="text-3xl font-bold md:text-4xl leading-tight">{selectedBook.title}</h1>
+                        <p className="text-slate-600">{selectedBook.description}</p>
+                      </div>
+                    </div>
+                  </div>
 
-  {/* Actions */}
-  <div className="order-1 md:order-2 flex w-full flex-wrap gap-3 justify-end md:w-auto">
-    <Button variant="outline" onClick={() => setAudioBookId(null)} className="flex gap-2" type="button">
-      ← {t("back")}
-    </Button>
+                  <div className="order-1 md:order-2 flex flex-col gap-3 md:flex-row md:items-center md:justify-end">
+                    <Button
+                      variant="outline"
+                      onClick={() => setAudioBookId(null)}
+                      className="w-full md:!w-auto"
+                      type="button"
+                    >
+                      ← {t("back")}
+                    </Button>
 
-    <Button onClick={downloadAllAudio} className="flex gap-2" type="button">
-      <Download className="w-4 h-4" />
-      {t("download_all")}
-    </Button>
-  </div>
-</div>
-                
+                    <Button onClick={downloadAllAudio} className="w-full md:!w-auto flex gap-2" type="button">
+                      <Download className="w-4 h-4" />
+                      {t("download_all")}
+                    </Button>
+                  </div>
+                </div>
+
                 <div className="grid md:grid-cols-3 gap-6 items-start">
                   <img
                     src={selectedBook.cover}
@@ -732,17 +816,17 @@ export default function App() {
                   <div className="md:col-span-2 space-y-3">
                     {selectedBook.tracks?.length ? (
                       selectedBook.tracks.map((tr) => (
-                       <TrackRow
-  key={tr.id}
-  track={tr}
-  isActive={currentTrack?.id === tr.id}
-  isPlaying={isPlaying}
-  onToggle={toggleTrack}
-  onSeek={seekTo}
-  t={t}
-  currentTime={currentTrack?.id === tr.id ? currentTime : 0}
-  duration={currentTrack?.id === tr.id ? duration : 0}
-/>
+                        <TrackRow
+                          key={tr.id}
+                          track={tr}
+                          isActive={currentTrack?.id === tr.id}
+                          isPlaying={isPlaying}
+                          onToggle={toggleTrack}
+                          onSeek={seekTo}
+                          t={t}
+                          currentTime={currentTrack?.id === tr.id ? currentTime : 0}
+                          duration={currentTrack?.id === tr.id ? duration : 0}
+                        />
                       ))
                     ) : (
                       <EmptyState title={t("not_found")} subtitle={t("audio_empty")} />
@@ -755,7 +839,6 @@ export default function App() {
         )}
       </main>
 
-      {/* Sticky footer (doesn't jump): bottom if little content, after content if long */}
       <footer className="mt-auto py-6 text-center text-xs text-slate-500 border-t">
         © {new Date().getFullYear()} Genndy Bogdanov
       </footer>
