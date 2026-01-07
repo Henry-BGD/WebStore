@@ -1,161 +1,31 @@
-// App.jsx
-import React, { useEffect, useMemo, useRef, useState, useCallback } from "react";
-import {
-  ExternalLink,
-  Download,
-  Play,
-  Pause,
-  X,
-  Search,
-  Sun,
-  Moon,
-  Volume2,
-  VolumeX,
-  RotateCcw,
-  FastForward,
-} from "lucide-react";
+import React, { useMemo, useRef, useState, useEffect, useCallback } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/Card.jsx";
+import { Button } from "./components/ui/Button.jsx";
+import { Input } from "./components/ui/Input.jsx";
+import { Badge } from "./components/ui/Badge.jsx";
+import { ExternalLink, Download, Play, Pause, X, Search } from "lucide-react";
 
-// =====================================================
-// Self-contained UI primitives (so nothing breaks on deploy)
-// Tailwind required. Works great with Vite + React + Tailwind.
-// =====================================================
-function cn(...xs) {
-  return xs.filter(Boolean).join(" ");
-}
+// ================== LAYOUT ==================
+/**
+ * Variant B: column is NOT centered; it is slightly shifted left on desktop.
+ * - no mx-auto
+ * - adaptive left margin
+ */
+const CONTAINER = "w-full max-w-6xl px-4 sm:ml-6 lg:ml-10";
+const TOPBAR_H = "min-h-[64px]";
 
-function Card({ className, children }) {
-  return (
-    <div
-      className={cn(
-        "rounded-2xl border border-slate-200/70 bg-white shadow-sm",
-        "dark:bg-slate-900 dark:border-slate-800",
-        className
-      )}
-    >
-      {children}
-    </div>
-  );
-}
-
-function CardHeader({ className, children }) {
-  return <div className={cn("p-5", className)}>{children}</div>;
-}
-
-function CardTitle({ className, children }) {
-  return (
-    <h3 className={cn("text-base font-semibold text-slate-900 dark:text-slate-100", className)}>
-      {children}
-    </h3>
-  );
-}
-
-function CardContent({ className, children }) {
-  return <div className={cn("p-5 pt-0", className)}>{children}</div>;
-}
-
-function Badge({ className, children }) {
-  return (
-    <span
-      className={cn(
-        "inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-medium",
-        "border-slate-200 bg-white/70 text-slate-700 backdrop-blur",
-        "dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-200",
-        className
-      )}
-    >
-      {children}
-    </span>
-  );
-}
-
-function Button({
-  className,
-  variant = "solid", // solid | outline | ghost
-  size = "md", // sm | md | lg | icon
-  type = "button",
-  disabled,
-  onClick,
-  children,
-  ariaLabel,
-  title,
-}) {
-  const sizes = {
-    sm: "h-9 px-3 text-sm rounded-xl",
-    md: "h-10 px-4 text-sm rounded-xl",
-    lg: "h-11 px-5 text-base rounded-2xl",
-    icon: "h-10 w-10 rounded-xl p-0",
-  };
-
-  const variants = {
-    solid: cn(
-      "bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-700",
-      "dark:bg-blue-600 dark:hover:bg-blue-500"
-    ),
-    outline: cn(
-      "border border-slate-200 bg-white hover:bg-slate-50 text-slate-900",
-      "dark:bg-slate-900 dark:text-slate-100 dark:border-slate-700 dark:hover:bg-slate-800/60"
-    ),
-    ghost: cn(
-      "bg-transparent hover:bg-slate-100 text-slate-900",
-      "dark:text-slate-100 dark:hover:bg-slate-800/60"
-    ),
-  };
-
-  return (
-    <button
-      type={type}
-      disabled={disabled}
-      onClick={onClick}
-      aria-label={ariaLabel}
-      title={title}
-      className={cn(
-        "inline-flex items-center justify-center gap-2 font-medium transition",
-        "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 dark:focus-visible:ring-blue-500",
-        "disabled:opacity-50 disabled:cursor-not-allowed",
-        sizes[size],
-        variants[variant],
-        className
-      )}
-    >
-      {children}
-    </button>
-  );
-}
-
-function Input({ className, ...props }) {
-  return (
-    <input
-      {...props}
-      className={cn(
-        "h-11 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm",
-        "placeholder:text-slate-400",
-        "focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-300",
-        "dark:bg-slate-900 dark:text-slate-100 dark:border-slate-700 dark:focus:ring-blue-500 dark:focus:border-blue-500",
-        className
-      )}
-    />
-  );
-}
-
-function Divider({ className }) {
-  return <div className={cn("h-px w-full bg-slate-200/70 dark:bg-slate-800", className)} />;
-}
-
-// =====================================================
-// DATA (edit safely)
-// =====================================================
+// ================== DATA ==================
 const PRODUCTS = [
   {
     id: "prod-ru-book-1",
     title: "Russian Short Stories by Leo Tolstoy",
-    kind: "A1–B1 Level",
+    kind: "A1-B1 Level",
     price: 12.99,
-    image: "/Product_Leo.png", // public/Product_Leo.png
+    image: "/Product_Leo.png", // ✅ public/Product_Leo.png
     externalUrl: "https://amazon.example/your-book",
     marketplace: "amazon",
-    badges: ["RU–EN", "Paperback", "Audio"],
-    description:
-      "Word-by-word translation, stress marks, grammar notes, exercises, and audio. Designed for confident reading.",
+    badges: ["RU-EN", "Paper Book", "Audio"],
+    description: "Word-by-word translation, stress marks, grammar explanations, exercises, audio included.",
   },
 ];
 
@@ -163,7 +33,7 @@ const AUDIO_BOOKS = [
   {
     id: "tolstoy-short-stories",
     title: "Russian Short Stories",
-    cover: "/Audio_External_Leo.png", // public/Audio_External_Leo.png
+    cover: "/Audio_External_Leo.png", // ✅ public/Audio_External_Leo.png
     description: "by Leo Tolstoy",
     tracks: [
       { id: "kostochka", title: "Косточка (The Pit)", src: "/audio/kostochka.mp3" },
@@ -176,25 +46,21 @@ const AUDIO_BOOKS = [
   },
 ];
 
-// =====================================================
-// I18N
-// =====================================================
+// ================== I18N ==================
 const I18N = {
   en: {
     name: "Genndy Bogdanov",
-    tagline: "Russian teacher • Reading-first approach",
+    tagline: "",
     nav_about: "About",
     nav_products: "Store",
     nav_audio: "Audiobooks",
 
-    about_title: "Hi! I’m Genndy — a Russian teacher and learning-materials author",
-    about_p1:
-      "I help English speakers read Russian faster and with confidence. 1000+ lessons taught, consistently high ratings.",
+    about_title: "Hi! I’m Genndy — a Russian language teacher and the author of learning materials",
+    about_p1: "I help English speakers read Russian faster and with confidence. 1000+ lessons taught, high rating.",
     contacts: "Contacts",
     learn_with_me: "Learn Russian with me on:",
-    newsletter: "Newsletter",
 
-    products_search: "Search by title, level, or description…",
+    products_search: "Search by title or description…",
     search_clear: "Clear",
     not_found: "Nothing found",
     try_another: "Try another search query.",
@@ -206,71 +72,62 @@ const I18N = {
     audio_empty: "No audiobooks available yet.",
     back: "Back",
     download_all: "Download all",
-    listen: "Play",
+    listen: "Listen",
     pause: "Pause",
     download: "Download",
-    now_playing: "Now playing",
-    playback_speed: "Speed",
-    volume: "Volume",
-    muted: "Muted",
-    unmuted: "Unmuted",
-    reset: "Restart",
-    forward_15: "Forward 15s",
-    error_audio: "Audio failed to load. Check the file path in /public/audio.",
-    theme_light: "Light",
-    theme_dark: "Dark",
   },
 
   ru: {
     name: "Genndy Bogdanov",
-    tagline: "Преподаватель русского • Учимся читать быстрее",
+    tagline: "",
     nav_about: "Обо мне",
     nav_products: "Магазин",
     nav_audio: "Аудиокниги",
 
-    about_title: "Привет! Я — Геннадий. Преподаватель русского языка и автор учебных материалов.",
-    about_p1:
-      "Я помогаю англоговорящим быстрее и увереннее читать по-русски. 1000+ уроков, стабильно высокий рейтинг.",
+    about_title: "Всем привет! Я — Геннадий. Преподаватель русского языка и автор учебных материалов.",
+    about_p1: "Я помогаю англоговорящим быстрее и увереннее читать по-русски. 1000+ проведённых уроков, высокий рейтинг.",
     contacts: "Контакты",
     learn_with_me: "Учи русский язык со мной на платформах:",
-    newsletter: "Рассылка",
 
-    products_search: "Поиск по названию, уровню или описанию…",
+    products_search: "Поиск по названию или описанию…",
     search_clear: "Очистить",
-    not_found: "Ничего не найдено",
+    not_found: "Не найдено",
     try_another: "Попробуйте другой запрос.",
     buy_amazon: "Купить на Amazon",
     buy_etsy: "Купить на Etsy",
     buy_generic: "Купить",
 
-    audio_choose: "Выберите книгу, чтобы слушать или скачать материалы",
+    audio_choose: "Выберите книгу, чтобы послушать или загрузить материалы",
     audio_empty: "Пока нет доступных аудиокниг.",
     back: "Назад",
     download_all: "Скачать всё",
     listen: "Слушать",
     pause: "Пауза",
     download: "Скачать",
-    now_playing: "Сейчас играет",
-    playback_speed: "Скорость",
-    volume: "Громкость",
-    muted: "Звук выключен",
-    unmuted: "Звук включен",
-    reset: "С начала",
-    forward_15: "+15 сек",
-    error_audio: "Не удалось загрузить аудио. Проверьте пути в /public/audio.",
-    theme_light: "Светлая",
-    theme_dark: "Тёмная",
   },
 };
 
-// =====================================================
-// Helpers
-// =====================================================
-function formatTime(sec) {
-  if (!Number.isFinite(sec) || sec < 0) return "0:00";
-  const m = Math.floor(sec / 60);
-  const s = Math.floor(sec % 60);
-  return `${m}:${String(s).padStart(2, "0")}`;
+// ================== UI HELPERS ==================
+function NavPill({ active, onClick, children, size = "md" }) {
+  const padding = size === "sm" ? "px-3 py-1.5 text-xs" : "px-5 py-2.5 text-sm";
+
+  return (
+    <button
+      onClick={onClick}
+      type="button"
+      className={[
+        padding,
+        "rounded-full border transition-all duration-200 select-none",
+        "active:scale-[0.97]",
+        "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300",
+        active
+          ? "bg-blue-600 text-white border-blue-600 shadow-md font-semibold"
+          : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:border-slate-300",
+      ].join(" ")}
+    >
+      {children}
+    </button>
+  );
 }
 
 function currencyUSD(n) {
@@ -287,83 +144,12 @@ function productBuyLabel(item, t) {
   return t("buy_generic");
 }
 
-function NavPill({ active, onClick, children }) {
+function EmptyState({ title, subtitle }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={cn(
-        "h-10 px-4 rounded-full border text-sm font-medium transition select-none",
-        "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 dark:focus-visible:ring-blue-500",
-        active
-          ? "bg-blue-600 text-white border-blue-600 shadow-sm"
-          : "bg-white text-slate-800 border-slate-200 hover:bg-slate-50 hover:border-slate-300",
-        "dark:bg-slate-900 dark:text-slate-100 dark:border-slate-700 dark:hover:bg-slate-800/60",
-        active && "dark:border-blue-600 dark:bg-blue-600"
-      )}
-    >
-      {children}
-    </button>
-  );
-}
-
-function EmptyState({ title, subtitle, action }) {
-  return (
-    <Card className="border border-slate-200/70 dark:border-slate-800">
+    <Card className="border border-slate-200">
       <CardContent className="p-6">
-        <p className="font-semibold text-slate-900 dark:text-slate-100">{title}</p>
-        {subtitle && <p className="text-sm text-slate-600 dark:text-slate-300 mt-1">{subtitle}</p>}
-        {action && <div className="mt-4">{action}</div>}
-      </CardContent>
-    </Card>
-  );
-}
-
-function ProductCard({ item, t }) {
-  const buyText = productBuyLabel(item, t);
-
-  return (
-    <Card className="overflow-hidden flex flex-col">
-      <div className="relative">
-        <img
-          src={item.image}
-          alt={item.title}
-          className="w-full h-56 object-cover"
-          loading="lazy"
-        />
-        <div className="absolute top-3 left-3 flex flex-wrap gap-2">
-          {item.badges?.map((b) => (
-            <Badge key={b}>{b}</Badge>
-          ))}
-        </div>
-      </div>
-
-      <CardContent className="flex flex-col flex-grow">
-        <div className="space-y-2">
-          <div className="space-y-1">
-            <CardTitle className="text-lg leading-snug">{item.title}</CardTitle>
-            <p className="text-sm text-slate-600 dark:text-slate-300">{item.kind}</p>
-          </div>
-          <p className="text-sm text-slate-700 dark:text-slate-200">{item.description}</p>
-        </div>
-
-        <div className="mt-auto pt-4 flex items-center justify-between gap-3">
-          <span className="text-xl font-semibold text-slate-900 dark:text-slate-100">
-            {currencyUSD(item.price)}
-          </span>
-
-          <a
-            href={item.externalUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex"
-          >
-            <Button variant="outline" className="gap-2" ariaLabel={buyText} title={buyText}>
-              <ExternalLink className="w-4 h-4" />
-              <span>{buyText}</span>
-            </Button>
-          </a>
-        </div>
+        <p className="font-semibold">{title}</p>
+        {subtitle && <p className="text-sm text-slate-600 mt-1">{subtitle}</p>}
       </CardContent>
     </Card>
   );
@@ -371,22 +157,17 @@ function ProductCard({ item, t }) {
 
 function AudioBookTile({ book, onOpen }) {
   return (
-    <button onClick={() => onOpen(book.id)} className="w-full text-left" type="button">
-      <Card className="p-4 hover:shadow-md transition">
+    <button
+  onClick={() => onOpen(book.id)}
+  className="w-full max-w-sm text-left"
+  type="button"
+>
+      <Card className="p-4 border border-slate-200 hover:shadow transition">
         <div className="flex gap-4 items-center">
-          <img
-            src={book.cover}
-            alt={book.title}
-            className="w-16 h-16 rounded-2xl object-cover flex-none"
-            loading="lazy"
-          />
+          <img src={book.cover} alt={book.title} className="w-16 h-16 rounded-xl object-cover flex-none" />
           <div className="min-w-0">
-            <p className="font-semibold text-slate-900 dark:text-slate-100 truncate">{book.title}</p>
-            {book.description && (
-              <p className="text-sm text-slate-600 dark:text-slate-300 line-clamp-2">
-                {book.description}
-              </p>
-            )}
+            <p className="font-semibold truncate">{book.title}</p>
+            {book.description && <p className="text-sm text-slate-600 line-clamp-2">{book.description}</p>}
           </div>
         </div>
       </Card>
@@ -394,63 +175,82 @@ function AudioBookTile({ book, onOpen }) {
   );
 }
 
+function formatTime(sec) {
+  if (!Number.isFinite(sec) || sec < 0) return "0:00";
+  const m = Math.floor(sec / 60);
+  const s = Math.floor(sec % 60);
+  return `${m}:${String(s).padStart(2, "0")}`;
+}
+
 function TrackRow({
   track,
-  t,
   isActive,
   isPlaying,
   onToggle,
   onSeek,
+  t,
   currentTime,
   duration,
-  onDownload,
 }) {
   const activeAndPlaying = isActive && isPlaying;
+  const showScrubber = isActive; // можно сделать isActive && duration>0
+
   const safeDuration = Number.isFinite(duration) && duration > 0 ? duration : 0;
   const safeTime = Number.isFinite(currentTime) && currentTime >= 0 ? currentTime : 0;
 
   return (
-    <Card className={cn("transition", isActive ? "shadow-md border-blue-200/80 dark:border-blue-700/60" : "")}>
+    <Card className={["border border-slate-200 transition", isActive ? "shadow-sm" : ""].join(" ")}>
       <CardContent className="p-4">
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
-            <p className={cn("font-medium truncate", isActive ? "text-slate-900 dark:text-slate-100" : "text-slate-800 dark:text-slate-200")}>
-              {track.title}
-            </p>
+            <p className="font-medium truncate">{track.title}</p>
 
-            {isActive && (
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+            {/* маленькая строка времени (без Listen/Pause текста) */}
+            {showScrubber && (
+              <p className="text-xs text-slate-500 mt-1">
                 {formatTime(safeTime)} / {formatTime(safeDuration)}
               </p>
             )}
           </div>
 
           <div className="flex items-center gap-2 flex-none">
-            <Button
-              size="icon"
-              variant="outline"
+            {/* PLAY/PAUSE — только иконка */}
+            <button
+              type="button"
               onClick={() => onToggle(track)}
-              ariaLabel={activeAndPlaying ? t("pause") : t("listen")}
+              className={[
+                "h-10 w-10 inline-flex items-center justify-center rounded-xl border",
+                "border-slate-200 bg-white hover:bg-slate-50 active:scale-[0.98]",
+                "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300",
+                isActive ? "shadow-sm" : "",
+              ].join(" ")}
+              aria-label={activeAndPlaying ? t("pause") : t("listen")}
               title={activeAndPlaying ? t("pause") : t("listen")}
-              className={cn(isActive ? "shadow-sm" : "")}
             >
               {activeAndPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
-            </Button>
+            </button>
 
-            <Button
-              size="icon"
-              variant="outline"
-              onClick={() => onDownload(track)}
-              ariaLabel={`${t("download")}: ${track.title}`}
-              title={t("download")}
-              disabled={!track.src || track.src === "#"}
-            >
-              <Download className="w-5 h-5" />
-            </Button>
+            {/* DOWNLOAD — только иконка */}
+            {track.src && track.src !== "#" && (
+              <a href={track.src} download className="inline-flex" aria-label={`${t("download")}: ${track.title}`}>
+                <button
+                  type="button"
+                  className={[
+                    "h-10 w-10 inline-flex items-center justify-center rounded-xl border",
+                    "border-slate-200 bg-white hover:bg-slate-50 active:scale-[0.98]",
+                    "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300",
+                  ].join(" ")}
+                  title={t("download")}
+                >
+                  <Download className="w-5 h-5" />
+                </button>
+              </a>
+            )}
           </div>
         </div>
 
-        {isActive && (
+        {/* 2) SEEK BAR появляется при нажатии Play (когда трек активен) */}
+        {showScrubber && (
           <div className="mt-3">
             <input
               type="range"
@@ -460,10 +260,11 @@ function TrackRow({
               value={Math.min(safeTime, safeDuration || safeTime)}
               onChange={(e) => onSeek(Number(e.target.value))}
               disabled={!safeDuration}
-              className={cn(
-                "w-full accent-blue-600",
-                "disabled:opacity-40 disabled:cursor-not-allowed"
-              )}
+              className={[
+                "w-full",
+                "accent-blue-600",
+                "disabled:opacity-40 disabled:cursor-not-allowed",
+              ].join(" ")}
               aria-label="Seek"
             />
           </div>
@@ -473,24 +274,64 @@ function TrackRow({
   );
 }
 
-// =====================================================
-// APP
-// =====================================================
+function ProductCard({ item, t }) {
+  return (
+    <Card className="overflow-hidden border border-slate-200 flex flex-col">
+      <CardHeader className="p-0">
+        <div className="relative">
+          <img src={item.image} alt={item.title} className="w-full h-56 object-cover" />
+          <div className="absolute top-3 left-3 flex flex-wrap gap-2">
+            {item.badges?.map((b) => (
+              <Badge key={b} className="backdrop-blur">
+                {b}
+              </Badge>
+            ))}
+          </div>
+        </div>
+      </CardHeader>
+
+      <CardContent className="p-4 flex flex-col flex-grow justify-between">
+        <div className="space-y-2">
+          <div className="space-y-1">
+            <CardTitle className="text-lg leading-snug">{item.title}</CardTitle>
+            <p className="text-sm opacity-80">{item.kind}</p>
+          </div>
+          <p className="text-sm text-slate-700">{item.description}</p>
+        </div>
+
+        <div className="flex items-center justify-between pt-4 mt-auto">
+          <span className="text-xl font-semibold">{currencyUSD(item.price)}</span>
+
+          <a href={item.externalUrl} target="_blank" rel="noopener noreferrer" className="inline-flex">
+            <Button variant="outline" className="flex items-center gap-1" type="button">
+              <ExternalLink className="w-4 h-4" />
+              <span>{productBuyLabel(item, t)}</span>
+            </Button>
+          </a>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// ================== APP ==================
 export default function App() {
-  // ---- language ----
+  // -------- language --------
   const detectLanguage = () => {
     try {
       const saved = localStorage.getItem("lang");
       if (saved === "ru" || saved === "en") return saved;
+
       const browser = (navigator.language || "en").toLowerCase();
-      return browser.startsWith("ru") ? "ru" : "en";
+      if (browser.startsWith("ru")) return "ru";
+      return "en";
     } catch {
       return "en";
     }
   };
 
   const [lang, setLang] = useState(() => detectLanguage());
-  const t = useCallback((key) => I18N[lang]?.[key] ?? I18N.en[key] ?? key, [lang]);
+  const t = (key) => I18N[lang]?.[key] ?? I18N.en[key] ?? key;
 
   const switchLang = (next) => {
     setLang(next);
@@ -499,30 +340,7 @@ export default function App() {
     } catch {}
   };
 
-  // ---- theme (light/dark) ----
-  const detectTheme = () => {
-    try {
-      const saved = localStorage.getItem("theme");
-      if (saved === "light" || saved === "dark") return saved;
-      if (window.matchMedia?.("(prefers-color-scheme: dark)").matches) return "dark";
-      return "light";
-    } catch {
-      return "light";
-    }
-  };
-
-  const [theme, setTheme] = useState(() => detectTheme());
-
-  useEffect(() => {
-    const root = document.documentElement;
-    if (theme === "dark") root.classList.add("dark");
-    else root.classList.remove("dark");
-    try {
-      localStorage.setItem("theme", theme);
-    } catch {}
-  }, [theme]);
-
-  // ---- tab ----
+  // -------- tab --------
   const detectTab = () => {
     try {
       const saved = localStorage.getItem("tab");
@@ -537,11 +355,13 @@ export default function App() {
     try {
       localStorage.setItem("tab", tab);
     } catch {}
+    // Small UX polish: go to top when switching tabs
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [tab]);
 
-  // ---- store search ----
+  // -------- store search --------
   const [query, setQuery] = useState("");
+
   const filteredProducts = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return PRODUCTS;
@@ -552,108 +372,54 @@ export default function App() {
 
   const clearQuery = () => setQuery("");
 
-  // ---- audiobooks ----
+  // -------- audiobooks --------
   const [audioBookId, setAudioBookId] = useState(null);
-  const selectedBook = useMemo(
-    () => AUDIO_BOOKS.find((b) => b.id === audioBookId) || null,
-    [audioBookId]
-  );
+
+  const selectedBook = useMemo(() => AUDIO_BOOKS.find((b) => b.id === audioBookId) || null, [audioBookId]);
 
   // One global audio player
   const audioRef = useRef(null);
-
   const [currentTrack, setCurrentTrack] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [playbackRate, setPlaybackRate] = useState(1);
-  const [volume, setVolume] = useState(1);
-  const [muted, setMuted] = useState(false);
-  const [audioError, setAudioError] = useState("");
-
-  // restore player prefs
-  useEffect(() => {
-    try {
-      const v = Number(localStorage.getItem("volume"));
-      const r = Number(localStorage.getItem("rate"));
-      const m = localStorage.getItem("muted");
-      if (Number.isFinite(v) && v >= 0 && v <= 1) setVolume(v);
-      if (Number.isFinite(r) && r >= 0.5 && r <= 2) setPlaybackRate(r);
-      if (m === "1" || m === "0") setMuted(m === "1");
-    } catch {}
-  }, []);
-
-  // apply to audio element
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    audio.playbackRate = playbackRate;
-    audio.volume = volume;
-    audio.muted = muted;
-    try {
-      localStorage.setItem("volume", String(volume));
-      localStorage.setItem("rate", String(playbackRate));
-      localStorage.setItem("muted", muted ? "1" : "0");
-    } catch {}
-  }, [playbackRate, volume, muted]);
 
   useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
+  const audio = audioRef.current;
+  if (!audio) return;
 
-    const onPlay = () => setIsPlaying(true);
-    const onPause = () => setIsPlaying(false);
-    const onEnded = () => setIsPlaying(false);
-    const onTime = () => setCurrentTime(audio.currentTime || 0);
-    const onMeta = () => {
-      setDuration(Number.isFinite(audio.duration) ? audio.duration : 0);
-      setCurrentTime(audio.currentTime || 0);
-    };
-    const onErr = () => {
-      setAudioError(t("error_audio"));
-      setIsPlaying(false);
-    };
+  const onPlay = () => setIsPlaying(true);
+  const onPause = () => setIsPlaying(false);
+  const onEnded = () => setIsPlaying(false);
 
-    audio.addEventListener("play", onPlay);
-    audio.addEventListener("pause", onPause);
-    audio.addEventListener("ended", onEnded);
-    audio.addEventListener("timeupdate", onTime);
-    audio.addEventListener("loadedmetadata", onMeta);
-    audio.addEventListener("durationchange", onMeta);
-    audio.addEventListener("error", onErr);
+  const onTime = () => setCurrentTime(audio.currentTime || 0);
+  const onMeta = () => {
+    setDuration(Number.isFinite(audio.duration) ? audio.duration : 0);
+    setCurrentTime(audio.currentTime || 0);
+  };
 
-    return () => {
-      audio.removeEventListener("play", onPlay);
-      audio.removeEventListener("pause", onPause);
-      audio.removeEventListener("ended", onEnded);
-      audio.removeEventListener("timeupdate", onTime);
-      audio.removeEventListener("loadedmetadata", onMeta);
-      audio.removeEventListener("durationchange", onMeta);
-      audio.removeEventListener("error", onErr);
-    };
-  }, [t]);
+  audio.addEventListener("play", onPlay);
+  audio.addEventListener("pause", onPause);
+  audio.addEventListener("ended", onEnded);
+  audio.addEventListener("timeupdate", onTime);
+  audio.addEventListener("loadedmetadata", onMeta);
+  audio.addEventListener("durationchange", onMeta);
+
+  return () => {
+    audio.removeEventListener("play", onPlay);
+    audio.removeEventListener("pause", onPause);
+    audio.removeEventListener("ended", onEnded);
+    audio.removeEventListener("timeupdate", onTime);
+    audio.removeEventListener("loadedmetadata", onMeta);
+    audio.removeEventListener("durationchange", onMeta);
+  };
+}, []);
 
   const stopAudio = useCallback(() => {
     const audio = audioRef.current;
     if (!audio) return;
     audio.pause();
     audio.currentTime = 0;
-    setCurrentTime(0);
-    setDuration(0);
-    setIsPlaying(false);
-    setAudioError("");
-  }, []);
-
-  const loadTrack = useCallback((track) => {
-    const audio = audioRef.current;
-    if (!audio || !track?.src || track.src === "#") return;
-
-    setAudioError("");
-    if (audio.src !== track.src) {
-      // IMPORTANT: make sure it becomes absolute to avoid some browser quirks
-      audio.src = track.src;
-    }
-    setCurrentTrack(track);
   }, []);
 
   const toggleTrack = useCallback(
@@ -661,22 +427,15 @@ export default function App() {
       const audio = audioRef.current;
       if (!audio || !track?.src || track.src === "#") return;
 
-      // same track: toggle
-      if (currentTrack?.id === track.id) {
-        if (!audio.paused) {
-          audio.pause();
-          return;
-        }
-        try {
-          await audio.play();
-        } catch (e) {
-          console.warn("Audio play failed:", e);
-        }
+      if (currentTrack?.id === track.id && !audio.paused) {
+        audio.pause();
         return;
       }
 
-      // new track
-      loadTrack(track);
+      if (currentTrack?.id !== track.id) {
+        audio.src = track.src;
+        setCurrentTrack(track);
+      }
 
       try {
         await audio.play();
@@ -684,44 +443,33 @@ export default function App() {
         console.warn("Audio play failed:", e);
       }
     },
-    [currentTrack, loadTrack]
+    [currentTrack]
   );
 
   const seekTo = useCallback((sec) => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    audio.currentTime = Math.max(0, sec || 0);
-    setCurrentTime(audio.currentTime);
-  }, []);
+  const audio = audioRef.current;
+  if (!audio) return;
 
-  const restart = useCallback(() => {
-    seekTo(0);
-  }, [seekTo]);
+  audio.currentTime = Math.max(0, sec || 0);
+  setCurrentTime(audio.currentTime);
+}, []);
 
-  const forward15 = useCallback(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    seekTo((audio.currentTime || 0) + 15);
-  }, [seekTo]);
-
-  const handleDownload = useCallback((track) => {
-    if (!track?.src || track.src === "#") return;
-    const a = document.createElement("a");
-    a.href = track.src;
-    a.download = ""; // let browser pick filename
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-  }, []);
-
-  const downloadAllAudio = useCallback(() => {
+  function downloadAllAudio() {
     if (!selectedBook?.tracks?.length) return;
-    // Browser limitation: this will trigger multiple downloads (normal behavior)
-    selectedBook.tracks.forEach((tr) => handleDownload(tr));
-  }, [selectedBook, handleDownload]);
+
+    selectedBook.tracks.forEach((tr) => {
+      if (!tr.src || tr.src === "#") return;
+      const a = document.createElement("a");
+      a.href = tr.src;
+      a.download = "";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    });
+  }
 
   useEffect(() => {
-    // leaving audio tab — stop and reset selection
+    // when leaving Audio tab — stop player and reset selection
     if (tab !== "free-audio") {
       stopAudio();
       setCurrentTrack(null);
@@ -730,252 +478,167 @@ export default function App() {
   }, [tab, stopAudio]);
 
   useEffect(() => {
-    // closing a book — stop
+    // when closing a book — stop
     if (!audioBookId) {
       stopAudio();
       setCurrentTrack(null);
     }
   }, [audioBookId, stopAudio]);
 
-  // Keyboard shortcuts (only inside audio book view)
-  useEffect(() => {
-    if (tab !== "free-audio" || !audioBookId) return;
-
-    const onKeyDown = (e) => {
-      // ignore typing into inputs
-      const tag = (e.target?.tagName || "").toLowerCase();
-      if (tag === "input" || tag === "textarea") return;
-
-      if (e.code === "Space") {
-        e.preventDefault();
-        if (currentTrack) toggleTrack(currentTrack);
-      }
-      if (e.key === "ArrowRight") forward15();
-      if (e.key === "r" || e.key === "R") restart();
-      if (e.key === "m" || e.key === "M") setMuted((v) => !v);
-    };
-
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [tab, audioBookId, currentTrack, toggleTrack, forward15, restart]);
-
-  // Layout
-  const CONTAINER = "w-full max-w-6xl mx-auto px-4 sm:px-6";
-  const TOPBAR_H = "min-h-[68px]";
-
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
+    <div className="min-h-screen flex flex-col bg-white">
       <a
         href="#content"
-        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[9999] bg-white dark:bg-slate-900 border rounded-xl px-3 py-2 shadow"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[9999] bg-white border rounded-lg px-3 py-2 shadow"
       >
         Skip to content
       </a>
 
-      <audio ref={audioRef} preload="metadata" />
+      <audio ref={audioRef} preload="none" />
 
-      {/* HEADER */}
-      <header className="sticky top-0 z-50 bg-white/80 dark:bg-slate-950/70 backdrop-blur border-b border-slate-200/70 dark:border-slate-800">
+      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur border-b">
         {/* TOP BAR */}
         <div className="w-full">
-          <div className={cn(CONTAINER, "py-3 flex items-center justify-between gap-4", TOPBAR_H)}>
+          <div className={`${CONTAINER} py-3 flex items-center justify-between gap-4 ${TOPBAR_H}`}>
             <div className="flex items-center gap-3 min-w-0">
-              {/* Use your own logo if you want: /logo.png */}
-              <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 grid place-items-center text-white font-bold">
-                G
-              </div>
-
+              <img
+                src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=240&auto=format&fit=crop"
+                alt="logo"
+                className="w-9 h-9 rounded-xl"
+              />
               <div className="min-w-0">
                 <p className="font-semibold leading-tight truncate">{t("name")}</p>
                 <p className="text-xs opacity-70 truncate">{t("tagline")}</p>
               </div>
             </div>
 
+            {/* RU/ENG — fixed to the right edge of the header row */}
             <div className="flex items-center gap-2 shrink-0">
-              {/* Theme toggle */}
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => setTheme((v) => (v === "dark" ? "light" : "dark"))}
-                ariaLabel={theme === "dark" ? t("theme_light") : t("theme_dark")}
-                title={theme === "dark" ? t("theme_light") : t("theme_dark")}
-              >
-                {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-              </Button>
-
-              {/* Language */}
-              <NavPill active={lang === "ru"} onClick={() => switchLang("ru")}>
+              <NavPill size="sm" active={lang === "ru"} onClick={() => switchLang("ru")}>
                 RU
               </NavPill>
-              <NavPill active={lang === "en"} onClick={() => switchLang("en")}>
-                EN
+              <NavPill size="sm" active={lang === "en"} onClick={() => switchLang("en")}>
+                ENG
               </NavPill>
             </div>
           </div>
         </div>
 
         {/* NAV */}
-        <nav className="border-t border-slate-200/70 dark:border-slate-800">
-          <div className={cn(CONTAINER, "py-3 flex items-center gap-3 overflow-x-auto")}>
-            <NavPill active={tab === "about"} onClick={() => setTab("about")}>
-              {t("nav_about")}
-            </NavPill>
-            <NavPill active={tab === "products"} onClick={() => setTab("products")}>
-              {t("nav_products")}
-            </NavPill>
-            <NavPill
-              active={tab === "free-audio"}
-              onClick={() => {
-                setTab("free-audio");
-                setAudioBookId(null);
-              }}
-            >
-              {t("nav_audio")}
-            </NavPill>
+        <nav className="border-t">
+          <div className="w-full">
+            <div className={`${CONTAINER} py-3 flex items-center gap-3`}>
+              <NavPill
+                active={tab === "about"}
+                onClick={() => {
+                  setTab("about");
+                }}
+              >
+                {t("nav_about")}
+              </NavPill>
+
+              <NavPill
+                active={tab === "products"}
+                onClick={() => {
+                  setTab("products");
+                }}
+              >
+                {t("nav_products")}
+              </NavPill>
+
+              <NavPill
+                active={tab === "free-audio"}
+                onClick={() => {
+                  setTab("free-audio");
+                  setAudioBookId(null);
+                }}
+              >
+                {t("nav_audio")}
+              </NavPill>
+            </div>
           </div>
         </nav>
       </header>
 
-      {/* MAIN */}
-      <main id="content" className={cn("flex-1", CONTAINER, "py-8 space-y-10")}>
+      <main id="content" className={`flex-1 ${CONTAINER} py-8 space-y-10`}>
         {/* ABOUT */}
         {tab === "about" && (
-          <section className="grid lg:grid-cols-3 gap-8 items-start">
-            <div className="lg:col-span-2 space-y-4">
-              <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">
-                {t("about_title")}
-              </h1>
-              <p className="leading-relaxed text-slate-700 dark:text-slate-200">{t("about_p1")}</p>
+          <section className="grid md:grid-cols-3 gap-8 items-start">
+            <div className="md:col-span-2 space-y-4">
+              <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">{t("about_title")}</h1>
+              <p className="leading-relaxed text-slate-700">{t("about_p1")}</p>
+            </div>
 
-              <div className="flex flex-wrap gap-3 pt-2">
-                <a
-                  href="https://preply.com/en/?pref=ODkzOTkyOQ==&id=1759522486.457389&ep=w1"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Button variant="solid" className="gap-2">
-                    <ExternalLink className="w-4 h-4" />
-                    Preply
-                  </Button>
-                </a>
-
-                <a
-                  href="https://www.italki.com/affshare?ref=af11775706"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Button variant="outline" className="gap-2">
-                    <ExternalLink className="w-4 h-4" />
-                    italki
-                  </Button>
-                </a>
-
-                <a
-                  href="https://substack.com/@gbogdanov"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Button variant="ghost" className="gap-2">
-                    <ExternalLink className="w-4 h-4" />
-                    {t("newsletter")}
-                  </Button>
-                </a>
+            <Card className="p-5 border border-slate-200">
+              <CardTitle className="mb-2">{t("contacts")}</CardTitle>
+              <div className="text-sm space-y-1">
+                <p>E-mail: genndybogdanov@gmail.com</p>
+                <p>
+                  <a className="underline hover:text-slate-900" href="https://medium.com/@gbogdanov" target="_blank" rel="noopener noreferrer">
+                    Medium
+                  </a>
+                </p>
+                <p>
+                  <a className="underline hover:text-slate-900" href="https://substack.com/@gbogdanov" target="_blank" rel="noopener noreferrer">
+                    Substack
+                  </a>
+                </p>
               </div>
+            </Card>
 
-              <Card className="mt-4">
-                <CardHeader>
-                  <CardTitle>{t("learn_with_me")}</CardTitle>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  <ul className="space-y-2 text-slate-700 dark:text-slate-200 text-sm">
-                    <li className="flex items-center justify-between gap-3">
-                      <span>Preply</span>
+            <Card className="md:col-span-3 border border-slate-200">
+              <div className="grid md:grid-cols-3 gap-6 p-5 items-center">
+                <div>
+                  <img
+                    src="/Portrait_1.jpg"
+                    alt="Portrait"
+                    className="w-auto h-40 md:h-48 object-cover rounded-2xl shadow aspect-[3/4]"
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <h3 className="text-xl font-semibold mb-2">{t("learn_with_me")}</h3>
+                  <ul className="space-y-2 text-slate-700">
+                    <li>
                       <a
-                        className="underline hover:opacity-80"
+                        className="underline hover:text-slate-900"
                         href="https://preply.com/en/?pref=ODkzOTkyOQ==&id=1759522486.457389&ep=w1"
                         target="_blank"
                         rel="noopener noreferrer"
                       >
-                        open
+                        Preply
                       </a>
                     </li>
-                    <li className="flex items-center justify-between gap-3">
-                      <span>italki</span>
-                      <a
-                        className="underline hover:opacity-80"
-                        href="https://www.italki.com/affshare?ref=af11775706"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        open
+                    <li>
+                      <a className="underline hover:text-slate-900" href="https://www.italki.com/affshare?ref=af11775706" target="_blank" rel="noopener noreferrer">
+                        italki
                       </a>
                     </li>
                   </ul>
-                </CardContent>
-              </Card>
-            </div>
-
-            <aside className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>{t("contacts")}</CardTitle>
-                </CardHeader>
-                <CardContent className="pt-0 text-sm space-y-2 text-slate-700 dark:text-slate-200">
-                  <div className="flex items-center justify-between gap-3">
-                    <span>E-mail</span>
-                    <a className="underline hover:opacity-80" href="mailto:genndybogdanov@gmail.com">
-                      genndybogdanov@gmail.com
-                    </a>
-                  </div>
-                  <div className="flex items-center justify-between gap-3">
-                    <span>Substack</span>
-                    <a
-                      className="underline hover:opacity-80"
-                      href="https://substack.com/@gbogdanov"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      open
-                    </a>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="overflow-hidden">
-                <img
-                  src="/Portrait_1.jpg"
-                  alt="Portrait"
-                  className="w-full aspect-[4/5] object-cover"
-                  loading="lazy"
-                />
-                <CardContent className="pt-4">
-                  <p className="text-sm text-slate-600 dark:text-slate-300">
-                    Minimal, clean, and readable — like your future Russian. 🙂
-                  </p>
-                </CardContent>
-              </Card>
-            </aside>
+                </div>
+              </div>
+            </Card>
           </section>
         )}
 
         {/* PRODUCTS */}
         {tab === "products" && (
           <section className="space-y-6">
-            <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
-              <div className="relative w-full sm:max-w-xl">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* SEARCH — first column */}
+              <div className="relative">
                 <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 <Input
                   aria-label={t("products_search")}
                   placeholder={t("products_search")}
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  className="pl-9 pr-10"
+                  className="w-full pl-9 pr-10"
                 />
                 {!!query && (
                   <button
                     type="button"
                     onClick={clearQuery}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-lg hover:bg-slate-100"
                     aria-label={t("search_clear")}
                     title={t("search_clear")}
                   >
@@ -984,19 +647,17 @@ export default function App() {
                 )}
               </div>
 
-              <div className="text-sm text-slate-600 dark:text-slate-300">
-                {filteredProducts.length} / {PRODUCTS.length}
-              </div>
-            </div>
+              {/* Fill rest of first row to keep grid alignment */}
+              <div className="hidden sm:block lg:col-span-2" />
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* Results */}
               {filteredProducts.length === 0 ? (
-                <div className="sm:col-span-2 lg:col-span-3">
-                  <EmptyState title={t("not_found")} subtitle={t("try_another")} />
-                </div>
-              ) : (
-                filteredProducts.map((p) => <ProductCard key={p.id} item={p} t={t} />)
-              )}
+  <div>
+    <EmptyState title={t("not_found")} subtitle={t("try_another")} />
+  </div>
+) : (
+  filteredProducts.map((p) => <ProductCard key={p.id} item={p} t={t} />)
+)}
             </div>
           </section>
         )}
@@ -1006,7 +667,7 @@ export default function App() {
           <section className="space-y-6">
             {!audioBookId && (
               <>
-                <p className="text-slate-700 dark:text-slate-200">{t("audio_choose")}</p>
+                <p className="text-slate-700">{t("audio_choose")}</p>
 
                 {AUDIO_BOOKS.length === 0 ? (
                   <EmptyState title={t("audio_empty")} />
@@ -1021,197 +682,67 @@ export default function App() {
             )}
 
             {audioBookId && selectedBook && (
-              <>
-                {/* Top: responsive header row */}
-                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                  {/* Mobile: mini cover next to title; Desktop: title only (big cover on the left below) */}
-                  <div className="flex items-center gap-4 min-w-0">
-                    <img
-                      src={selectedBook.cover}
-                      alt={selectedBook.title}
-                      className="w-20 h-20 rounded-2xl object-cover shadow flex-none md:hidden"
-                    />
-                    <div className="min-w-0">
-                      <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight truncate">
-                        {selectedBook.title}
-                      </h1>
-                      <p className="text-slate-600 dark:text-slate-300">{selectedBook.description}</p>
-                      {currentTrack && (
-                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 truncate">
-                          {t("now_playing")}: {currentTrack.title}
-                        </p>
-                      )}
-                    </div>
-                  </div>
+              <>              
+<div
+  className="
+    order-1 md:order-2
+    flex flex-col gap-3
+    md:flex-row md:items-center md:gap-3
+    w-full md:w-auto
+    justify-end
+  "
+>
+  {/* Mobile: cover + title row */}
+  <div className="order-2 md:order-1 w-full">
+    <div className="flex items-center gap-4 md:block">
+      {/* mini cover ONLY on mobile */}
+      <img
+        src={selectedBook.cover}
+        alt={selectedBook.title}
+        className="w-20 h-20 rounded-2xl object-cover shadow flex-none md:hidden"
+      />
 
-                  {/* Actions (no a>button nesting, fully responsive) */}
-                  <div className="flex w-full md:w-auto flex-wrap gap-3 md:justify-end">
-                    <Button variant="outline" onClick={() => setAudioBookId(null)} className="w-full sm:w-auto">
-                      ← {t("back")}
-                    </Button>
-                    <Button onClick={downloadAllAudio} className="w-full sm:w-auto">
-                      <Download className="w-4 h-4" />
-                      {t("download_all")}
-                    </Button>
-                  </div>
-                </div>
+      <div className="min-w-0">
+        <h1 className="text-3xl font-bold md:text-4xl leading-tight">{selectedBook.title}</h1>
+        <p className="text-slate-600">{selectedBook.description}</p>
+      </div>
+    </div>
+  </div>
 
+  {/* Actions */}
+  <div className="order-1 md:order-2 flex w-full flex-wrap gap-3 justify-end md:w-auto">
+    <Button variant="outline" onClick={() => setAudioBookId(null)} className="flex gap-2" type="button">
+      ← {t("back")}
+    </Button>
+
+    <Button onClick={downloadAllAudio} className="flex gap-2" type="button">
+      <Download className="w-4 h-4" />
+      {t("download_all")}
+    </Button>
+  </div>
+</div>
+                
                 <div className="grid md:grid-cols-3 gap-6 items-start">
-                  {/* Desktop cover */}
-                  <Card className="hidden md:block overflow-hidden md:col-span-1">
-                    <img
-                      src={selectedBook.cover}
-                      alt={selectedBook.title}
-                      className="w-full aspect-square object-cover"
-                      loading="lazy"
-                    />
-                    <CardContent className="pt-4 space-y-4">
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between gap-3">
-                          <span className="text-sm text-slate-600 dark:text-slate-300">
-                            {t("playback_speed")}
-                          </span>
-                          <div className="flex gap-2">
-                            {[0.75, 1, 1.25, 1.5].map((r) => (
-                              <Button
-                                key={r}
-                                size="sm"
-                                variant={playbackRate === r ? "solid" : "outline"}
-                                onClick={() => setPlaybackRate(r)}
-                              >
-                                {r}×
-                              </Button>
-                            ))}
-                          </div>
-                        </div>
+                  <img
+                    src={selectedBook.cover}
+                    alt={selectedBook.title}
+                    className="hidden md:block w-full aspect-square object-cover rounded-2xl shadow md:col-span-1"
+                  />
 
-                        <Divider />
-
-                        <div className="flex items-center justify-between gap-3">
-                          <span className="text-sm text-slate-600 dark:text-slate-300">{t("volume")}</span>
-                          <Button
-                            size="icon"
-                            variant="outline"
-                            onClick={() => setMuted((v) => !v)}
-                            ariaLabel={muted ? t("unmuted") : t("muted")}
-                            title={muted ? t("unmuted") : t("muted")}
-                          >
-                            {muted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
-                          </Button>
-                        </div>
-
-                        <input
-                          type="range"
-                          min={0}
-                          max={1}
-                          step={0.01}
-                          value={volume}
-                          onChange={(e) => setVolume(Number(e.target.value))}
-                          className="w-full accent-blue-600"
-                          aria-label={t("volume")}
-                        />
-                      </div>
-
-                      <div className="flex gap-2">
-                        <Button variant="outline" size="sm" onClick={restart} className="flex-1">
-                          <RotateCcw className="w-4 h-4" />
-                          {t("reset")}
-                        </Button>
-                        <Button variant="outline" size="sm" onClick={forward15} className="flex-1">
-                          <FastForward className="w-4 h-4" />
-                          {t("forward_15")}
-                        </Button>
-                      </div>
-
-                      <p className="text-xs text-slate-500 dark:text-slate-400">
-                        Hotkeys: Space = play/pause, → = +15s, R = restart, M = mute.
-                      </p>
-                    </CardContent>
-                  </Card>
-
-                  {/* Tracks */}
                   <div className="md:col-span-2 space-y-3">
-                    {/* Mobile quick controls */}
-                    <Card className="md:hidden">
-                      <CardContent className="p-4 space-y-3">
-                        <div className="flex items-center justify-between gap-3">
-                          <span className="text-sm text-slate-600 dark:text-slate-300">{t("playback_speed")}</span>
-                          <div className="flex gap-2">
-                            {[1, 1.25, 1.5].map((r) => (
-                              <Button
-                                key={r}
-                                size="sm"
-                                variant={playbackRate === r ? "solid" : "outline"}
-                                onClick={() => setPlaybackRate(r)}
-                              >
-                                {r}×
-                              </Button>
-                            ))}
-                          </div>
-                        </div>
-
-                        <div className="flex items-center gap-3">
-                          <Button
-                            size="icon"
-                            variant="outline"
-                            onClick={() => setMuted((v) => !v)}
-                            ariaLabel={muted ? t("unmuted") : t("muted")}
-                            title={muted ? t("unmuted") : t("muted")}
-                          >
-                            {muted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
-                          </Button>
-
-                          <input
-                            type="range"
-                            min={0}
-                            max={1}
-                            step={0.01}
-                            value={volume}
-                            onChange={(e) => setVolume(Number(e.target.value))}
-                            className="w-full accent-blue-600"
-                            aria-label={t("volume")}
-                          />
-                        </div>
-
-                        <div className="flex gap-2">
-                          <Button variant="outline" size="sm" onClick={restart} className="flex-1">
-                            <RotateCcw className="w-4 h-4" />
-                            {t("reset")}
-                          </Button>
-                          <Button variant="outline" size="sm" onClick={forward15} className="flex-1">
-                            <FastForward className="w-4 h-4" />
-                            {t("forward_15")}
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-
-                    {audioError && (
-                      <EmptyState
-                        title={audioError}
-                        subtitle="Tip: files must be in /public/audio and referenced like /audio/name.mp3"
-                        action={
-                          <Button variant="outline" onClick={() => setAudioError("")}>
-                            OK
-                          </Button>
-                        }
-                      />
-                    )}
-
                     {selectedBook.tracks?.length ? (
                       selectedBook.tracks.map((tr) => (
-                        <TrackRow
-                          key={tr.id}
-                          track={tr}
-                          t={t}
-                          isActive={currentTrack?.id === tr.id}
-                          isPlaying={isPlaying}
-                          onToggle={toggleTrack}
-                          onSeek={seekTo}
-                          onDownload={handleDownload}
-                          currentTime={currentTrack?.id === tr.id ? currentTime : 0}
-                          duration={currentTrack?.id === tr.id ? duration : 0}
-                        />
+                       <TrackRow
+  key={tr.id}
+  track={tr}
+  isActive={currentTrack?.id === tr.id}
+  isPlaying={isPlaying}
+  onToggle={toggleTrack}
+  onSeek={seekTo}
+  t={t}
+  currentTime={currentTrack?.id === tr.id ? currentTime : 0}
+  duration={currentTrack?.id === tr.id ? duration : 0}
+/>
                       ))
                     ) : (
                       <EmptyState title={t("not_found")} subtitle={t("audio_empty")} />
@@ -1224,8 +755,8 @@ export default function App() {
         )}
       </main>
 
-      {/* FOOTER */}
-      <footer className="mt-auto py-8 text-center text-xs text-slate-500 dark:text-slate-400 border-t border-slate-200/70 dark:border-slate-800">
+      {/* Sticky footer (doesn't jump): bottom if little content, after content if long */}
+      <footer className="mt-auto py-6 text-center text-xs text-slate-500 border-t">
         © {new Date().getFullYear()} Genndy Bogdanov
       </footer>
     </div>
