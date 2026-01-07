@@ -383,6 +383,33 @@ export default function App() {
   const [lang, setLang] = useState(() => detectLanguage());
   const t = (key) => I18N[lang]?.[key] ?? I18N.en[key] ?? key;
 
+  // haptic-like pulse (for tiny visual feedback)
+const [hapticPulse, setHapticPulse] = useState(0);
+
+// respects OS setting
+const prefersReducedMotion = useMemo(() => {
+  try {
+    return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  } catch {
+    return false;
+  }
+}, []);
+
+const hapticTap = useCallback(
+  (pattern = [8]) => {
+    if (prefersReducedMotion) return;
+
+    // Real vibration (mostly Android)
+    if (typeof navigator !== "undefined" && "vibrate" in navigator) {
+      navigator.vibrate(pattern);
+    }
+
+    // Visual fallback: tiny pulse
+    setHapticPulse((v) => v + 1);
+  },
+  [prefersReducedMotion]
+);
+
   const switchLang = (next) => {
     setLang(next);
     try {
@@ -544,28 +571,28 @@ export default function App() {
   const TABS_ORDER = ["about", "products", "free-audio"];
 
   const goPrevTab = useCallback(() => {
-    setTab((prev) => {
-      const i = TABS_ORDER.indexOf(prev);
-      if (i <= 0) return prev;
-      const nextTab = TABS_ORDER[i - 1];
+  setTab((prev) => {
+    const i = TABS_ORDER.indexOf(prev);
+    if (i <= 0) return prev;
 
-      // If leaving audiobooks tab — close book selection, but do NOT forcibly stop audio here
-      // (stopAudio is handled by tab effect above when tab becomes not free-audio)
-      if (nextTab !== "free-audio") setAudioBookId(null);
+    hapticTap([8]); // short tick
+    const nextTab = TABS_ORDER[i - 1];
+    if (nextTab !== "free-audio") setAudioBookId(null);
+    return nextTab;
+  });
+}, [hapticTap]);
 
-      return nextTab;
-    });
-  }, []);
+const goNextTab = useCallback(() => {
+  setTab((prev) => {
+    const i = TABS_ORDER.indexOf(prev);
+    if (i === -1 || i >= TABS_ORDER.length - 1) return prev;
 
-  const goNextTab = useCallback(() => {
-    setTab((prev) => {
-      const i = TABS_ORDER.indexOf(prev);
-      if (i === -1 || i >= TABS_ORDER.length - 1) return prev;
-      const nextTab = TABS_ORDER[i + 1];
-      if (nextTab !== "free-audio") setAudioBookId(null);
-      return nextTab;
-    });
-  }, []);
+    hapticTap([8]); // short tick
+    const nextTab = TABS_ORDER[i + 1];
+    if (nextTab !== "free-audio") setAudioBookId(null);
+    return nextTab;
+  });
+}, [hapticTap]);
 
   // ✅ NEW RULE:
   // Swipe is enabled on mobile when audio is NOT playing (paused or stopped is OK),
@@ -617,26 +644,45 @@ export default function App() {
         {/* NAV */}
         <nav className="border-t">
           <div className="w-full">
-            <div className={`${CONTAINER} py-3 flex items-center gap-3`}>
-              <NavPill active={tab === "about"} onClick={() => setTab("about")}>
-                {t("nav_about")}
-              </NavPill>
+<div className={`${CONTAINER} py-3 flex items-center gap-3`}>
+  <div
+    // key заставит анимацию срабатывать каждый раз при импульсе
+    key={hapticPulse}
+    className="flex items-center gap-3 animate-[haptic_150ms_ease-out]"
+    style={{ animationPlayState: hapticPulse ? "running" : "paused" }}
+  >
+    <NavPill
+      active={tab === "about"}
+      onClick={() => {
+        hapticTap([8]);
+        setTab("about");
+      }}
+    >
+      {t("nav_about")}
+    </NavPill>
 
-              <NavPill active={tab === "products"} onClick={() => setTab("products")}>
-                {t("nav_products")}
-              </NavPill>
+    <NavPill
+      active={tab === "products"}
+      onClick={() => {
+        hapticTap([8]);
+        setTab("products");
+      }}
+    >
+      {t("nav_products")}
+    </NavPill>
 
-              <NavPill
-                active={tab === "free-audio"}
-                onClick={() => {
-                  setTab("free-audio");
-                  setAudioBookId(null);
-                }}
-              >
-                {t("nav_audio")}
-              </NavPill>
-            </div>
-          </div>
+    <NavPill
+      active={tab === "free-audio"}
+      onClick={() => {
+        hapticTap([8]);
+        setTab("free-audio");
+        setAudioBookId(null);
+      }}
+    >
+      {t("nav_audio")}
+    </NavPill>
+  </div>
+</div>
         </nav>
       </header>
 
