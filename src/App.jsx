@@ -175,37 +175,106 @@ function AudioBookTile({ book, onOpen }) {
   );
 }
 
-function TrackRow({ track, isActive, isPlaying, onToggle, t }) {
+function formatTime(sec) {
+  if (!Number.isFinite(sec) || sec < 0) return "0:00";
+  const m = Math.floor(sec / 60);
+  const s = Math.floor(sec % 60);
+  return `${m}:${String(s).padStart(2, "0")}`;
+}
+
+function TrackRow({
+  track,
+  isActive,
+  isPlaying,
+  onToggle,
+  onSeek,
+  t,
+  currentTime,
+  duration,
+}) {
   const activeAndPlaying = isActive && isPlaying;
+  const showScrubber = isActive; // можно сделать isActive && duration>0
+
+  const safeDuration = Number.isFinite(duration) && duration > 0 ? duration : 0;
+  const safeTime = Number.isFinite(currentTime) && currentTime >= 0 ? currentTime : 0;
 
   return (
-    <Card className="border border-slate-200">
-      <CardContent className="p-4 flex items-center justify-between gap-3">
-        <div className="min-w-0">
-          <p className="font-medium truncate">{track.title}</p>
+    <Card className={["border border-slate-200 transition", isActive ? "shadow-sm" : ""].join(" ")}>
+      <CardContent className="p-4">
+        <div className="flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <p className="font-medium truncate">{track.title}</p>
+
+            {/* маленькая строка времени (без Listen/Pause текста) */}
+            {showScrubber && (
+              <p className="text-xs text-slate-500 mt-1">
+                {formatTime(safeTime)} / {formatTime(safeDuration)}
+              </p>
+            )}
+          </div>
+
+          <div className="flex items-center gap-2 flex-none">
+            {/* PLAY/PAUSE — только иконка */}
+            <button
+              type="button"
+              onClick={() => onToggle(track)}
+              className={[
+                "h-10 w-10 inline-flex items-center justify-center rounded-xl border",
+                "border-slate-200 bg-white hover:bg-slate-50 active:scale-[0.98]",
+                "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300",
+                isActive ? "shadow-sm" : "",
+              ].join(" ")}
+              aria-label={activeAndPlaying ? t("pause") : t("listen")}
+              title={activeAndPlaying ? t("pause") : t("listen")}
+            >
+              {activeAndPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
+            </button>
+
+            {/* DOWNLOAD — только иконка */}
+            {track.src && track.src !== "#" && (
+              <a href={track.src} download className="inline-flex" aria-label={`${t("download")}: ${track.title}`}>
+                <button
+                  type="button"
+                  className={[
+                    "h-10 w-10 inline-flex items-center justify-center rounded-xl border",
+                    "border-slate-200 bg-white hover:bg-slate-50 active:scale-[0.98]",
+                    "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300",
+                  ].join(" ")}
+                  title={t("download")}
+                >
+                  <Download className="w-5 h-5" />
+                </button>
+              </a>
+            )}
+          </div>
         </div>
 
-        <div className="flex items-center gap-2 flex-none">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onToggle(track)}
-            className="flex items-center gap-2"
-            type="button"
-          >
-            {activeAndPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-            {activeAndPlaying ? t("pause") : t("listen")}
-          </Button>
+        {/* 2) SEEK BAR появляется при нажатии Play (когда трек активен) */}
+        {showScrubber && (
+          <div className="mt-3">
+            <input
+              type="range"
+              min={0}
+              max={safeDuration || 0}
+              step={0.25}
+              value={Math.min(safeTime, safeDuration || safeTime)}
+              onChange={(e) => onSeek(Number(e.target.value))}
+              disabled={!safeDuration}
+              className={[
+                "w-full",
+                "accent-blue-600",
+                "disabled:opacity-40 disabled:cursor-not-allowed",
+              ].join(" ")}
+              aria-label="Seek"
+            />
 
-          {track.src && track.src !== "#" && (
-            <a href={track.src} download className="inline-flex" aria-label={`${t("download")}: ${track.title}`}>
-              <Button size="sm" className="flex items-center gap-2" type="button">
-                <Download className="w-4 h-4" />
-                {t("download")}
-              </Button>
-            </a>
-          )}
-        </div>
+            {/* маленькие подсказки слева/справа (современно и полезно) */}
+            <div className="flex justify-between text-[11px] text-slate-400 mt-1">
+              <span>{formatTime(safeTime)}</span>
+              <span>-{formatTime((safeDuration || 0) - safeTime)}</span>
+            </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
@@ -318,25 +387,39 @@ export default function App() {
   const audioRef = useRef(null);
   const [currentTrack, setCurrentTrack] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
 
   useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
+  const audio = audioRef.current;
+  if (!audio) return;
 
-    const onPlay = () => setIsPlaying(true);
-    const onPause = () => setIsPlaying(false);
-    const onEnded = () => setIsPlaying(false);
+  const onPlay = () => setIsPlaying(true);
+  const onPause = () => setIsPlaying(false);
+  const onEnded = () => setIsPlaying(false);
 
-    audio.addEventListener("play", onPlay);
-    audio.addEventListener("pause", onPause);
-    audio.addEventListener("ended", onEnded);
+  const onTime = () => setCurrentTime(audio.currentTime || 0);
+  const onMeta = () => {
+    setDuration(Number.isFinite(audio.duration) ? audio.duration : 0);
+    setCurrentTime(audio.currentTime || 0);
+  };
 
-    return () => {
-      audio.removeEventListener("play", onPlay);
-      audio.removeEventListener("pause", onPause);
-      audio.removeEventListener("ended", onEnded);
-    };
-  }, []);
+  audio.addEventListener("play", onPlay);
+  audio.addEventListener("pause", onPause);
+  audio.addEventListener("ended", onEnded);
+  audio.addEventListener("timeupdate", onTime);
+  audio.addEventListener("loadedmetadata", onMeta);
+  audio.addEventListener("durationchange", onMeta);
+
+  return () => {
+    audio.removeEventListener("play", onPlay);
+    audio.removeEventListener("pause", onPause);
+    audio.removeEventListener("ended", onEnded);
+    audio.removeEventListener("timeupdate", onTime);
+    audio.removeEventListener("loadedmetadata", onMeta);
+    audio.removeEventListener("durationchange", onMeta);
+  };
+}, []);
 
   const stopAudio = useCallback(() => {
     const audio = audioRef.current;
@@ -368,6 +451,14 @@ export default function App() {
     },
     [currentTrack]
   );
+
+  const seekTo = useCallback((sec) => {
+  const audio = audioRef.current;
+  if (!audio) return;
+
+  audio.currentTime = Math.max(0, sec || 0);
+  setCurrentTime(audio.currentTime);
+}, []);
 
   function downloadAllAudio() {
     if (!selectedBook?.tracks?.length) return;
@@ -626,14 +717,17 @@ export default function App() {
                   <div className="md:col-span-2 space-y-3">
                     {selectedBook.tracks?.length ? (
                       selectedBook.tracks.map((tr) => (
-                        <TrackRow
-                          key={tr.id}
-                          track={tr}
-                          isActive={currentTrack?.id === tr.id}
-                          isPlaying={isPlaying}
-                          onToggle={toggleTrack}
-                          t={t}
-                        />
+                       <TrackRow
+  key={tr.id}
+  track={tr}
+  isActive={currentTrack?.id === tr.id}
+  isPlaying={isPlaying}
+  onToggle={toggleTrack}
+  onSeek={seekTo}
+  t={t}
+  currentTime={currentTrack?.id === tr.id ? currentTime : 0}
+  duration={currentTrack?.id === tr.id ? duration : 0}
+/>
                       ))
                     ) : (
                       <EmptyState title={t("not_found")} subtitle={t("audio_empty")} />
