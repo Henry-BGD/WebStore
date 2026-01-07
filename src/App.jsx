@@ -678,29 +678,42 @@ export default function App() {
 
             {audioBookId && selectedBook && (
               <>
-                <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                  <div className="order-1 flex w-full flex-wrap gap-3 justify-end md:order-2 md:w-auto">
-                    <Button variant="outline" onClick={() => setAudioBookId(null)} className="flex gap-2" type="button">
-                      ← {t("back")}
-                    </Button>
+               <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+  {/* Mobile: cover + title row */}
+  <div className="order-2 md:order-1 w-full">
+    <div className="flex items-center gap-4 md:block">
+      {/* mini cover ONLY on mobile */}
+      <img
+        src={selectedBook.cover}
+        alt={selectedBook.title}
+        className="w-20 h-20 rounded-2xl object-cover shadow flex-none md:hidden"
+      />
 
-                    <Button onClick={downloadAllAudio} className="flex gap-2" type="button">
-                      <Download className="w-4 h-4" />
-                      {t("download_all")}
-                    </Button>
-                  </div>
+      <div className="min-w-0">
+        <h1 className="text-3xl font-bold md:text-4xl leading-tight">{selectedBook.title}</h1>
+        <p className="text-slate-600">{selectedBook.description}</p>
+      </div>
+    </div>
+  </div>
 
-                  <div className="order-2 w-full md:order-1 md:max-w-[60%]">
-                    <h1 className="text-3xl font-bold md:text-4xl">{selectedBook.title}</h1>
-                    <p className="text-slate-600">{selectedBook.description}</p>
-                  </div>
-                </div>
+  {/* Actions */}
+  <div className="order-1 md:order-2 flex w-full flex-wrap gap-3 justify-end md:w-auto">
+    <Button variant="outline" onClick={() => setAudioBookId(null)} className="flex gap-2" type="button">
+      ← {t("back")}
+    </Button>
 
+    <Button onClick={downloadAllAudio} className="flex gap-2" type="button">
+      <Download className="w-4 h-4" />
+      {t("download_all")}
+    </Button>
+  </div>
+</div>
+                
                 <div className="grid md:grid-cols-3 gap-6 items-start">
                   <img
                     src={selectedBook.cover}
                     alt={selectedBook.title}
-                    className="w-full aspect-square object-cover rounded-2xl shadow md:col-span-1"
+                   className="hidden md:block w-full aspect-square object-cover rounded-2xl shadow md:col-span-1"
                   />
 
                   <div className="md:col-span-2 space-y-3">
