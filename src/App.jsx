@@ -303,12 +303,7 @@ function ProductCard({ item, t }) {
           <span className="text-xl font-semibold">{currencyUSD(item.price)}</span>
 
           <a href={item.externalUrl} target="_blank" rel="noopener noreferrer" className="inline-flex">
-            <Button
-  variant="outline"
-  onClick={() => setAudioBookId(null)}
-  type="button"
-  className="w-full md:w-auto"
->
+            <Button variant="outline" className="flex items-center gap-1" type="button">
               <ExternalLink className="w-4 h-4" />
               <span>{productBuyLabel(item, t)}</span>
             </Button>
@@ -579,6 +574,11 @@ export default function App() {
               <div className="text-sm space-y-1">
                 <p>E-mail: genndybogdanov@gmail.com</p>
                 <p>
+                  <a className="underline hover:text-slate-900" href="https://medium.com/@gbogdanov" target="_blank" rel="noopener noreferrer">
+                    Medium
+                  </a>
+                </p>
+                <p>
                   <a className="underline hover:text-slate-900" href="https://substack.com/@gbogdanov" target="_blank" rel="noopener noreferrer">
                     Substack
                   </a>
@@ -683,26 +683,8 @@ export default function App() {
 
             {audioBookId && selectedBook && (
               <>
-               <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-  {/* Mobile: cover + title row */}
-  <div className="order-2 md:order-1 w-full">
-    <div className="flex items-center gap-4 md:block">
-      {/* mini cover ONLY on mobile */}
-      <img
-        src={selectedBook.cover}
-        alt={selectedBook.title}
-        className="w-20 h-20 rounded-2xl object-cover shadow flex-none md:hidden"
-      />
-
-      <div className="min-w-0">
-        <h1 className="text-3xl font-bold md:text-4xl leading-tight">{selectedBook.title}</h1>
-        <p className="text-slate-600">{selectedBook.description}</p>
-      </div>
-    </div>
-  </div>
-
-  {/* Actions */}
-  <div
+                <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                  <div
   className="
     order-1 md:order-2
     flex flex-col gap-3
@@ -711,26 +693,27 @@ export default function App() {
     justify-end
   "
 >
-    <Button variant="outline" onClick={() => setAudioBookId(null)} className="flex gap-2" type="button">
-      ← {t("back")}
-    </Button>
+                    <Button variant="outline" onClick={() => setAudioBookId(null)} className="flex gap-2" type="button">
+                      ← {t("back")}
+                    </Button>
 
-<Button
-  onClick={downloadAllAudio}
-  type="button"
-  className="w-full md:w-auto"
->
-  <Download className="w-4 h-4" />
-  {t("download_all")}
-</Button>
-  </div>
-</div>
-                
+                    <Button onClick={downloadAllAudio} className="flex gap-2" type="button">
+                      <Download className="w-4 h-4" />
+                      {t("download_all")}
+                    </Button>
+                  </div>
+
+                  <div className="order-2 w-full md:order-1 md:max-w-[60%]">
+                    <h1 className="text-3xl font-bold md:text-4xl">{selectedBook.title}</h1>
+                    <p className="text-slate-600">{selectedBook.description}</p>
+                  </div>
+                </div>
+
                 <div className="grid md:grid-cols-3 gap-6 items-start">
                   <img
                     src={selectedBook.cover}
                     alt={selectedBook.title}
-                   className="hidden md:block w-full aspect-square object-cover rounded-2xl shadow md:col-span-1"
+                    className="w-full aspect-square object-cover rounded-2xl shadow md:col-span-1"
                   />
 
                   <div className="md:col-span-2 space-y-3">
