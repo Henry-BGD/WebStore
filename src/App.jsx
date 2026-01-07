@@ -11,7 +11,7 @@ import { ExternalLink, Download, Play, Pause, X, Search } from "lucide-react";
  * - no mx-auto
  * - adaptive left margin
  */
-const CONTAINER = "w-full max-w-6xl px-4 sm:ml-6 lg:ml-10";
+const CONTAINER = "w-full max-w-6xl px-4 sm:px-6 lg:px-8";
 const TOPBAR_H = "min-h-[64px]";
 
 // ================== DATA ==================
