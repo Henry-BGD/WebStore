@@ -574,7 +574,7 @@ const hapticTap = useCallback(
     const i = TABS_ORDER.indexOf(prev);
     if (i <= 0) return prev;
 
-    hapticTap([2, 18, 2]); // 👈 мягкий двойной для свайпа
+    hapticTap(3); // 👈 сила свайпа
     const nextTab = TABS_ORDER[i - 1];
     if (nextTab !== "free-audio") setAudioBookId(null);
     return nextTab;
@@ -586,7 +586,7 @@ const goNextTab = useCallback(() => {
     const i = TABS_ORDER.indexOf(prev);
     if (i === -1 || i >= TABS_ORDER.length - 1) return prev;
 
-    hapticTap([2, 18, 2]); // 👈 мягкий двойной для свайпа
+    hapticTap(3); // 👈 сила свайпа
     const nextTab = TABS_ORDER[i + 1];
     if (nextTab !== "free-audio") setAudioBookId(null);
     return nextTab;
