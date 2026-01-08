@@ -15,3 +15,7 @@ body {
   40% { transform: translateY(-1px); }
   100% { transform: translateY(0); }
 }
+
+/* hide scrollbar but keep scroll */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
