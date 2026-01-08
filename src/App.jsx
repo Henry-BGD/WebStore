@@ -558,49 +558,70 @@ const hapticTap = useCallback(
   }, [audioBookId, stopAudio]);
 
   // -------- mobile detection (for swipe) --------
-  const [isMobile, setIsMobile] = useState(false);
-  useEffect(() => {
-    const check = () => setIsMobile(window.matchMedia("(max-width: 768px)").matches);
-    check();
-    window.addEventListener("resize", check);
-    return () => window.removeEventListener("resize", check);
-  }, []);
+ const [isMobile, setIsMobile] = useState(() => {
+  if (typeof window === "undefined") return false;
+  return window.matchMedia("(max-width: 768px)").matches;
+});
+
+useEffect(() => {
+  const mq = window.matchMedia("(max-width: 768px)");
+
+  const handler = (e) => setIsMobile(e.matches);
+
+  // modern
+  if (mq.addEventListener) mq.addEventListener("change", handler);
+  // legacy Safari
+  else mq.addListener(handler);
+
+  // sync once (just in case)
+  setIsMobile(mq.matches);
+
+  return () => {
+    if (mq.removeEventListener) mq.removeEventListener("change", handler);
+    else mq.removeListener(handler);
+  };
+}, []);
+
 
   // -------- swipe tab navigation --------
-  const TABS_ORDER = ["about", "products", "free-audio"];
+ const TABS_ORDER = ["about", "products", "free-audio"];
 
-  const goPrevTab = useCallback(() => {
+const goPrevTab = useCallback(() => {
   setTab((prev) => {
     const i = TABS_ORDER.indexOf(prev);
     if (i <= 0) return prev;
 
-    hapticTap(3); // 👈 сила свайпа
     const nextTab = TABS_ORDER[i - 1];
     if (nextTab !== "free-audio") setAudioBookId(null);
     return nextTab;
   });
-}, [hapticTap]);
+}, []);
 
 const goNextTab = useCallback(() => {
   setTab((prev) => {
     const i = TABS_ORDER.indexOf(prev);
     if (i === -1 || i >= TABS_ORDER.length - 1) return prev;
 
-    hapticTap(3); // 👈 сила свайпа
     const nextTab = TABS_ORDER[i + 1];
     if (nextTab !== "free-audio") setAudioBookId(null);
     return nextTab;
   });
-}, [hapticTap]);
+}, []);
 
   // ✅ NEW RULE:
   // Swipe is enabled on mobile when audio is NOT playing (paused or stopped is OK),
   // even inside an opened book.
   const swipeHandlers = useSwipeTabs({
-    enabled: isMobile && !isPlaying,
-    onPrev: goPrevTab,
-    onNext: goNextTab,
-  });
+  enabled: isMobile && !isPlaying,
+  onPrev: () => {
+    hapticTap(3);   // 👈 вибро прямо в touchend
+    goPrevTab();
+  },
+  onNext: () => {
+    hapticTap(3);   // 👈 вибро прямо в touchend
+    goNextTab();
+  },
+});
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
