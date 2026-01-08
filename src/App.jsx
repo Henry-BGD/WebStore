@@ -9,16 +9,8 @@ import { ExternalLink, Download, Play, Pause, X, Search } from "lucide-react";
 const CONTAINER = "w-full max-w-6xl mx-auto px-8";
 const TOPBAR_H = "min-h-[64px]";
 
-// ================== SWIPE TABS HOOK (FIXED) ==================
-// - более надежное распознавание вертикального скролла vs свайпа
-// - зовем onSwipeLeft/onSwipeRight внутри touchend
-function useSwipeTabs({
-  enabled,
-  onSwipeLeft,
-  onSwipeRight,
-  thresholdPx = 55,
-  restraintPx = 70,
-}) {
+// ================== SWIPE TABS HOOK ==================
+function useSwipeTabs({ enabled, onPrev, onNext, onHaptic, thresholdPx = 60, restraintPx = 40 }) {
   const startX = useRef(0);
   const startY = useRef(0);
   const tracking = useRef(false);
@@ -38,7 +30,6 @@ function useSwipeTabs({
       if (!enabled) return;
       const t = e.touches?.[0];
       if (!t) return;
-
       if (shouldIgnoreTarget(e.target)) return;
 
       startX.current = t.clientX;
@@ -58,9 +49,10 @@ function useSwipeTabs({
       const dx = t.clientX - startX.current;
       const dy = t.clientY - startY.current;
 
-      // Отменяем только если это ЯВНО вертикальный скролл
-      const isVerticalIntent = Math.abs(dy) > restraintPx && Math.abs(dy) > Math.abs(dx) * 1.2;
-      if (isVerticalIntent) tracking.current = false;
+      // If user scrolls vertically → stop tracking (do not hijack scroll)
+      if (Math.abs(dy) > restraintPx && Math.abs(dy) > Math.abs(dx)) {
+        tracking.current = false;
+      }
     },
     [enabled, restraintPx]
   );
@@ -76,14 +68,19 @@ function useSwipeTabs({
       const dx = t.clientX - startX.current;
       const dy = t.clientY - startY.current;
 
-      // Явно вертикально — игнорируем
-      const isMostlyVertical = Math.abs(dy) > restraintPx && Math.abs(dy) > Math.abs(dx) * 1.2;
-      if (isMostlyVertical) return;
+      // ignore diagonal / vertical gestures
+      if (Math.abs(dy) > restraintPx) return;
 
-      if (dx <= -thresholdPx) onSwipeLeft?.(); // swipe left
-      else if (dx >= thresholdPx) onSwipeRight?.(); // swipe right
+      // haptic should happen inside touchend and only if tab REALLY changed
+      if (dx > thresholdPx) {
+        const changed = onPrev?.();
+        if (changed) onHaptic?.();
+      } else if (dx < -thresholdPx) {
+        const changed = onNext?.();
+        if (changed) onHaptic?.();
+      }
     },
-    [enabled, onSwipeLeft, onSwipeRight, thresholdPx, restraintPx]
+    [enabled, onPrev, onNext, onHaptic, thresholdPx, restraintPx]
   );
 
   return { onTouchStart, onTouchMove, onTouchEnd };
@@ -333,18 +330,24 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
   );
 }
 
+/**
+ * ✅ ProductCard tightened:
+ * - badges максимально близко к верхней границе
+ * - меньше воздуха между верхом/картинкой/текстом
+ */
 function ProductCard({ item, t }) {
   return (
     <Card className="overflow-hidden border border-slate-200 flex flex-col">
-      {/* ✅ Убрали лишний нижний отступ у хедера, чтобы бейджи были ближе к верхней границе */}
+      {/* Убрали pb, чтобы контент начинался ближе к картинке */}
       <CardHeader className="p-0">
         <div className="relative">
-          <img src={item.image} alt={item.title} className="w-full h-56 object-cover" />
+          {/* чуть меньше высота = меньше воздуха */}
+          <img src={item.image} alt={item.title} className="w-full h-52 sm:h-56 object-cover" />
 
-          {/* ✅ БЕЙДЖИ МАКСИМАЛЬНО ВВЕРХ */}
-          <div className="absolute top-2 left-2 flex flex-wrap gap-1.5">
+          {/* бейджи максимально вверх + компактнее */}
+          <div className="absolute top-2 left-2 right-2 flex flex-wrap gap-2">
             {item.badges?.map((b) => (
-              <Badge key={b} className="backdrop-blur">
+              <Badge key={b} className="backdrop-blur px-3 py-1">
                 {b}
               </Badge>
             ))}
@@ -352,20 +355,21 @@ function ProductCard({ item, t }) {
         </div>
       </CardHeader>
 
-      <CardContent className="p-4 flex flex-col flex-grow justify-between">
+      {/* уменьшаем общий паддинг и вертикальные интервалы */}
+      <CardContent className="p-4 pt-3 flex flex-col flex-grow">
         <div className="space-y-1">
-          <div className="space-y-1">
+          <div className="space-y-0.5">
             <CardTitle className="text-lg leading-snug break-words">{item.title}</CardTitle>
             <p className="text-sm opacity-80">{item.kind}</p>
           </div>
-          <p className="text-sm text-slate-700">{item.description}</p>
+          <p className="text-sm text-slate-700 leading-snug">{item.description}</p>
         </div>
 
-        <div className="flex items-center justify-between pt-4 mt-auto gap-3">
+        <div className="flex items-center justify-between mt-4 gap-3">
           <span className="text-xl font-semibold tabular-nums">{currencyUSD(item.price)}</span>
 
           <a href={item.externalUrl} target="_blank" rel="noopener noreferrer" className="inline-flex">
-            <Button variant="outline" className="flex items-center gap-1" type="button">
+            <Button variant="outline" className="flex items-center gap-2" type="button">
               <ExternalLink className="w-4 h-4" />
               <span className="whitespace-nowrap">{productBuyLabel(item, t)}</span>
             </Button>
@@ -406,16 +410,48 @@ export default function App() {
     }
   }, []);
 
+  // ✅ "разбудить" вибро на первом касании (чтобы свайпы работали сразу после refresh)
+  const hapticsPrimedRef = useRef(false);
+
+  useEffect(() => {
+    if (typeof navigator === "undefined" || !("vibrate" in navigator)) return;
+
+    const prime = () => {
+      if (hapticsPrimedRef.current) return;
+      try {
+        navigator.vibrate(0); // максимально незаметно, но часто снимает "user activation" блок
+      } catch {}
+      hapticsPrimedRef.current = true;
+    };
+
+    window.addEventListener("pointerdown", prime, { capture: true, passive: true, once: true });
+    window.addEventListener("touchstart", prime, { capture: true, passive: true, once: true });
+
+    return () => {
+      window.removeEventListener("pointerdown", prime, { capture: true });
+      window.removeEventListener("touchstart", prime, { capture: true });
+    };
+  }, []);
+
   const hapticTap = useCallback(
     (pattern = 3) => {
       if (prefersReducedMotion) return;
 
-      // Real vibration (mostly Android)
       if (typeof navigator !== "undefined" && "vibrate" in navigator) {
-        navigator.vibrate(pattern);
+        // self-prime
+        if (!hapticsPrimedRef.current) {
+          try {
+            navigator.vibrate(0);
+          } catch {}
+          hapticsPrimedRef.current = true;
+        }
+
+        try {
+          navigator.vibrate(pattern);
+        } catch {}
       }
 
-      // Visual fallback pulse (iOS etc.)
+      // visual fallback pulse
       setHapticPulse((v) => v + 1);
     },
     [prefersReducedMotion]
@@ -438,12 +474,6 @@ export default function App() {
   };
 
   const [tab, setTab] = useState(() => detectTab());
-
-  // ✅ tabRef: чтобы свайп-переключение не зависело от setTab(prev=>...) и не ломало вибро
-  const tabRef = useRef(tab);
-  useEffect(() => {
-    tabRef.current = tab;
-  }, [tab]);
 
   useEffect(() => {
     try {
@@ -596,32 +626,42 @@ export default function App() {
     };
   }, []);
 
-  // -------- swipe tab navigation (FIXED) --------
+  // -------- swipe tab navigation --------
   const TABS_ORDER = ["about", "products", "free-audio"];
 
-  const swipeTo = useCallback(
-    (dir) => {
-      const i = TABS_ORDER.indexOf(tabRef.current);
-      if (i === -1) return;
+  const goPrevTab = useCallback(() => {
+    let changed = false;
+    setTab((prev) => {
+      const i = TABS_ORDER.indexOf(prev);
+      if (i <= 0) return prev;
 
-      const nextIndex = dir === "left" ? i + 1 : i - 1;
-      if (nextIndex < 0 || nextIndex >= TABS_ORDER.length) return;
-
-      // ✅ ВИБРО СТРОГО ВНУТРИ TOUCHEND:
-      hapticTap(3);
-
-      const nextTab = TABS_ORDER[nextIndex];
+      changed = true;
+      const nextTab = TABS_ORDER[i - 1];
       if (nextTab !== "free-audio") setAudioBookId(null);
+      return nextTab;
+    });
+    return changed;
+  }, []);
 
-      setTab(nextTab);
-    },
-    [hapticTap]
-  );
+  const goNextTab = useCallback(() => {
+    let changed = false;
+    setTab((prev) => {
+      const i = TABS_ORDER.indexOf(prev);
+      if (i === -1 || i >= TABS_ORDER.length - 1) return prev;
+
+      changed = true;
+      const nextTab = TABS_ORDER[i + 1];
+      if (nextTab !== "free-audio") setAudioBookId(null);
+      return nextTab;
+    });
+    return changed;
+  }, []);
 
   const swipeHandlers = useSwipeTabs({
-    enabled: isMobile && !isPlaying, // как ты хотел: если играет — свайпы OFF
-    onSwipeLeft: () => swipeTo("left"),
-    onSwipeRight: () => swipeTo("right"),
+    enabled: isMobile && !isPlaying,
+    onPrev: goPrevTab,
+    onNext: goNextTab,
+    onHaptic: () => hapticTap(3),
   });
 
   return (
@@ -666,14 +706,12 @@ export default function App() {
         <nav className="border-t">
           <div className="w-full">
             <div className={`${CONTAINER} py-3`}>
-              {/* На мобиле лучше скролл по табам, чем уродливый перенос */}
               <div
                 key={hapticPulse}
                 className={[
                   "flex items-center gap-3",
-                  "overflow-x-auto",
+                  "overflow-x-auto no-scrollbar",
                   "flex-nowrap",
-                  "animate-[haptic_150ms_ease-out]",
                 ].join(" ")}
               >
                 <NavPill
@@ -723,7 +761,9 @@ export default function App() {
         {tab === "about" && (
           <section className="grid md:grid-cols-3 gap-8 items-start">
             <div className="md:col-span-2 space-y-4">
-              <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight break-words">{t("about_title")}</h1>
+              <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight break-words">
+                {t("about_title")}
+              </h1>
               <p className="leading-relaxed text-slate-700">{t("about_p1")}</p>
             </div>
 
@@ -861,7 +901,7 @@ export default function App() {
                     </div>
                   </div>
 
-                  <div className="order-1 md:order-2 flex gap-3 w-full md:w-auto">
+                  <div className="order-1 md:order-2 flex gap-3 md:gap-3 w-full md:w-auto">
                     <Button
                       variant="outline"
                       onClick={() => setAudioBookId(null)}
