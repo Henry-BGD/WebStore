@@ -9,3 +9,9 @@
 body {
   @apply bg-gradient-to-b from-white to-slate-50 text-slate-900;
 }
+
+@keyframes haptic {
+  0% { transform: translateY(0); }
+  40% { transform: translateY(-1px); }
+  100% { transform: translateY(0); }
+}
