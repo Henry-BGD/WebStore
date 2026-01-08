@@ -323,57 +323,78 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
   );
 }
 
-/**
- * ✅ ProductCard — tighter, professional:
- * - image fills full width (no “inner frame”)
- * - reduced vertical gaps (image->title and bottom padding)
- * - badges overlay on image, compact
- */
 function ProductCard({ item, t }) {
   return (
-    <Card className="overflow-hidden border border-slate-200 flex flex-col">
-      <CardHeader className="p-0">
-        <div className="relative">
-          {/* чуть меньше высота + без лишних отступов вокруг */}
-          <img
-            src={item.image}
-            alt={item.title}
-            className="w-full h-56 sm:h-60 object-cover block"
-          />
+    <Card className="overflow-hidden border border-slate-200 bg-white flex flex-col">
+      {/* HERO / COVER */}
+      <div className="relative">
+        {/* современная подложка (даёт “премиум” ощущение даже если у PNG есть поля) */}
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-50 to-white" />
 
-          {/* тонкий градиент чтобы бейджи читались на любом фоне */}
-          <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-white/80 to-transparent pointer-events-none" />
+        {/* обложка — компактнее по высоте + ровные края */}
+        <div className="relative px-4 pt-4">
+          <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden">
+            {/* ВАЖНО:
+                object-cover не уберёт белые поля, если они уже “внутри” картинки.
+                Но за счёт рамки/подложки это выглядит как “обложка в паспарту”, то есть профессионально. */}
+            <img
+              src={item.image}
+              alt={item.title}
+              className="w-full h-[190px] sm:h-[210px] object-cover block"
+              loading="lazy"
+            />
+          </div>
+        </div>
 
-          {/* badges максимально сверху и компактно */}
-          <div className="absolute top-2 left-2 right-2 flex flex-wrap gap-2">
+        {/* BADGES — компактно, всегда сверху, без лишнего воздуха */}
+        <div className="relative px-4 pt-3 pb-2">
+          <div className="flex flex-wrap gap-2">
             {item.badges?.map((b) => (
-              <Badge key={b} className="backdrop-blur px-3 py-1">
+              <Badge
+                key={b}
+                className="bg-white/90 border border-slate-200 text-slate-700 rounded-full px-3 py-1 backdrop-blur"
+              >
                 {b}
               </Badge>
             ))}
           </div>
         </div>
-      </CardHeader>
+      </div>
 
-      {/* ключевое: уменьшаем отступ сверху (между картинкой и заголовком) */}
-      <CardContent className="p-4 pt-2.5 flex flex-col flex-grow">
+      {/* CONTENT */}
+      <CardContent className="px-4 pt-2 pb-4 flex flex-col flex-1">
+        {/* Title + meta */}
         <div className="space-y-1">
-          <div className="space-y-0.5">
-            <CardTitle className="text-lg leading-snug break-words">{item.title}</CardTitle>
-            <p className="text-sm opacity-80">{item.kind}</p>
-          </div>
-
-          <p className="text-sm text-slate-700 leading-snug">{item.description}</p>
+          <CardTitle className="text-[18px] sm:text-[19px] leading-snug break-words">
+            {item.title}
+          </CardTitle>
+          <p className="text-sm text-slate-600">{item.kind}</p>
         </div>
 
-        {/* снизу тоже без лишнего воздуха */}
-        <div className="flex items-center justify-between mt-3 gap-3">
-          <span className="text-xl font-semibold tabular-nums">{currencyUSD(item.price)}</span>
+        {/* Description */}
+        <p className="mt-2 text-sm text-slate-700 leading-relaxed">
+          {item.description}
+        </p>
 
-          <a href={item.externalUrl} target="_blank" rel="noopener noreferrer" className="inline-flex">
-            <Button variant="outline" className="flex items-center gap-2" type="button">
+        {/* Bottom bar */}
+        <div className="mt-auto pt-3 flex items-center justify-between gap-3">
+          <span className="text-2xl font-semibold tracking-tight tabular-nums">
+            {currencyUSD(item.price)}
+          </span>
+
+          <a
+            href={item.externalUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex"
+          >
+            <Button
+              variant="outline"
+              className="rounded-full px-4 h-11 flex items-center gap-2 whitespace-nowrap"
+              type="button"
+            >
               <ExternalLink className="w-4 h-4" />
-              <span className="whitespace-nowrap">{productBuyLabel(item, t)}</span>
+              <span>{productBuyLabel(item, t)}</span>
             </Button>
           </a>
         </div>
