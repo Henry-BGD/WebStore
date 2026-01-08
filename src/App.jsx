@@ -323,25 +323,13 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
   );
 }
 
+// ================== PRODUCT CARD ==================
 function ProductCard({ item, t }) {
   return (
     <Card className="overflow-hidden border border-slate-200 flex flex-col bg-white">
-      {/* IMAGE AREA (3:4, always fully visible) */}
       <CardHeader className="p-0">
         <div className="relative">
-          {/* badges — максимально вверх */}
-          <div className="absolute top-2 left-2 right-2 z-10 flex flex-wrap gap-2">
-            {item.badges?.map((b) => (
-              <Badge
-                key={b}
-                className="backdrop-blur bg-white/90 border border-slate-200 text-slate-700 rounded-full px-3 py-1"
-              >
-                {b}
-              </Badge>
-            ))}
-          </div>
-
-          {/* 3:4 container */}
+          {/* 4:3 container (always fully visible) */}
           <div className="w-full aspect-[4/3] bg-white">
             <img
               src={item.image}
@@ -351,28 +339,31 @@ function ProductCard({ item, t }) {
             />
           </div>
 
-          {/* очень лёгкий градиент сверху, чтобы бейджи читались на любом фоне */}
-          <div className="pointer-events-none absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-white/70 to-transparent" />
+          {/* лёгкий градиент под бейджами (ниже по z), чтобы читались на любом фоне */}
+          <div className="pointer-events-none absolute inset-x-0 top-0 z-[1] h-16 bg-gradient-to-b from-white/70 to-transparent" />
+
+          {/* badges максимально к верхней рамке + компактнее */}
+          <div className="absolute top-1 left-2 right-2 z-[2] flex flex-wrap gap-2">
+            {item.badges?.map((b) => (
+              <Badge key={b} className="backdrop-blur px-2.5 py-1 text-xs font-semibold">
+                {b}
+              </Badge>
+            ))}
+          </div>
         </div>
       </CardHeader>
 
-      {/* CONTENT — максимально близко к картинке */}
-      <CardContent className="px-4 pt-1.5 pb-4 flex flex-col flex-1">
+      {/* ✅ убираем “жёлтую штриховку” — поднимаем контент поверх пустоты внутри PNG */}
+      <CardContent className="p-4 pt-2 flex flex-col flex-grow -mt-3">
         <div className="space-y-1">
-          <CardTitle className="text-lg leading-snug break-words">
-            {item.title}
-          </CardTitle>
+          <CardTitle className="text-lg leading-snug break-words">{item.title}</CardTitle>
           <p className="text-sm text-slate-600">{item.kind}</p>
         </div>
 
-        <p className="mt-2 text-sm text-slate-700 leading-snug">
-          {item.description}
-        </p>
+        <p className="mt-2 text-sm text-slate-700 leading-snug">{item.description}</p>
 
         <div className="mt-auto pt-3 flex items-center justify-between gap-3">
-          <span className="text-xl font-semibold tabular-nums">
-            {currencyUSD(item.price)}
-          </span>
+          <span className="text-xl font-semibold tabular-nums">{currencyUSD(item.price)}</span>
 
           <a href={item.externalUrl} target="_blank" rel="noopener noreferrer" className="inline-flex">
             <Button variant="outline" className="flex items-center gap-2" type="button">
