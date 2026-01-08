@@ -10,7 +10,7 @@ const CONTAINER = "w-full max-w-6xl mx-auto px-8";
 const TOPBAR_H = "min-h-[64px]";
 
 // ================== SWIPE TABS HOOK ==================
-function useSwipeTabs({ enabled, onPrev, onNext, onHaptic, thresholdPx = 60, restraintPx = 40 }) {
+function useSwipeTabs({ enabled, onPrev, onNext, thresholdPx = 60, restraintPx = 40 }) {
   const startX = useRef(0);
   const startY = useRef(0);
   const tracking = useRef(false);
@@ -49,7 +49,7 @@ function useSwipeTabs({ enabled, onPrev, onNext, onHaptic, thresholdPx = 60, res
       const dx = t.clientX - startX.current;
       const dy = t.clientY - startY.current;
 
-      // If user scrolls vertically → stop tracking (do not hijack scroll)
+      // If user scrolls vertically → stop tracking
       if (Math.abs(dy) > restraintPx && Math.abs(dy) > Math.abs(dx)) {
         tracking.current = false;
       }
@@ -68,19 +68,12 @@ function useSwipeTabs({ enabled, onPrev, onNext, onHaptic, thresholdPx = 60, res
       const dx = t.clientX - startX.current;
       const dy = t.clientY - startY.current;
 
-      // ignore diagonal / vertical gestures
       if (Math.abs(dy) > restraintPx) return;
 
-      // haptic should happen inside touchend and only if tab REALLY changed
-      if (dx > thresholdPx) {
-        const changed = onPrev?.();
-        if (changed) onHaptic?.();
-      } else if (dx < -thresholdPx) {
-        const changed = onNext?.();
-        if (changed) onHaptic?.();
-      }
+      if (dx > thresholdPx) onPrev?.(); // swipe right
+      else if (dx < -thresholdPx) onNext?.(); // swipe left
     },
-    [enabled, onPrev, onNext, onHaptic, thresholdPx, restraintPx]
+    [enabled, onPrev, onNext, thresholdPx, restraintPx]
   );
 
   return { onTouchStart, onTouchMove, onTouchEnd };
@@ -331,20 +324,27 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
 }
 
 /**
- * ✅ ProductCard tightened:
- * - badges максимально близко к верхней границе
- * - меньше воздуха между верхом/картинкой/текстом
+ * ✅ ProductCard — tighter, professional:
+ * - image fills full width (no “inner frame”)
+ * - reduced vertical gaps (image->title and bottom padding)
+ * - badges overlay on image, compact
  */
 function ProductCard({ item, t }) {
   return (
     <Card className="overflow-hidden border border-slate-200 flex flex-col">
-      {/* Убрали pb, чтобы контент начинался ближе к картинке */}
       <CardHeader className="p-0">
         <div className="relative">
-          {/* чуть меньше высота = меньше воздуха */}
-          <img src={item.image} alt={item.title} className="w-full h-52 sm:h-56 object-cover" />
+          {/* чуть меньше высота + без лишних отступов вокруг */}
+          <img
+            src={item.image}
+            alt={item.title}
+            className="w-full h-56 sm:h-60 object-cover block"
+          />
 
-          {/* бейджи максимально вверх + компактнее */}
+          {/* тонкий градиент чтобы бейджи читались на любом фоне */}
+          <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-white/80 to-transparent pointer-events-none" />
+
+          {/* badges максимально сверху и компактно */}
           <div className="absolute top-2 left-2 right-2 flex flex-wrap gap-2">
             {item.badges?.map((b) => (
               <Badge key={b} className="backdrop-blur px-3 py-1">
@@ -355,17 +355,19 @@ function ProductCard({ item, t }) {
         </div>
       </CardHeader>
 
-      {/* уменьшаем общий паддинг и вертикальные интервалы */}
-      <CardContent className="p-4 pt-3 flex flex-col flex-grow">
+      {/* ключевое: уменьшаем отступ сверху (между картинкой и заголовком) */}
+      <CardContent className="p-4 pt-2.5 flex flex-col flex-grow">
         <div className="space-y-1">
           <div className="space-y-0.5">
             <CardTitle className="text-lg leading-snug break-words">{item.title}</CardTitle>
             <p className="text-sm opacity-80">{item.kind}</p>
           </div>
+
           <p className="text-sm text-slate-700 leading-snug">{item.description}</p>
         </div>
 
-        <div className="flex items-center justify-between mt-4 gap-3">
+        {/* снизу тоже без лишнего воздуха */}
+        <div className="flex items-center justify-between mt-3 gap-3">
           <span className="text-xl font-semibold tabular-nums">{currencyUSD(item.price)}</span>
 
           <a href={item.externalUrl} target="_blank" rel="noopener noreferrer" className="inline-flex">
@@ -398,64 +400,6 @@ export default function App() {
 
   const [lang, setLang] = useState(() => detectLanguage());
   const t = (key) => I18N[lang]?.[key] ?? I18N.en[key] ?? key;
-
-  // ---------- haptic ----------
-  const [hapticPulse, setHapticPulse] = useState(0);
-
-  const prefersReducedMotion = useMemo(() => {
-    try {
-      return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    } catch {
-      return false;
-    }
-  }, []);
-
-  // ✅ "разбудить" вибро на первом касании (чтобы свайпы работали сразу после refresh)
-  const hapticsPrimedRef = useRef(false);
-
-  useEffect(() => {
-    if (typeof navigator === "undefined" || !("vibrate" in navigator)) return;
-
-    const prime = () => {
-      if (hapticsPrimedRef.current) return;
-      try {
-        navigator.vibrate(0); // максимально незаметно, но часто снимает "user activation" блок
-      } catch {}
-      hapticsPrimedRef.current = true;
-    };
-
-    window.addEventListener("pointerdown", prime, { capture: true, passive: true, once: true });
-    window.addEventListener("touchstart", prime, { capture: true, passive: true, once: true });
-
-    return () => {
-      window.removeEventListener("pointerdown", prime, { capture: true });
-      window.removeEventListener("touchstart", prime, { capture: true });
-    };
-  }, []);
-
-  const hapticTap = useCallback(
-    (pattern = 3) => {
-      if (prefersReducedMotion) return;
-
-      if (typeof navigator !== "undefined" && "vibrate" in navigator) {
-        // self-prime
-        if (!hapticsPrimedRef.current) {
-          try {
-            navigator.vibrate(0);
-          } catch {}
-          hapticsPrimedRef.current = true;
-        }
-
-        try {
-          navigator.vibrate(pattern);
-        } catch {}
-      }
-
-      // visual fallback pulse
-      setHapticPulse((v) => v + 1);
-    },
-    [prefersReducedMotion]
-  );
 
   const switchLang = (next) => {
     setLang(next);
@@ -499,7 +443,6 @@ export default function App() {
   const [audioBookId, setAudioBookId] = useState(null);
   const selectedBook = useMemo(() => AUDIO_BOOKS.find((b) => b.id === audioBookId) || null, [audioBookId]);
 
-  // One global audio player
   const audioRef = useRef(null);
   const [currentTrack, setCurrentTrack] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -630,38 +573,31 @@ export default function App() {
   const TABS_ORDER = ["about", "products", "free-audio"];
 
   const goPrevTab = useCallback(() => {
-    let changed = false;
     setTab((prev) => {
       const i = TABS_ORDER.indexOf(prev);
       if (i <= 0) return prev;
 
-      changed = true;
       const nextTab = TABS_ORDER[i - 1];
       if (nextTab !== "free-audio") setAudioBookId(null);
       return nextTab;
     });
-    return changed;
   }, []);
 
   const goNextTab = useCallback(() => {
-    let changed = false;
     setTab((prev) => {
       const i = TABS_ORDER.indexOf(prev);
       if (i === -1 || i >= TABS_ORDER.length - 1) return prev;
 
-      changed = true;
       const nextTab = TABS_ORDER[i + 1];
       if (nextTab !== "free-audio") setAudioBookId(null);
       return nextTab;
     });
-    return changed;
   }, []);
 
   const swipeHandlers = useSwipeTabs({
     enabled: isMobile && !isPlaying,
     onPrev: goPrevTab,
     onNext: goNextTab,
-    onHaptic: () => hapticTap(3),
   });
 
   return (
@@ -706,38 +642,18 @@ export default function App() {
         <nav className="border-t">
           <div className="w-full">
             <div className={`${CONTAINER} py-3`}>
-              <div
-                key={hapticPulse}
-                className={[
-                  "flex items-center gap-3",
-                  "overflow-x-auto no-scrollbar",
-                  "flex-nowrap",
-                ].join(" ")}
-              >
-                <NavPill
-                  active={tab === "about"}
-                  onClick={() => {
-                    hapticTap(3);
-                    setTab("about");
-                  }}
-                >
+              <div className="flex items-center gap-3 overflow-x-auto no-scrollbar flex-nowrap">
+                <NavPill active={tab === "about"} onClick={() => setTab("about")}>
                   {t("nav_about")}
                 </NavPill>
 
-                <NavPill
-                  active={tab === "products"}
-                  onClick={() => {
-                    hapticTap(3);
-                    setTab("products");
-                  }}
-                >
+                <NavPill active={tab === "products"} onClick={() => setTab("products")}>
                   {t("nav_products")}
                 </NavPill>
 
                 <NavPill
                   active={tab === "free-audio"}
                   onClick={() => {
-                    hapticTap(3);
                     setTab("free-audio");
                     setAudioBookId(null);
                   }}
@@ -827,6 +743,7 @@ export default function App() {
         {tab === "products" && (
           <section className="space-y-6">
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* SEARCH */}
               <div className="relative">
                 <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 <Input
