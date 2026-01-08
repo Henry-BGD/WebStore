@@ -6,21 +6,20 @@ import { Badge } from "./components/ui/Badge.jsx";
 import { ExternalLink, Download, Play, Pause, X, Search } from "lucide-react";
 
 // ================== LAYOUT ==================
-/**
- * Container (centered) + comfortable padding
- */
 const CONTAINER = "w-full max-w-6xl mx-auto px-8";
 const TOPBAR_H = "min-h-[64px]";
 
 // ================== SWIPE TABS HOOK ==================
-function useSwipeTabs({ enabled, onPrev, onNext, thresholdPx = 60, restraintPx = 40 }) {
+function useSwipeTabs({ enabled, onPrev, onNext, onHaptic, thresholdPx = 60, restraintPx = 40 }) {
   const startX = useRef(0);
   const startY = useRef(0);
   const tracking = useRef(false);
 
   const shouldIgnoreTarget = (target) => {
     try {
-      return !!target?.closest?.('input, textarea, select, button, a, [data-no-swipe="true"]');
+      return !!target?.closest?.(
+        'input, textarea, select, button, a, [data-no-swipe="true"], [role="slider"]'
+      );
     } catch {
       return false;
     }
@@ -31,7 +30,6 @@ function useSwipeTabs({ enabled, onPrev, onNext, thresholdPx = 60, restraintPx =
       if (!enabled) return;
       const t = e.touches?.[0];
       if (!t) return;
-
       if (shouldIgnoreTarget(e.target)) return;
 
       startX.current = t.clientX;
@@ -73,10 +71,17 @@ function useSwipeTabs({ enabled, onPrev, onNext, thresholdPx = 60, restraintPx =
       // ignore diagonal / vertical gestures
       if (Math.abs(dy) > restraintPx) return;
 
-      if (dx > thresholdPx) onPrev?.(); // swipe right
-      else if (dx < -thresholdPx) onNext?.(); // swipe left
+      // IMPORTANT: haptic should happen inside the gesture handler (touchend),
+      // and only if tab actually changes (avoid haptic at edges).
+      if (dx > thresholdPx) {
+        const changed = onPrev?.();
+        if (changed) onHaptic?.();
+      } else if (dx < -thresholdPx) {
+        const changed = onNext?.();
+        if (changed) onHaptic?.();
+      }
     },
-    [enabled, onPrev, onNext, thresholdPx, restraintPx]
+    [enabled, onPrev, onNext, onHaptic, thresholdPx, restraintPx]
   );
 
   return { onTouchStart, onTouchMove, onTouchEnd };
@@ -185,6 +190,8 @@ function NavPill({ active, onClick, children, size = "md" }) {
       type="button"
       className={[
         padding,
+        // ensure it never wraps awkwardly
+        "whitespace-nowrap",
         "rounded-full border transition-all duration-200 select-none",
         "active:scale-[0.97]",
         "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300",
@@ -212,9 +219,9 @@ function productBuyLabel(item, t) {
   return t("buy_generic");
 }
 
-function EmptyState({ title, subtitle }) {
+function EmptyState({ title, subtitle, className = "" }) {
   return (
-    <Card className="border border-slate-200">
+    <Card className={["border border-slate-200", className].join(" ")}>
       <CardContent className="p-6">
         <p className="font-semibold">{title}</p>
         {subtitle && <p className="text-sm text-slate-600 mt-1">{subtitle}</p>}
@@ -261,7 +268,7 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
             <p className="font-medium truncate">{track.title}</p>
 
             {showScrubber && (
-              <p className="text-xs text-slate-500 mt-1">
+              <p className="text-xs text-slate-500 mt-1 tabular-nums">
                 {formatTime(safeTime)} / {formatTime(safeDuration)}
               </p>
             )}
@@ -280,6 +287,7 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
               ].join(" ")}
               aria-label={activeAndPlaying ? t("pause") : t("listen")}
               title={activeAndPlaying ? t("pause") : t("listen")}
+              data-no-swipe="true"
             >
               {activeAndPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
             </button>
@@ -295,6 +303,7 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
                     "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300",
                   ].join(" ")}
                   title={t("download")}
+                  data-no-swipe="true"
                 >
                   <Download className="w-5 h-5" />
                 </button>
@@ -303,11 +312,12 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
           </div>
         </div>
 
-        {/* SEEK BAR (appears when track active) */}
+        {/* SEEK BAR */}
         {showScrubber && (
           <div className="mt-3">
             <input
               type="range"
+              role="slider"
               min={0}
               max={safeDuration || 0}
               step={0.25}
@@ -316,6 +326,7 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
               disabled={!safeDuration}
               className="w-full accent-blue-600 disabled:opacity-40 disabled:cursor-not-allowed"
               aria-label="Seek"
+              data-no-swipe="true"
             />
           </div>
         )}
@@ -330,7 +341,8 @@ function ProductCard({ item, t }) {
       <CardHeader className="p-0 pb-2">
         <div className="relative">
           <img src={item.image} alt={item.title} className="w-full h-56 object-cover" />
-          <div className="absolute top-0 left-3 flex flex-wrap gap-2">
+          {/* badges: raise to top, reduce empty space */}
+          <div className="absolute top-3 left-3 right-3 flex flex-wrap gap-2">
             {item.badges?.map((b) => (
               <Badge key={b} className="backdrop-blur">
                 {b}
@@ -343,19 +355,19 @@ function ProductCard({ item, t }) {
       <CardContent className="p-4 flex flex-col flex-grow justify-between">
         <div className="space-y-1">
           <div className="space-y-1">
-            <CardTitle className="text-lg leading-snug">{item.title}</CardTitle>
+            <CardTitle className="text-lg leading-snug break-words">{item.title}</CardTitle>
             <p className="text-sm opacity-80">{item.kind}</p>
           </div>
           <p className="text-sm text-slate-700">{item.description}</p>
         </div>
 
-        <div className="flex items-center justify-between pt-4 mt-auto">
-          <span className="text-xl font-semibold">{currencyUSD(item.price)}</span>
+        <div className="flex items-center justify-between pt-4 mt-auto gap-3">
+          <span className="text-xl font-semibold tabular-nums">{currencyUSD(item.price)}</span>
 
           <a href={item.externalUrl} target="_blank" rel="noopener noreferrer" className="inline-flex">
             <Button variant="outline" className="flex items-center gap-1" type="button">
               <ExternalLink className="w-4 h-4" />
-              <span>{productBuyLabel(item, t)}</span>
+              <span className="whitespace-nowrap">{productBuyLabel(item, t)}</span>
             </Button>
           </a>
         </div>
@@ -383,31 +395,31 @@ export default function App() {
   const [lang, setLang] = useState(() => detectLanguage());
   const t = (key) => I18N[lang]?.[key] ?? I18N.en[key] ?? key;
 
-  // haptic-like pulse (for tiny visual feedback)
-const [hapticPulse, setHapticPulse] = useState(0);
+  // ---------- haptic ----------
+  const [hapticPulse, setHapticPulse] = useState(0);
 
-// respects OS setting
-const prefersReducedMotion = useMemo(() => {
-  try {
-    return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  } catch {
-    return false;
-  }
-}, []);
-
-const hapticTap = useCallback(
-  (pattern = 3) => {
-    if (prefersReducedMotion) return;
-
-    if (typeof navigator !== "undefined" && "vibrate" in navigator) {
-      navigator.vibrate(pattern);
+  const prefersReducedMotion = useMemo(() => {
+    try {
+      return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    } catch {
+      return false;
     }
+  }, []);
 
-    // visual fallback pulse
-    setHapticPulse((v) => v + 1);
-  },
-  [prefersReducedMotion]
-);
+  const hapticTap = useCallback(
+    (pattern = 3) => {
+      if (prefersReducedMotion) return;
+
+      // Real vibration (mostly Android)
+      if (typeof navigator !== "undefined" && "vibrate" in navigator) {
+        navigator.vibrate(pattern);
+      }
+
+      // Visual fallback pulse (iOS etc.)
+      setHapticPulse((v) => v + 1);
+    },
+    [prefersReducedMotion]
+  );
 
   const switchLang = (next) => {
     setLang(next);
@@ -558,70 +570,66 @@ const hapticTap = useCallback(
   }, [audioBookId, stopAudio]);
 
   // -------- mobile detection (for swipe) --------
- const [isMobile, setIsMobile] = useState(() => {
-  if (typeof window === "undefined") return false;
-  return window.matchMedia("(max-width: 768px)").matches;
-});
+  // IMPORTANT: init from matchMedia so it's correct on first render
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return window.matchMedia("(max-width: 768px)").matches;
+  });
 
-useEffect(() => {
-  const mq = window.matchMedia("(max-width: 768px)");
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 768px)");
+    const handler = (e) => setIsMobile(e.matches);
 
-  const handler = (e) => setIsMobile(e.matches);
+    if (mq.addEventListener) mq.addEventListener("change", handler);
+    else mq.addListener(handler);
 
-  // modern
-  if (mq.addEventListener) mq.addEventListener("change", handler);
-  // legacy Safari
-  else mq.addListener(handler);
+    setIsMobile(mq.matches);
 
-  // sync once (just in case)
-  setIsMobile(mq.matches);
-
-  return () => {
-    if (mq.removeEventListener) mq.removeEventListener("change", handler);
-    else mq.removeListener(handler);
-  };
-}, []);
-
+    return () => {
+      if (mq.removeEventListener) mq.removeEventListener("change", handler);
+      else mq.removeListener(handler);
+    };
+  }, []);
 
   // -------- swipe tab navigation --------
- const TABS_ORDER = ["about", "products", "free-audio"];
+  const TABS_ORDER = ["about", "products", "free-audio"];
 
-const goPrevTab = useCallback(() => {
-  setTab((prev) => {
-    const i = TABS_ORDER.indexOf(prev);
-    if (i <= 0) return prev;
+  // Return boolean: did we actually change tab?
+  const goPrevTab = useCallback(() => {
+    let changed = false;
+    setTab((prev) => {
+      const i = TABS_ORDER.indexOf(prev);
+      if (i <= 0) return prev;
 
-    const nextTab = TABS_ORDER[i - 1];
-    if (nextTab !== "free-audio") setAudioBookId(null);
-    return nextTab;
-  });
-}, []);
+      changed = true;
+      const nextTab = TABS_ORDER[i - 1];
+      if (nextTab !== "free-audio") setAudioBookId(null);
+      return nextTab;
+    });
+    return changed;
+  }, []);
 
-const goNextTab = useCallback(() => {
-  setTab((prev) => {
-    const i = TABS_ORDER.indexOf(prev);
-    if (i === -1 || i >= TABS_ORDER.length - 1) return prev;
+  const goNextTab = useCallback(() => {
+    let changed = false;
+    setTab((prev) => {
+      const i = TABS_ORDER.indexOf(prev);
+      if (i === -1 || i >= TABS_ORDER.length - 1) return prev;
 
-    const nextTab = TABS_ORDER[i + 1];
-    if (nextTab !== "free-audio") setAudioBookId(null);
-    return nextTab;
-  });
-}, []);
+      changed = true;
+      const nextTab = TABS_ORDER[i + 1];
+      if (nextTab !== "free-audio") setAudioBookId(null);
+      return nextTab;
+    });
+    return changed;
+  }, []);
 
-  // ✅ NEW RULE:
-  // Swipe is enabled on mobile when audio is NOT playing (paused or stopped is OK),
-  // even inside an opened book.
+  // Swipe enabled on mobile when audio is NOT playing
   const swipeHandlers = useSwipeTabs({
-  enabled: isMobile && !isPlaying,
-  onPrev: () => {
-    hapticTap(3);   // 👈 вибро прямо в touchend
-    goPrevTab();
-  },
-  onNext: () => {
-    hapticTap(3);   // 👈 вибро прямо в touchend
-    goNextTab();
-  },
-});
+    enabled: isMobile && !isPlaying,
+    onPrev: goPrevTab,
+    onNext: goNextTab,
+    onHaptic: () => hapticTap(3), // haptic happens in touchend
+  });
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
@@ -661,49 +669,54 @@ const goNextTab = useCallback(() => {
           </div>
         </div>
 
-       {/* NAV */}
-<nav className="border-t">
-  <div className="w-full">
-    <div className={`${CONTAINER} py-3 flex items-center gap-3`}>
-      <div
-        // key заставит анимацию срабатывать каждый раз при импульсе
-        key={hapticPulse}
-        className="flex items-center gap-3 animate-[haptic_150ms_ease-out]"
-      >
-        <NavPill
-  active={tab === "about"}
-  onClick={() => {
-    hapticTap(3); // 👈 очень мягкий тик
-    setTab("about");
-  }}
->
-          {t("nav_about")}
-        </NavPill>
+        {/* NAV */}
+        <nav className="border-t">
+          <div className="w-full">
+            <div className={`${CONTAINER} py-3`}>
+              {/* Design fix: on mobile, tabs scroll horizontally instead of wrapping ugly */}
+              <div
+                key={hapticPulse}
+                className={[
+                  "flex items-center gap-3",
+                  "overflow-x-auto no-scrollbar",
+                  "flex-nowrap",
+                  "animate-[haptic_150ms_ease-out]",
+                ].join(" ")}
+              >
+                <NavPill
+                  active={tab === "about"}
+                  onClick={() => {
+                    hapticTap(3);
+                    setTab("about");
+                  }}
+                >
+                  {t("nav_about")}
+                </NavPill>
 
-        <NavPill
-          active={tab === "products"}
-          onClick={() => {
-            hapticTap([3]);
-            setTab("products");
-          }}
-        >
-          {t("nav_products")}
-        </NavPill>
+                <NavPill
+                  active={tab === "products"}
+                  onClick={() => {
+                    hapticTap(3);
+                    setTab("products");
+                  }}
+                >
+                  {t("nav_products")}
+                </NavPill>
 
-        <NavPill
-          active={tab === "free-audio"}
-          onClick={() => {
-            hapticTap([3]);
-            setTab("free-audio");
-            setAudioBookId(null);
-          }}
-        >
-          {t("nav_audio")}
-        </NavPill>
-      </div>
-    </div>
-  </div>
-</nav>
+                <NavPill
+                  active={tab === "free-audio"}
+                  onClick={() => {
+                    hapticTap(3);
+                    setTab("free-audio");
+                    setAudioBookId(null);
+                  }}
+                >
+                  {t("nav_audio")}
+                </NavPill>
+              </div>
+            </div>
+          </div>
+        </nav>
       </header>
 
       <main
@@ -717,7 +730,9 @@ const goNextTab = useCallback(() => {
         {tab === "about" && (
           <section className="grid md:grid-cols-3 gap-8 items-start">
             <div className="md:col-span-2 space-y-4">
-              <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">{t("about_title")}</h1>
+              <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight break-words">
+                {t("about_title")}
+              </h1>
               <p className="leading-relaxed text-slate-700">{t("about_p1")}</p>
             </div>
 
@@ -727,7 +742,7 @@ const goNextTab = useCallback(() => {
                 <p>E-mail: genndybogdanov@gmail.com</p>
                 <p>
                   <a
-                    className="underline hover:text-slate-900"
+                    className="underline hover:text-slate-900 break-all"
                     href="https://substack.com/@gbogdanov"
                     target="_blank"
                     rel="noopener noreferrer"
@@ -752,7 +767,7 @@ const goNextTab = useCallback(() => {
                   <ul className="space-y-2 text-slate-700">
                     <li>
                       <a
-                        className="underline hover:text-slate-900"
+                        className="underline hover:text-slate-900 break-all"
                         href="https://preply.com/en/?pref=ODkzOTkyOQ==&id=1759522486.457389&ep=w1"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -762,7 +777,7 @@ const goNextTab = useCallback(() => {
                     </li>
                     <li>
                       <a
-                        className="underline hover:text-slate-900"
+                        className="underline hover:text-slate-900 break-all"
                         href="https://www.italki.com/affshare?ref=af11775706"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -808,7 +823,8 @@ const goNextTab = useCallback(() => {
 
               {filteredProducts.length === 0 ? (
                 <div>
-                  <EmptyState title={t("not_found")} subtitle={t("try_another")} />
+                  {/* small visual polish: match search width nicely */}
+                  <EmptyState title={t("not_found")} subtitle={t("try_another")} className="max-w-[32rem]" />
                 </div>
               ) : (
                 filteredProducts.map((p) => <ProductCard key={p.id} item={p} t={t} />)
@@ -838,10 +854,12 @@ const goNextTab = useCallback(() => {
 
             {audioBookId && selectedBook && (
               <>
-                {/* Title + actions (mobile mini-cover) */}
+                {/* Title + actions */}
                 <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                  {/* Title block */}
                   <div className="order-2 md:order-1 w-full">
                     <div className="flex items-center gap-4 md:block">
+                      {/* mini cover on mobile */}
                       <img
                         src={selectedBook.cover}
                         alt={selectedBook.title}
@@ -849,23 +867,32 @@ const goNextTab = useCallback(() => {
                       />
 
                       <div className="min-w-0">
-                        <h1 className="text-3xl font-bold md:text-4xl leading-tight">{selectedBook.title}</h1>
-                        <p className="text-slate-600">{selectedBook.description}</p>
+                        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold leading-tight break-words">
+                          {selectedBook.title}
+                        </h1>
+                        <p className="text-slate-600 break-words">{selectedBook.description}</p>
                       </div>
                     </div>
                   </div>
 
-                  <div className="order-1 md:order-2 flex flex-col gap-3 md:flex-row md:items-center md:justify-end">
+                  {/* Actions: keep nice layout even when text wraps */}
+                  <div className="order-1 md:order-2 flex gap-3 md:gap-3 w-full md:w-auto">
                     <Button
                       variant="outline"
                       onClick={() => setAudioBookId(null)}
-                      className="w-full md:!w-auto"
+                      className="w-1/2 md:w-auto whitespace-nowrap"
                       type="button"
+                      data-no-swipe="true"
                     >
                       ← {t("back")}
                     </Button>
 
-                    <Button onClick={downloadAllAudio} className="w-full md:!w-auto flex gap-2" type="button">
+                    <Button
+                      onClick={downloadAllAudio}
+                      className="w-1/2 md:w-auto flex gap-2 justify-center whitespace-nowrap"
+                      type="button"
+                      data-no-swipe="true"
+                    >
                       <Download className="w-4 h-4" />
                       {t("download_all")}
                     </Button>
