@@ -396,15 +396,14 @@ const prefersReducedMotion = useMemo(() => {
 }, []);
 
 const hapticTap = useCallback(
-  (pattern = [8]) => {
+  (pattern = 3) => {
     if (prefersReducedMotion) return;
 
-    // Real vibration (mostly Android)
     if (typeof navigator !== "undefined" && "vibrate" in navigator) {
       navigator.vibrate(pattern);
     }
 
-    // Visual fallback: tiny pulse
+    // visual fallback pulse
     setHapticPulse((v) => v + 1);
   },
   [prefersReducedMotion]
@@ -575,7 +574,7 @@ const hapticTap = useCallback(
     const i = TABS_ORDER.indexOf(prev);
     if (i <= 0) return prev;
 
-    hapticTap([8]); // short tick
+    hapticTap([2, 18, 2]); // 👈 мягкий двойной для свайпа
     const nextTab = TABS_ORDER[i - 1];
     if (nextTab !== "free-audio") setAudioBookId(null);
     return nextTab;
@@ -587,7 +586,7 @@ const goNextTab = useCallback(() => {
     const i = TABS_ORDER.indexOf(prev);
     if (i === -1 || i >= TABS_ORDER.length - 1) return prev;
 
-    hapticTap([8]); // short tick
+    hapticTap([2, 18, 2]); // 👈 мягкий двойной для свайпа
     const nextTab = TABS_ORDER[i + 1];
     if (nextTab !== "free-audio") setAudioBookId(null);
     return nextTab;
@@ -651,19 +650,19 @@ const goNextTab = useCallback(() => {
         className="flex items-center gap-3 animate-[haptic_150ms_ease-out]"
       >
         <NavPill
-          active={tab === "about"}
-          onClick={() => {
-            hapticTap([8]);
-            setTab("about");
-          }}
-        >
+  active={tab === "about"}
+  onClick={() => {
+    hapticTap(3); // 👈 очень мягкий тик
+    setTab("about");
+  }}
+>
           {t("nav_about")}
         </NavPill>
 
         <NavPill
           active={tab === "products"}
           onClick={() => {
-            hapticTap([8]);
+            hapticTap([3]);
             setTab("products");
           }}
         >
@@ -673,7 +672,7 @@ const goNextTab = useCallback(() => {
         <NavPill
           active={tab === "free-audio"}
           onClick={() => {
-            hapticTap([8]);
+            hapticTap([3]);
             setTab("free-audio");
             setAudioBookId(null);
           }}
