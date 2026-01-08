@@ -641,49 +641,49 @@ const goNextTab = useCallback(() => {
           </div>
         </div>
 
-        {/* NAV */}
-        <nav className="border-t">
-          <div className="w-full">
-<div className={`${CONTAINER} py-3 flex items-center gap-3`}>
-  <div
-    // key заставит анимацию срабатывать каждый раз при импульсе
-    key={hapticPulse}
-    className="flex items-center gap-3 animate-[haptic_150ms_ease-out]"
-    style={{ animationPlayState: hapticPulse ? "running" : "paused" }}
-  >
-    <NavPill
-      active={tab === "about"}
-      onClick={() => {
-        hapticTap([8]);
-        setTab("about");
-      }}
-    >
-      {t("nav_about")}
-    </NavPill>
+       {/* NAV */}
+<nav className="border-t">
+  <div className="w-full">
+    <div className={`${CONTAINER} py-3 flex items-center gap-3`}>
+      <div
+        // key заставит анимацию срабатывать каждый раз при импульсе
+        key={hapticPulse}
+        className="flex items-center gap-3 animate-[haptic_150ms_ease-out]"
+      >
+        <NavPill
+          active={tab === "about"}
+          onClick={() => {
+            hapticTap([8]);
+            setTab("about");
+          }}
+        >
+          {t("nav_about")}
+        </NavPill>
 
-    <NavPill
-      active={tab === "products"}
-      onClick={() => {
-        hapticTap([8]);
-        setTab("products");
-      }}
-    >
-      {t("nav_products")}
-    </NavPill>
+        <NavPill
+          active={tab === "products"}
+          onClick={() => {
+            hapticTap([8]);
+            setTab("products");
+          }}
+        >
+          {t("nav_products")}
+        </NavPill>
 
-    <NavPill
-      active={tab === "free-audio"}
-      onClick={() => {
-        hapticTap([8]);
-        setTab("free-audio");
-        setAudioBookId(null);
-      }}
-    >
-      {t("nav_audio")}
-    </NavPill>
+        <NavPill
+          active={tab === "free-audio"}
+          onClick={() => {
+            hapticTap([8]);
+            setTab("free-audio");
+            setAudioBookId(null);
+          }}
+        >
+          {t("nav_audio")}
+        </NavPill>
+      </div>
+    </div>
   </div>
-</div>
-        </nav>
+</nav>
       </header>
 
       <main
