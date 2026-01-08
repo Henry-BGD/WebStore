@@ -9,8 +9,16 @@ import { ExternalLink, Download, Play, Pause, X, Search } from "lucide-react";
 const CONTAINER = "w-full max-w-6xl mx-auto px-8";
 const TOPBAR_H = "min-h-[64px]";
 
-// ================== SWIPE TABS HOOK ==================
-function useSwipeTabs({ enabled, onPrev, onNext, onHaptic, thresholdPx = 60, restraintPx = 40 }) {
+// ================== SWIPE TABS HOOK (FIXED) ==================
+// - более надежное распознавание вертикального скролла vs свайпа
+// - зовем onSwipeLeft/onSwipeRight внутри touchend
+function useSwipeTabs({
+  enabled,
+  onSwipeLeft,
+  onSwipeRight,
+  thresholdPx = 55,
+  restraintPx = 70,
+}) {
   const startX = useRef(0);
   const startY = useRef(0);
   const tracking = useRef(false);
@@ -30,6 +38,7 @@ function useSwipeTabs({ enabled, onPrev, onNext, onHaptic, thresholdPx = 60, res
       if (!enabled) return;
       const t = e.touches?.[0];
       if (!t) return;
+
       if (shouldIgnoreTarget(e.target)) return;
 
       startX.current = t.clientX;
@@ -49,10 +58,9 @@ function useSwipeTabs({ enabled, onPrev, onNext, onHaptic, thresholdPx = 60, res
       const dx = t.clientX - startX.current;
       const dy = t.clientY - startY.current;
 
-      // If user scrolls vertically → stop tracking (do not hijack scroll)
-      if (Math.abs(dy) > restraintPx && Math.abs(dy) > Math.abs(dx)) {
-        tracking.current = false;
-      }
+      // Отменяем только если это ЯВНО вертикальный скролл
+      const isVerticalIntent = Math.abs(dy) > restraintPx && Math.abs(dy) > Math.abs(dx) * 1.2;
+      if (isVerticalIntent) tracking.current = false;
     },
     [enabled, restraintPx]
   );
@@ -68,20 +76,14 @@ function useSwipeTabs({ enabled, onPrev, onNext, onHaptic, thresholdPx = 60, res
       const dx = t.clientX - startX.current;
       const dy = t.clientY - startY.current;
 
-      // ignore diagonal / vertical gestures
-      if (Math.abs(dy) > restraintPx) return;
+      // Явно вертикально — игнорируем
+      const isMostlyVertical = Math.abs(dy) > restraintPx && Math.abs(dy) > Math.abs(dx) * 1.2;
+      if (isMostlyVertical) return;
 
-      // IMPORTANT: haptic should happen inside the gesture handler (touchend),
-      // and only if tab actually changes (avoid haptic at edges).
-      if (dx > thresholdPx) {
-        const changed = onPrev?.();
-        if (changed) onHaptic?.();
-      } else if (dx < -thresholdPx) {
-        const changed = onNext?.();
-        if (changed) onHaptic?.();
-      }
+      if (dx <= -thresholdPx) onSwipeLeft?.(); // swipe left
+      else if (dx >= thresholdPx) onSwipeRight?.(); // swipe right
     },
-    [enabled, onPrev, onNext, onHaptic, thresholdPx, restraintPx]
+    [enabled, onSwipeLeft, onSwipeRight, thresholdPx, restraintPx]
   );
 
   return { onTouchStart, onTouchMove, onTouchEnd };
@@ -190,7 +192,6 @@ function NavPill({ active, onClick, children, size = "md" }) {
       type="button"
       className={[
         padding,
-        // ensure it never wraps awkwardly
         "whitespace-nowrap",
         "rounded-full border transition-all duration-200 select-none",
         "active:scale-[0.97]",
@@ -275,7 +276,6 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
           </div>
 
           <div className="flex items-center gap-2 flex-none">
-            {/* PLAY/PAUSE — icon only */}
             <button
               type="button"
               onClick={() => onToggle(track)}
@@ -292,7 +292,6 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
               {activeAndPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
             </button>
 
-            {/* DOWNLOAD — icon only */}
             {track.src && track.src !== "#" && (
               <a href={track.src} download className="inline-flex" aria-label={`${t("download")}: ${track.title}`}>
                 <button
@@ -312,7 +311,6 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
           </div>
         </div>
 
-        {/* SEEK BAR */}
         {showScrubber && (
           <div className="mt-3">
             <input
@@ -338,11 +336,13 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
 function ProductCard({ item, t }) {
   return (
     <Card className="overflow-hidden border border-slate-200 flex flex-col">
-      <CardHeader className="p-0 pb-2">
+      {/* ✅ Убрали лишний нижний отступ у хедера, чтобы бейджи были ближе к верхней границе */}
+      <CardHeader className="p-0">
         <div className="relative">
           <img src={item.image} alt={item.title} className="w-full h-56 object-cover" />
-          {/* badges: raise to top, reduce empty space */}
-          <div className="absolute top-3 left-3 right-3 flex flex-wrap gap-2">
+
+          {/* ✅ БЕЙДЖИ МАКСИМАЛЬНО ВВЕРХ */}
+          <div className="absolute top-2 left-2 flex flex-wrap gap-1.5">
             {item.badges?.map((b) => (
               <Badge key={b} className="backdrop-blur">
                 {b}
@@ -438,6 +438,12 @@ export default function App() {
   };
 
   const [tab, setTab] = useState(() => detectTab());
+
+  // ✅ tabRef: чтобы свайп-переключение не зависело от setTab(prev=>...) и не ломало вибро
+  const tabRef = useRef(tab);
+  useEffect(() => {
+    tabRef.current = tab;
+  }, [tab]);
 
   useEffect(() => {
     try {
@@ -570,7 +576,6 @@ export default function App() {
   }, [audioBookId, stopAudio]);
 
   // -------- mobile detection (for swipe) --------
-  // IMPORTANT: init from matchMedia so it's correct on first render
   const [isMobile, setIsMobile] = useState(() => {
     if (typeof window === "undefined") return false;
     return window.matchMedia("(max-width: 768px)").matches;
@@ -591,44 +596,32 @@ export default function App() {
     };
   }, []);
 
-  // -------- swipe tab navigation --------
+  // -------- swipe tab navigation (FIXED) --------
   const TABS_ORDER = ["about", "products", "free-audio"];
 
-  // Return boolean: did we actually change tab?
-  const goPrevTab = useCallback(() => {
-    let changed = false;
-    setTab((prev) => {
-      const i = TABS_ORDER.indexOf(prev);
-      if (i <= 0) return prev;
+  const swipeTo = useCallback(
+    (dir) => {
+      const i = TABS_ORDER.indexOf(tabRef.current);
+      if (i === -1) return;
 
-      changed = true;
-      const nextTab = TABS_ORDER[i - 1];
+      const nextIndex = dir === "left" ? i + 1 : i - 1;
+      if (nextIndex < 0 || nextIndex >= TABS_ORDER.length) return;
+
+      // ✅ ВИБРО СТРОГО ВНУТРИ TOUCHEND:
+      hapticTap(3);
+
+      const nextTab = TABS_ORDER[nextIndex];
       if (nextTab !== "free-audio") setAudioBookId(null);
-      return nextTab;
-    });
-    return changed;
-  }, []);
 
-  const goNextTab = useCallback(() => {
-    let changed = false;
-    setTab((prev) => {
-      const i = TABS_ORDER.indexOf(prev);
-      if (i === -1 || i >= TABS_ORDER.length - 1) return prev;
+      setTab(nextTab);
+    },
+    [hapticTap]
+  );
 
-      changed = true;
-      const nextTab = TABS_ORDER[i + 1];
-      if (nextTab !== "free-audio") setAudioBookId(null);
-      return nextTab;
-    });
-    return changed;
-  }, []);
-
-  // Swipe enabled on mobile when audio is NOT playing
   const swipeHandlers = useSwipeTabs({
-    enabled: isMobile && !isPlaying,
-    onPrev: goPrevTab,
-    onNext: goNextTab,
-    onHaptic: () => hapticTap(3), // haptic happens in touchend
+    enabled: isMobile && !isPlaying, // как ты хотел: если играет — свайпы OFF
+    onSwipeLeft: () => swipeTo("left"),
+    onSwipeRight: () => swipeTo("right"),
   });
 
   return (
@@ -673,12 +666,12 @@ export default function App() {
         <nav className="border-t">
           <div className="w-full">
             <div className={`${CONTAINER} py-3`}>
-              {/* Design fix: on mobile, tabs scroll horizontally instead of wrapping ugly */}
+              {/* На мобиле лучше скролл по табам, чем уродливый перенос */}
               <div
                 key={hapticPulse}
                 className={[
                   "flex items-center gap-3",
-                  "overflow-x-auto no-scrollbar",
+                  "overflow-x-auto",
                   "flex-nowrap",
                   "animate-[haptic_150ms_ease-out]",
                 ].join(" ")}
@@ -730,9 +723,7 @@ export default function App() {
         {tab === "about" && (
           <section className="grid md:grid-cols-3 gap-8 items-start">
             <div className="md:col-span-2 space-y-4">
-              <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight break-words">
-                {t("about_title")}
-              </h1>
+              <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight break-words">{t("about_title")}</h1>
               <p className="leading-relaxed text-slate-700">{t("about_p1")}</p>
             </div>
 
@@ -796,7 +787,6 @@ export default function App() {
         {tab === "products" && (
           <section className="space-y-6">
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {/* SEARCH */}
               <div className="relative">
                 <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 <Input
@@ -823,7 +813,6 @@ export default function App() {
 
               {filteredProducts.length === 0 ? (
                 <div>
-                  {/* small visual polish: match search width nicely */}
                   <EmptyState title={t("not_found")} subtitle={t("try_another")} className="max-w-[32rem]" />
                 </div>
               ) : (
@@ -854,12 +843,9 @@ export default function App() {
 
             {audioBookId && selectedBook && (
               <>
-                {/* Title + actions */}
                 <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                  {/* Title block */}
                   <div className="order-2 md:order-1 w-full">
                     <div className="flex items-center gap-4 md:block">
-                      {/* mini cover on mobile */}
                       <img
                         src={selectedBook.cover}
                         alt={selectedBook.title}
@@ -875,8 +861,7 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* Actions: keep nice layout even when text wraps */}
-                  <div className="order-1 md:order-2 flex gap-3 md:gap-3 w-full md:w-auto">
+                  <div className="order-1 md:order-2 flex gap-3 w-full md:w-auto">
                     <Button
                       variant="outline"
                       onClick={() => setAudioBookId(null)}
