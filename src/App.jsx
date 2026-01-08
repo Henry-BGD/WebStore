@@ -323,52 +323,56 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
   );
 }
 
-/**
- * ✅ ProductCard — tighter, professional:
- * - image fills full width (no “inner frame”)
- * - reduced vertical gaps (image->title and bottom padding)
- * - badges overlay on image, compact
- */
 function ProductCard({ item, t }) {
   return (
-    <Card className="overflow-hidden border border-slate-200 flex flex-col">
+    <Card className="overflow-hidden border border-slate-200 flex flex-col bg-white">
+      {/* IMAGE AREA (3:4, always fully visible) */}
       <CardHeader className="p-0">
         <div className="relative">
-          {/* чуть меньше высота + без лишних отступов вокруг */}
-          <img
-            src={item.image}
-            alt={item.title}
-            className="w-full h-56 sm:h-60 object-cover block"
-          />
-
-          {/* тонкий градиент чтобы бейджи читались на любом фоне */}
-          <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-white/80 to-transparent pointer-events-none" />
-
-          {/* badges максимально сверху и компактно */}
-          <div className="absolute top-2 left-2 right-2 flex flex-wrap gap-2">
+          {/* badges — максимально вверх */}
+          <div className="absolute top-2 left-2 right-2 z-10 flex flex-wrap gap-2">
             {item.badges?.map((b) => (
-              <Badge key={b} className="backdrop-blur px-3 py-1">
+              <Badge
+                key={b}
+                className="backdrop-blur bg-white/90 border border-slate-200 text-slate-700 rounded-full px-3 py-1"
+              >
                 {b}
               </Badge>
             ))}
           </div>
+
+          {/* 3:4 container */}
+          <div className="w-full aspect-[4/3] bg-white">
+            <img
+              src={item.image}
+              alt={item.title}
+              className="w-full h-full object-contain block"
+              loading="lazy"
+            />
+          </div>
+
+          {/* очень лёгкий градиент сверху, чтобы бейджи читались на любом фоне */}
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-white/70 to-transparent" />
         </div>
       </CardHeader>
 
-      {/* ключевое: уменьшаем отступ сверху (между картинкой и заголовком) */}
-      <CardContent className="p-4 pt-2.5 flex flex-col flex-grow">
+      {/* CONTENT — максимально близко к картинке */}
+      <CardContent className="px-4 pt-1.5 pb-4 flex flex-col flex-1">
         <div className="space-y-1">
-          <div className="space-y-0.5">
-            <CardTitle className="text-lg leading-snug break-words">{item.title}</CardTitle>
-            <p className="text-sm opacity-80">{item.kind}</p>
-          </div>
-
-          <p className="text-sm text-slate-700 leading-snug">{item.description}</p>
+          <CardTitle className="text-lg leading-snug break-words">
+            {item.title}
+          </CardTitle>
+          <p className="text-sm text-slate-600">{item.kind}</p>
         </div>
 
-        {/* снизу тоже без лишнего воздуха */}
-        <div className="flex items-center justify-between mt-3 gap-3">
-          <span className="text-xl font-semibold tabular-nums">{currencyUSD(item.price)}</span>
+        <p className="mt-2 text-sm text-slate-700 leading-snug">
+          {item.description}
+        </p>
+
+        <div className="mt-auto pt-3 flex items-center justify-between gap-3">
+          <span className="text-xl font-semibold tabular-nums">
+            {currencyUSD(item.price)}
+          </span>
 
           <a href={item.externalUrl} target="_blank" rel="noopener noreferrer" className="inline-flex">
             <Button variant="outline" className="flex items-center gap-2" type="button">
