@@ -107,7 +107,6 @@ const PRODUCTS = [
     disabled: true, // ✅ ключевой флаг
   },
 ];
-];
 
 const AUDIO_BOOKS = [
   {
