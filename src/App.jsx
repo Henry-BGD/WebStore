@@ -92,6 +92,21 @@ const PRODUCTS = [
     badges: ["RU-EN", "Paper Book", "Audio"],
     description: "Word-by-word translation, stress marks, grammar explanations, exercises, audio included.",
   },
+
+   // ✅ NEW — Chekhov (coming soon)
+  {
+    id: "prod-ru-book-2",
+    title: "Russian Short Stories by Anton Chekhov",
+    kind: "A1-B1 Level",
+    price: 12.99, // можешь оставить, или поставить null — см. ниже
+    image: "/Product_Chekhov.png", // ты добавишь позже
+    externalUrl: "", // пусто, потому что пока не продаётся
+    marketplace: "amazon",
+    badges: ["RU-EN", "Paper Book", "Audio", "Coming soon"],
+    description: "Coming soon. Word-by-word translation, stress marks, grammar explanations, exercises, audio included.",
+    disabled: true, // ✅ ключевой флаг
+  },
+];
 ];
 
 const AUDIO_BOOKS = [
@@ -108,6 +123,16 @@ const AUDIO_BOOKS = [
       { id: "shark", title: "Акула (The Shark)", src: "/audio/shark.mp3" },
       { id: "jump", title: "Прыжок (The Jump)", src: "/audio/jump.mp3" },
     ],
+  },
+
+  // ✅ NEW — Chekhov (coming soon)
+  {
+    id: "chekhov-short-stories",
+    title: "Russian Short Stories",
+    cover: "/Audio_External_Chekhov.png", // добавишь позже
+    description: "by Anton Chekhov (coming soon)",
+    tracks: [], // пока пусто
+    disabled: true, // ✅ флаг
   },
 ];
 
@@ -248,13 +273,30 @@ function EmptyState({ title, subtitle, className = "" }) {
 }
 
 function AudioBookTile({ book, onOpen }) {
+  const isDisabled = !!book.disabled;
+
   return (
-    <button onClick={() => onOpen(book.id)} className="w-full max-w-sm text-left" type="button">
-      <Card className="p-4 border border-slate-200 hover:shadow transition">
+    <button
+      onClick={() => {
+        if (isDisabled) return;
+        onOpen(book.id);
+      }}
+      className="w-full max-w-sm text-left"
+      type="button"
+      disabled={isDisabled}
+    >
+      <Card
+        className={[
+          "p-4 border border-slate-200 transition",
+          isDisabled ? "opacity-70 cursor-not-allowed" : "hover:shadow",
+        ].join(" ")}
+      >
         <div className="flex gap-4 items-center">
           <img src={book.cover} alt={book.title} className="w-16 h-16 rounded-xl object-cover flex-none" />
           <div className="min-w-0">
-            <p className="font-semibold truncate">{book.title}</p>
+            <p className="font-semibold truncate">
+              {book.title} {isDisabled ? "• Coming soon" : ""}
+            </p>
             {book.description && <p className="text-sm text-slate-600 line-clamp-2">{book.description}</p>}
           </div>
         </div>
@@ -352,9 +394,16 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
 }
 
 // ================== PRODUCT CARD ==================
-function ProductCard({ item, t }) {
+function ProductCard({ item, t, lang }) {
+  const isDisabled = !!item.disabled;
+
   return (
-    <Card className="overflow-hidden border border-slate-200 flex flex-col bg-white">
+    <Card
+      className={[
+        "overflow-hidden border border-slate-200 flex flex-col bg-white",
+        isDisabled ? "opacity-80" : "",
+      ].join(" ")}
+    >
       <CardHeader className="p-0">
         <div className="relative">
           <div className="w-full aspect-[4/3] bg-white">
@@ -385,14 +434,30 @@ function ProductCard({ item, t }) {
         <p className="mt-2 text-sm text-slate-700 leading-snug">{item.description}</p>
 
         <div className="mt-auto pt-3 flex items-center justify-between gap-3">
-          <span className="text-xl font-semibold tabular-nums">{currencyUSD(item.price)}</span>
+          <span className="text-xl font-semibold tabular-nums">
+            {Number.isFinite(item.price) ? currencyUSD(item.price) : "—"}
+          </span>
 
-          <a href={item.externalUrl} target="_blank" rel="noopener noreferrer" className="inline-flex">
-            <Button variant="outline" className="flex items-center gap-2" type="button">
+          {isDisabled ? (
+            <Button
+              variant="outline"
+              type="button"
+              disabled
+              className="flex items-center gap-2 opacity-70 cursor-not-allowed"
+            >
               <ExternalLink className="w-4 h-4" />
-              <span className="whitespace-nowrap">{productBuyLabel(item, t)}</span>
+              <span className="whitespace-nowrap">
+                {lang === "ru" ? "Скоро в продаже" : "Coming soon"}
+              </span>
             </Button>
-          </a>
+          ) : (
+            <a href={item.externalUrl} target="_blank" rel="noopener noreferrer" className="inline-flex">
+              <Button variant="outline" className="flex items-center gap-2" type="button">
+                <ExternalLink className="w-4 h-4" />
+                <span className="whitespace-nowrap">{productBuyLabel(item, t)}</span>
+              </Button>
+            </a>
+          )}
         </div>
       </CardContent>
     </Card>
@@ -776,7 +841,7 @@ export default function App() {
                   <EmptyState title={t("not_found")} subtitle={t("try_another")} className="max-w-[32rem]" />
                 </div>
               ) : (
-                filteredProducts.map((p) => <ProductCard key={p.id} item={p} t={t} />)
+                filteredProducts.map((p) => <ProductCard key={p.id} item={p} t={t} lang={lang} />)
               )}
             </div>
           </section>
