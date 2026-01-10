@@ -98,12 +98,12 @@ const PRODUCTS = [
     id: "prod-ru-book-2",
     title: "Russian Short Stories by Anton Chekhov",
     kind: "A1-B1 Level",
-    price: 12.99, // можешь оставить, или поставить null — см. ниже
+    price: null, // можешь оставить, или поставить null — см. ниже
     image: "/Product_Chekhov.png", // ты добавишь позже
     externalUrl: "", // пусто, потому что пока не продаётся
     marketplace: "amazon",
-    badges: ["RU-EN", "Paper Book", "Audio", "Coming soon"],
-    description: "Coming soon. Word-by-word translation, stress marks, grammar explanations, exercises, audio included.",
+    badges: ["RU-EN", "Paper Book", "Audio"],
+    description: "Coming soon.",
     disabled: true, // ✅ ключевой флаг
   },
 ];
@@ -294,7 +294,7 @@ function AudioBookTile({ book, onOpen }) {
           <img src={book.cover} alt={book.title} className="w-16 h-16 rounded-xl object-cover flex-none" />
           <div className="min-w-0">
             <p className="font-semibold truncate">
-              {book.title} {isDisabled ? "• Coming soon" : ""}
+              {book.title}
             </p>
             {book.description && <p className="text-sm text-slate-600 line-clamp-2">{book.description}</p>}
           </div>
@@ -426,7 +426,9 @@ function ProductCard({ item, t, lang }) {
 
       <CardContent className="p-4 pt-2 flex flex-col flex-grow -mt-3">
         <div className="space-y-1">
-          <CardTitle className="text-lg leading-snug break-words">{item.title}</CardTitle>
+          <CardTitle className="text-base leading-snug font-semibold break-words">
+        {item.title}
+          </CardTitle>
           <p className="text-sm text-slate-600">{item.kind}</p>
         </div>
 
