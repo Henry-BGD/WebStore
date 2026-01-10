@@ -196,27 +196,26 @@ function NavPill({ active, onClick, children, size = "md" }) {
   );
 }
 
-function ExternalLinkChip({ href, children }) {
+function ExternalLinkChip({ href, children, className = "" }) {
   return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="inline-flex"
-    >
+    <a href={href} target="_blank" rel="noopener noreferrer" className="block w-full">
       <button
         type="button"
         className={[
-          "inline-flex items-center gap-2",
+          "w-full",
+          "inline-flex items-center justify-between gap-3",
           "rounded-xl border border-slate-200 bg-white",
           "px-3 py-2 text-sm font-medium text-slate-800",
           "hover:bg-slate-50 active:scale-[0.99]",
           "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300",
-          "whitespace-nowrap",
+          className,
         ].join(" ")}
       >
-        <span>{children}</span>
-        <ExternalLink className="w-4 h-4 opacity-80" />
+        {/* текст слева */}
+        <span className="truncate">{children}</span>
+
+        {/* иконка всегда справа */}
+        <ExternalLink className="w-4 h-4 opacity-80 flex-none" />
       </button>
     </a>
   );
@@ -695,7 +694,7 @@ export default function App() {
         {tab === "about" && (
           <section className="grid md:grid-cols-3 gap-8 items-start">
             <div className="md:col-span-2 space-y-4">
-              <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight break-words">
+              <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight break-words">
                 {t("about_title")}
               </h1>
               <p className="leading-relaxed text-slate-700">{t("about_p1")}</p>
@@ -740,7 +739,7 @@ export default function App() {
           {t("learn_with_me")}
         </h3>
 
-        <div className="mt-3 flex flex-col gap-2 w-full">
+        <div className="mt-3 flex flex-col gap-2 w-full max-w-[220px]">
           <ExternalLinkChip href="https://preply.com/en/?pref=ODkzOTkyOQ==&id=1759522486.457389&ep=w1">
             Preply
           </ExternalLinkChip>
