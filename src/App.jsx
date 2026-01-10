@@ -339,9 +339,6 @@ function ProductCard({ item, t }) {
             />
           </div>
 
-          {/* лёгкий градиент под бейджами (ниже по z), чтобы читались на любом фоне */}
-          <div className="pointer-events-none absolute inset-x-0 top-0 z-[1] h-16 bg-gradient-to-b from-white/70 to-transparent" />
-
           {/* badges максимально к верхней рамке + компактнее */}
           <div className="absolute top-1 left-1 flex flex-wrap gap-1">
             {item.badges?.map((b) => (
