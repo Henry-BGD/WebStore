@@ -196,6 +196,32 @@ function NavPill({ active, onClick, children, size = "md" }) {
   );
 }
 
+function ExternalLinkChip({ href, children }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-flex"
+    >
+      <button
+        type="button"
+        className={[
+          "inline-flex items-center gap-2",
+          "rounded-xl border border-slate-200 bg-white",
+          "px-3 py-2 text-sm font-medium text-slate-800",
+          "hover:bg-slate-50 active:scale-[0.99]",
+          "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300",
+          "whitespace-nowrap",
+        ].join(" ")}
+      >
+        <span>{children}</span>
+        <ExternalLink className="w-4 h-4 opacity-80" />
+      </button>
+    </a>
+  );
+}
+
 function currencyUSD(n) {
   try {
     return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);
@@ -693,41 +719,41 @@ export default function App() {
             </Card>
 
             <Card className="md:col-span-3 border border-slate-200">
-              <div className="grid md:grid-cols-3 gap-6 p-5 items-center">
-                <div>
-                  <img
-                    src="/Portrait_1.jpg"
-                    alt="Portrait"
-                    className="w-auto h-40 md:h-48 object-cover rounded-2xl shadow aspect-[3/4]"
-                  />
-                </div>
-                <div className="md:col-span-2">
-                  <h3 className="text-xl font-semibold mb-2">{t("learn_with_me")}</h3>
-                  <ul className="space-y-2 text-slate-700">
-                    <li>
-                      <a
-                        className="underline hover:text-slate-900 break-all"
-                        href="https://preply.com/en/?pref=ODkzOTkyOQ==&id=1759522486.457389&ep=w1"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        Preply
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        className="underline hover:text-slate-900 break-all"
-                        href="https://www.italki.com/affshare?ref=af11775706"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        italki
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </Card>
+  <div className="p-5">
+    {/* Mobile: text справа от фото; Desktop: тоже аккуратно, без пустоты */}
+    <div className="flex items-start gap-5">
+      <img
+        src="/Portrait_1.jpg"
+        alt="Portrait"
+        className={[
+          "flex-none rounded-2xl shadow object-cover",
+          // размер на мобиле
+          "w-28 h-28",
+          // на десктопе чуть крупнее
+          "sm:w-32 sm:h-32 md:w-40 md:h-48",
+        ].join(" ")}
+      />
+
+      <div className="min-w-0 flex-1">
+        {/* можно чуть уменьшить заголовок и на мобиле, и на десктопе */}
+        <h3 className="text-lg sm:text-xl font-semibold leading-snug">
+          {t("learn_with_me")}
+        </h3>
+
+        <div className="mt-3 flex flex-col gap-2 w-full">
+          <ExternalLinkChip href="https://preply.com/en/?pref=ODkzOTkyOQ==&id=1759522486.457389&ep=w1">
+            Preply
+          </ExternalLinkChip>
+
+          <ExternalLinkChip href="https://www.italki.com/affshare?ref=af11775706">
+            italki
+          </ExternalLinkChip>
+        </div>
+      </div>
+    </div>
+  </div>
+</Card>
+
           </section>
         )}
 
