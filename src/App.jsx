@@ -185,7 +185,10 @@ function NavPill({ active, onClick, children, size = "md" }) {
         "whitespace-nowrap",
         "rounded-full border transition-all duration-200 select-none",
         "active:scale-[0.97]",
-        "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300",
+        // ✅ убираем странные “полукруги” на мобилках (tap highlight)
+        "[-webkit-tap-highlight-color:transparent]",
+        // ✅ вместо странного эффекта — красивая обводка (как у outline-кнопок)
+        "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
         active
           ? "bg-blue-600 text-white border-blue-600 shadow-md font-semibold"
           : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:border-slate-300",
@@ -207,14 +210,12 @@ function ExternalLinkChip({ href, children, className = "" }) {
           "rounded-xl border border-slate-200 bg-white",
           "px-3 py-2 text-sm font-medium text-slate-800",
           "hover:bg-slate-50 active:scale-[0.99]",
-          "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300",
+          "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
+          "[-webkit-tap-highlight-color:transparent]",
           className,
         ].join(" ")}
       >
-        {/* текст слева */}
         <span className="truncate">{children}</span>
-
-        {/* иконка всегда справа */}
         <ExternalLink className="w-4 h-4 opacity-80 flex-none" />
       </button>
     </a>
@@ -297,7 +298,8 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
               className={[
                 "h-10 w-10 inline-flex items-center justify-center rounded-xl border",
                 "border-slate-200 bg-white hover:bg-slate-50 active:scale-[0.98]",
-                "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300",
+                "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
+                "[-webkit-tap-highlight-color:transparent]",
                 isActive ? "shadow-sm" : "",
               ].join(" ")}
               aria-label={activeAndPlaying ? t("pause") : t("listen")}
@@ -314,7 +316,8 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
                   className={[
                     "h-10 w-10 inline-flex items-center justify-center rounded-xl border",
                     "border-slate-200 bg-white hover:bg-slate-50 active:scale-[0.98]",
-                    "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300",
+                    "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
+                    "[-webkit-tap-highlight-color:transparent]",
                   ].join(" ")}
                   title={t("download")}
                   data-no-swipe="true"
@@ -354,7 +357,6 @@ function ProductCard({ item, t }) {
     <Card className="overflow-hidden border border-slate-200 flex flex-col bg-white">
       <CardHeader className="p-0">
         <div className="relative">
-          {/* 4:3 container (always fully visible) */}
           <div className="w-full aspect-[4/3] bg-white">
             <img
               src={item.image}
@@ -364,10 +366,9 @@ function ProductCard({ item, t }) {
             />
           </div>
 
-          {/* badges максимально к верхней рамке + компактнее */}
           <div className="absolute top-1 left-1 flex flex-wrap gap-1">
             {item.badges?.map((b) => (
-              <Badge key={b} className="backdrop-blur px-2 py-0.5 text-[11px] font-normal leading-none">
+              <Badge key={b} className="px-2 py-0.5 text-[11px] font-normal leading-none">
                 {b}
               </Badge>
             ))}
@@ -375,7 +376,6 @@ function ProductCard({ item, t }) {
         </div>
       </CardHeader>
 
-      {/* ✅ убираем “жёлтую штриховку” — поднимаем контент поверх пустоты внутри PNG */}
       <CardContent className="p-4 pt-2 flex flex-col flex-grow -mt-3">
         <div className="space-y-1">
           <CardTitle className="text-lg leading-snug break-words">{item.title}</CardTitle>
@@ -401,7 +401,6 @@ function ProductCard({ item, t }) {
 
 // ================== APP ==================
 export default function App() {
-  // -------- language --------
   const detectLanguage = () => {
     try {
       const saved = localStorage.getItem("lang");
@@ -425,7 +424,6 @@ export default function App() {
     } catch {}
   };
 
-  // -------- tab --------
   const detectTab = () => {
     try {
       const saved = localStorage.getItem("tab");
@@ -443,7 +441,6 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [tab]);
 
-  // -------- store search --------
   const [query, setQuery] = useState("");
 
   const filteredProducts = useMemo(() => {
@@ -456,7 +453,6 @@ export default function App() {
 
   const clearQuery = () => setQuery("");
 
-  // -------- audiobooks --------
   const [audioBookId, setAudioBookId] = useState(null);
   const selectedBook = useMemo(() => AUDIO_BOOKS.find((b) => b.id === audioBookId) || null, [audioBookId]);
 
@@ -565,7 +561,6 @@ export default function App() {
     }
   }, [audioBookId, stopAudio]);
 
-  // -------- mobile detection (for swipe) --------
   const [isMobile, setIsMobile] = useState(() => {
     if (typeof window === "undefined") return false;
     return window.matchMedia("(max-width: 768px)").matches;
@@ -586,7 +581,6 @@ export default function App() {
     };
   }, []);
 
-  // -------- swipe tab navigation --------
   const TABS_ORDER = ["about", "products", "free-audio"];
 
   const goPrevTab = useCallback(() => {
@@ -629,7 +623,6 @@ export default function App() {
       <audio ref={audioRef} preload="none" />
 
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur border-b">
-        {/* TOP BAR */}
         <div className="w-full">
           <div className={`${CONTAINER} py-3 flex items-center justify-between gap-4 ${TOPBAR_H}`}>
             <div className="flex items-center gap-3 min-w-0">
@@ -655,7 +648,6 @@ export default function App() {
           </div>
         </div>
 
-        {/* NAV */}
         <nav className="border-t">
           <div className="w-full">
             <div className={`${CONTAINER} py-3`}>
@@ -690,7 +682,6 @@ export default function App() {
         onTouchMove={swipeHandlers.onTouchMove}
         onTouchEnd={swipeHandlers.onTouchEnd}
       >
-        {/* ABOUT */}
         {tab === "about" && (
           <section className="grid md:grid-cols-3 gap-8 items-start">
             <div className="md:col-span-2 space-y-4">
@@ -717,50 +708,45 @@ export default function App() {
               </div>
             </Card>
 
+            {/* ✅ обновлённый блок: фото 3:4 без кропа + desktop центрирование текста */}
             <Card className="md:col-span-3 border border-slate-200">
-  <div className="p-5">
-    {/* Mobile: text справа от фото; Desktop: тоже аккуратно, без пустоты */}
-    <div className="flex items-start gap-5">
-      <img
-        src="/Portrait_1.jpg"
-        alt="Portrait"
-        className={[
-          "flex-none rounded-2xl shadow object-cover",
-          // размер на мобиле
-          "w-28 h-28",
-          // на десктопе чуть крупнее
-          "sm:w-32 sm:h-32 md:w-40 md:h-48",
-        ].join(" ")}
-      />
+              <div className="p-5">
+                <div className="flex items-start gap-5">
+                  {/* FIX: строго 3:4, без обрезки */}
+                  <div className="flex-none w-28 sm:w-32 md:w-36 aspect-[3/4] rounded-2xl overflow-hidden bg-white shadow">
+                    <img
+                      src="/Portrait_1.jpg"
+                      alt="Portrait"
+                      className="w-full h-full object-contain"
+                      loading="lazy"
+                    />
+                  </div>
 
-      <div className="min-w-0 flex-1">
-        {/* можно чуть уменьшить заголовок и на мобиле, и на десктопе */}
-        <h3 className="text-lg sm:text-xl font-semibold leading-snug">
-          {t("learn_with_me")}
-        </h3>
+                  {/* Mobile: слева; Desktop: центрируем этот блок в карточке */}
+                  <div className="min-w-0 flex-1 md:flex md:flex-col md:items-center md:text-center">
+                    <h3 className="text-lg sm:text-xl font-semibold leading-snug">
+                      {t("learn_with_me")}
+                    </h3>
 
-        <div className="mt-3 flex flex-col gap-2 w-full max-w-[220px]">
-          <ExternalLinkChip href="https://preply.com/en/?pref=ODkzOTkyOQ==&id=1759522486.457389&ep=w1">
-            Preply
-          </ExternalLinkChip>
+                    <div className="mt-3 flex flex-col gap-2 w-full max-w-[260px]">
+                      <ExternalLinkChip href="https://preply.com/en/?pref=ODkzOTkyOQ==&id=1759522486.457389&ep=w1">
+                        Preply
+                      </ExternalLinkChip>
 
-          <ExternalLinkChip href="https://www.italki.com/affshare?ref=af11775706">
-            italki
-          </ExternalLinkChip>
-        </div>
-      </div>
-    </div>
-  </div>
-</Card>
-
+                      <ExternalLinkChip href="https://www.italki.com/affshare?ref=af11775706">
+                        italki
+                      </ExternalLinkChip>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Card>
           </section>
         )}
 
-        {/* PRODUCTS */}
         {tab === "products" && (
           <section className="space-y-6">
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {/* SEARCH */}
               <div className="relative">
                 <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 <Input
@@ -796,7 +782,6 @@ export default function App() {
           </section>
         )}
 
-        {/* AUDIO */}
         {tab === "free-audio" && (
           <section className="space-y-6">
             {!audioBookId && (
