@@ -97,8 +97,8 @@ const PRODUCTS = [
   {
     id: "prod-ru-book-2",
     title: "Russian Short Stories by Anton Chekhov",
-    kind: "A1-B1 Level",
-    price: null, // можешь оставить, или поставить null — см. ниже
+    kind: "A2-B2 Level",
+    price: 14.99, // можешь оставить, или поставить null — см. ниже
     image: "/Product_Chekhov.png", // ты добавишь позже
     externalUrl: "", // пусто, потому что пока не продаётся
     marketplace: "amazon",
