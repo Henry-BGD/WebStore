@@ -17,7 +17,9 @@ function useSwipeTabs({ enabled, onPrev, onNext, thresholdPx = 60, restraintPx =
 
   const shouldIgnoreTarget = (target) => {
     try {
-      return !!target?.closest?.('input, textarea, select, button, a, [data-no-swipe="true"], [role="slider"]');
+      return !!target?.closest?.(
+        'input, textarea, select, button, a, [data-no-swipe="true"], [role="slider"]'
+      );
     } catch {
       return false;
     }
@@ -47,6 +49,7 @@ function useSwipeTabs({ enabled, onPrev, onNext, thresholdPx = 60, restraintPx =
       const dx = t.clientX - startX.current;
       const dy = t.clientY - startY.current;
 
+      // If user scrolls vertically → stop tracking
       if (Math.abs(dy) > restraintPx && Math.abs(dy) > Math.abs(dx)) {
         tracking.current = false;
       }
@@ -67,8 +70,8 @@ function useSwipeTabs({ enabled, onPrev, onNext, thresholdPx = 60, restraintPx =
 
       if (Math.abs(dy) > restraintPx) return;
 
-      if (dx > thresholdPx) onPrev?.();
-      else if (dx < -thresholdPx) onNext?.();
+      if (dx > thresholdPx) onPrev?.(); // swipe right
+      else if (dx < -thresholdPx) onNext?.(); // swipe left
     },
     [enabled, onPrev, onNext, thresholdPx, restraintPx]
   );
@@ -172,6 +175,7 @@ const I18N = {
 // ================== UI HELPERS ==================
 function NavPill({ active, onClick, children, size = "md" }) {
   const padding = size === "sm" ? "px-3 py-1.5 text-xs" : "px-5 py-2.5 text-sm";
+
   return (
     <button
       onClick={onClick}
@@ -181,7 +185,10 @@ function NavPill({ active, onClick, children, size = "md" }) {
         "whitespace-nowrap",
         "rounded-full border transition-all duration-200 select-none",
         "active:scale-[0.97]",
-        "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300",
+        // ✅ убираем странные “полукруги” на мобилках (tap highlight)
+        "[-webkit-tap-highlight-color:transparent]",
+        // ✅ вместо странного эффекта — красивая обводка (как у outline-кнопок)
+        "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
         active
           ? "bg-blue-600 text-white border-blue-600 shadow-md font-semibold"
           : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:border-slate-300",
@@ -192,7 +199,7 @@ function NavPill({ active, onClick, children, size = "md" }) {
   );
 }
 
-function ExternalLinkChip({ href, label, className = "" }) {
+function ExternalLinkChip({ href, children, className = "" }) {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer" className="block w-full">
       <button
@@ -200,14 +207,15 @@ function ExternalLinkChip({ href, label, className = "" }) {
         className={[
           "w-full",
           "inline-flex items-center justify-between gap-3",
-          "rounded-2xl border border-slate-200 bg-white",
-          "px-4 py-2.5 text-sm font-medium text-slate-900",
+          "rounded-xl border border-slate-200 bg-white",
+          "px-3 py-2 text-sm font-medium text-slate-800",
           "hover:bg-slate-50 active:scale-[0.99]",
-          "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300",
+          "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
+          "[-webkit-tap-highlight-color:transparent]",
           className,
         ].join(" ")}
       >
-        <span className="truncate">{label}</span>
+        <span className="truncate">{children}</span>
         <ExternalLink className="w-4 h-4 opacity-80 flex-none" />
       </button>
     </a>
@@ -275,6 +283,7 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
             <p className="font-medium truncate">{track.title}</p>
+
             {showScrubber && (
               <p className="text-xs text-slate-500 mt-1 tabular-nums">
                 {formatTime(safeTime)} / {formatTime(safeDuration)}
@@ -289,7 +298,8 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
               className={[
                 "h-10 w-10 inline-flex items-center justify-center rounded-xl border",
                 "border-slate-200 bg-white hover:bg-slate-50 active:scale-[0.98]",
-                "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300",
+                "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
+                "[-webkit-tap-highlight-color:transparent]",
                 isActive ? "shadow-sm" : "",
               ].join(" ")}
               aria-label={activeAndPlaying ? t("pause") : t("listen")}
@@ -306,7 +316,8 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
                   className={[
                     "h-10 w-10 inline-flex items-center justify-center rounded-xl border",
                     "border-slate-200 bg-white hover:bg-slate-50 active:scale-[0.98]",
-                    "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300",
+                    "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
+                    "[-webkit-tap-highlight-color:transparent]",
                   ].join(" ")}
                   title={t("download")}
                   data-no-swipe="true"
@@ -388,80 +399,8 @@ function ProductCard({ item, t }) {
   );
 }
 
-// ================== ABOUT CARDS (DESKTOP DESIGN) ==================
-function LearnCard({ t }) {
-  return (
-    <Card className="border border-slate-200">
-      <div className="p-6">
-        {/* Mobile: column; Desktop: row with centered text block */}
-        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
-          {/* Photo: always 3:4, no crop */}
-          <div className="w-40 sm:w-44 md:w-52 flex-none">
-            <div className="w-full aspect-[3/4] rounded-3xl border border-slate-100 overflow-hidden shadow-sm bg-white">
-              <img
-                src="/Portrait_1.jpg"
-                alt="Portrait"
-                className="w-full h-full object-contain block"
-                loading="lazy"
-              />
-            </div>
-          </div>
-
-          {/* Text/links */}
-          <div className="min-w-0 flex-1 w-full">
-            {/* Desktop: center the block inside card */}
-            <div className="sm:pt-2 md:pt-6 md:flex md:justify-center">
-              <div className="w-full md:max-w-[420px]">
-                <h3 className="text-lg sm:text-xl font-semibold leading-snug text-slate-900">
-                  {t("learn_with_me")}
-                </h3>
-
-                <div className="mt-4 grid gap-3 w-full max-w-[320px]">
-                  <ExternalLinkChip
-                    href="https://preply.com/en/?pref=ODkzOTkyOQ==&id=1759522486.457389&ep=w1"
-                    label="Preply"
-                  />
-                  <ExternalLinkChip
-                    href="https://www.italki.com/affshare?ref=af11775706"
-                    label="italki"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </Card>
-  );
-}
-
-function ContactsCard({ t }) {
-  return (
-    <Card className="border border-slate-200">
-      <div className="p-6 h-full flex flex-col">
-        <div className="md:flex md:justify-center md:pt-6">
-          <div className="w-full md:max-w-[420px]">
-            <h3 className="text-lg sm:text-xl font-semibold leading-snug text-slate-900 text-center md:text-center">
-              {t("contacts")}
-            </h3>
-
-            <div className="mt-4 grid gap-3">
-              <ExternalLinkChip href="mailto:genndybogdanov@gmail.com" label="E-mail: genndybogdanov@gmail.com" />
-              <ExternalLinkChip href="https://substack.com/@gbogdanov" label="Substack" />
-            </div>
-          </div>
-        </div>
-
-        {/* subtle spacer to keep height consistent */}
-        <div className="mt-auto" />
-      </div>
-    </Card>
-  );
-}
-
 // ================== APP ==================
 export default function App() {
-  // -------- language --------
   const detectLanguage = () => {
     try {
       const saved = localStorage.getItem("lang");
@@ -485,7 +424,6 @@ export default function App() {
     } catch {}
   };
 
-  // -------- tab --------
   const detectTab = () => {
     try {
       const saved = localStorage.getItem("tab");
@@ -503,7 +441,6 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [tab]);
 
-  // -------- store search --------
   const [query, setQuery] = useState("");
 
   const filteredProducts = useMemo(() => {
@@ -516,7 +453,6 @@ export default function App() {
 
   const clearQuery = () => setQuery("");
 
-  // -------- audiobooks --------
   const [audioBookId, setAudioBookId] = useState(null);
   const selectedBook = useMemo(() => AUDIO_BOOKS.find((b) => b.id === audioBookId) || null, [audioBookId]);
 
@@ -625,7 +561,6 @@ export default function App() {
     }
   }, [audioBookId, stopAudio]);
 
-  // -------- mobile detection (for swipe) --------
   const [isMobile, setIsMobile] = useState(() => {
     if (typeof window === "undefined") return false;
     return window.matchMedia("(max-width: 768px)").matches;
@@ -646,7 +581,6 @@ export default function App() {
     };
   }, []);
 
-  // -------- swipe tab navigation --------
   const TABS_ORDER = ["about", "products", "free-audio"];
 
   const goPrevTab = useCallback(() => {
@@ -689,7 +623,6 @@ export default function App() {
       <audio ref={audioRef} preload="none" />
 
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur border-b">
-        {/* TOP BAR */}
         <div className="w-full">
           <div className={`${CONTAINER} py-3 flex items-center justify-between gap-4 ${TOPBAR_H}`}>
             <div className="flex items-center gap-3 min-w-0">
@@ -715,7 +648,6 @@ export default function App() {
           </div>
         </div>
 
-        {/* NAV */}
         <nav className="border-t">
           <div className="w-full">
             <div className={`${CONTAINER} py-3`}>
@@ -745,35 +677,76 @@ export default function App() {
 
       <main
         id="content"
-        className={`flex-1 ${CONTAINER} py-10 space-y-10`}
+        className={`flex-1 ${CONTAINER} py-8 space-y-10`}
         onTouchStart={swipeHandlers.onTouchStart}
         onTouchMove={swipeHandlers.onTouchMove}
         onTouchEnd={swipeHandlers.onTouchEnd}
       >
-        {/* ABOUT */}
         {tab === "about" && (
-          <section className="space-y-8">
-            {/* Title + subtitle (clean, like your screenshot) */}
-            <div className="space-y-4">
-              <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight break-words text-slate-900">
+          <section className="grid md:grid-cols-3 gap-8 items-start">
+            <div className="md:col-span-2 space-y-4">
+              <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight break-words">
                 {t("about_title")}
               </h1>
-              <p className="leading-relaxed text-slate-700 max-w-3xl">{t("about_p1")}</p>
+              <p className="leading-relaxed text-slate-700">{t("about_p1")}</p>
             </div>
 
-            {/* Two big cards (desktop side-by-side, mobile stack) */}
-            <div className="grid lg:grid-cols-2 gap-6 items-stretch">
-              <LearnCard t={t} />
-              <ContactsCard t={t} />
-            </div>
+            <Card className="p-5 border border-slate-200">
+              <CardTitle className="mb-2">{t("contacts")}</CardTitle>
+              <div className="text-sm space-y-1">
+                <p>E-mail: genndybogdanov@gmail.com</p>
+                <p>
+                  <a
+                    className="underline hover:text-slate-900 break-all"
+                    href="https://substack.com/@gbogdanov"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Substack
+                  </a>
+                </p>
+              </div>
+            </Card>
+
+            {/* ✅ обновлённый блок: фото 3:4 без кропа + desktop центрирование текста */}
+            <Card className="md:col-span-3 border border-slate-200">
+              <div className="p-5">
+                <div className="flex items-start gap-5">
+                  {/* FIX: строго 3:4, без обрезки */}
+                  <div className="flex-none w-28 sm:w-32 md:w-36 aspect-[3/4] rounded-2xl overflow-hidden bg-white shadow">
+                    <img
+                      src="/Portrait_1.jpg"
+                      alt="Portrait"
+                      className="w-full h-full object-contain"
+                      loading="lazy"
+                    />
+                  </div>
+
+                  {/* Mobile: слева; Desktop: центрируем этот блок в карточке */}
+                  <div className="min-w-0 flex-1 md:flex md:flex-col md:items-center md:text-center">
+                    <h3 className="text-lg sm:text-xl font-semibold leading-snug">
+                      {t("learn_with_me")}
+                    </h3>
+
+                    <div className="mt-3 flex flex-col gap-2 w-full max-w-[260px]">
+                      <ExternalLinkChip href="https://preply.com/en/?pref=ODkzOTkyOQ==&id=1759522486.457389&ep=w1">
+                        Preply
+                      </ExternalLinkChip>
+
+                      <ExternalLinkChip href="https://www.italki.com/affshare?ref=af11775706">
+                        italki
+                      </ExternalLinkChip>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Card>
           </section>
         )}
 
-        {/* PRODUCTS */}
         {tab === "products" && (
           <section className="space-y-6">
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {/* SEARCH */}
               <div className="relative">
                 <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 <Input
@@ -809,7 +782,6 @@ export default function App() {
           </section>
         )}
 
-        {/* AUDIO */}
         {tab === "free-audio" && (
           <section className="space-y-6">
             {!audioBookId && (
