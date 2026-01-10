@@ -345,7 +345,7 @@ function ProductCard({ item, t }) {
           {/* badges максимально к верхней рамке + компактнее */}
           <div className="absolute top-1 left-2 right-2 z-[2] flex flex-wrap gap-2">
             {item.badges?.map((b) => (
-              <Badge key={b} className="backdrop-blur px-2.5 py-1 text-xs font-semibold">
+              <Badge key={b} className="backdrop-blur px-2 py-0.5 text-[11px] font-normal leading-none">
                 {b}
               </Badge>
             ))}
