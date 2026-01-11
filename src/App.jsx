@@ -202,13 +202,14 @@ const I18N = {
 };
 
 // ================== UI HELPERS ==================
-function NavPill({ active, onClick, children, size = "md" }) {
+function NavPill({ active, onClick, children, size = "md", ...props }) {
   const padding = size === "sm" ? "px-3 py-1.5 text-xs" : "px-5 py-2.5 text-sm";
 
   return (
     <button
       onClick={onClick}
       type="button"
+      {...props}
       className={[
         padding,
         "whitespace-nowrap",
@@ -479,6 +480,18 @@ function ProductCard({ item, t, lang }) {
   );
 }
 
+// ================== helper для фоновой предзагрузки ==================
+function preloadImages(urls = []) {
+  if (typeof window === "undefined") return;
+
+  urls.forEach((url) => {
+    if (!url) return;
+    const img = new Image();
+    img.decoding = "async";
+    img.src = url;
+  });
+}
+
 // ================== APP ==================
 export default function App() {
   const detectLanguage = () => {
@@ -493,6 +506,16 @@ export default function App() {
       return "en";
     }
   };
+
+  const PREFETCH_AFTER_ABOUT = [
+  // store images
+  "/Product_Leo.webp",
+  "/Product_Chekhov.webp",
+
+  // audiobooks covers
+  "/Audio_External_Leo.webp",
+  "/Audio_External_Chekhov.webp",
+];
 
   const [lang, setLang] = useState(() => detectLanguage());
   const t = (key) => I18N[lang]?.[key] ?? I18N.en[key] ?? key;
@@ -520,6 +543,37 @@ export default function App() {
     } catch {}
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [tab]);
+
+  useEffect(() => {
+  if (typeof window === "undefined") return;
+
+  // Хотим: сначала отрисовать About, потом в фоне прогреть остальное
+  // Прогреваем только один раз за сессию
+  const key = "prefetch_done_v1";
+  if (sessionStorage.getItem(key)) return;
+
+  const run = () => {
+    preloadImages(PREFETCH_AFTER_ABOUT);
+    sessionStorage.setItem(key, "1");
+  };
+
+  // Самый мягкий вариант — когда браузеру “не занято”
+  if ("requestIdleCallback" in window) {
+    window.requestIdleCallback(run, { timeout: 2000 });
+  } else {
+    setTimeout(run, 700);
+  }
+}, []);
+
+  // 🔥 one-time prefetch guard
+const hasPrefetchedRef = useRef(false);
+
+const prefetchAudiobooksOnce = useCallback(() => {
+  if (hasPrefetchedRef.current) return;
+
+  hasPrefetchedRef.current = true;
+  preloadImages(PREFETCH_AFTER_ABOUT);
+}, []);
 
   const [query, setQuery] = useState("");
 
@@ -750,15 +804,17 @@ export default function App() {
                   {t("nav_products")}
                 </NavPill>
 
-                <NavPill
-                  active={tab === "free-audio"}
-                  onClick={() => {
-                    setTab("free-audio");
-                    setAudioBookId(null);
-                  }}
-                >
-                  {t("nav_audio")}
-                </NavPill>
+               <NavPill
+  active={tab === "free-audio"}
+  onMouseEnter={prefetchAudiobooksOnce}
+  onFocus={prefetchAudiobooksOnce}
+  onClick={() => {
+    setTab("free-audio");
+    setAudioBookId(null);
+  }}
+>
+  {t("nav_audio")}
+</NavPill> 
               </div>
             </div>
           </div>
