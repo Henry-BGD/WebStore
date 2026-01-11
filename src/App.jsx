@@ -144,8 +144,8 @@ const I18N = {
     nav_products: "Store",
     nav_audio: "Audiobooks",
 
-    about_title: "Hi! I'm Gennady – a Russian language teacher and the author of books and educational materials",
-    about_p1: "I help students master Russian faster and with greater confidence. With over 1,000 lessons taught and a high rating, I work with learners of all levels, from complete beginners to confident speakers.",
+    about_title: "Hi everyone! I’m Genndy. I’m a Russian language teacher and the author of books",
+    about_p1: "I help learners at all levels learn Russian faster and with confidence. I’ve taught over 1,000 lessons and consistently maintain a high rating.",
     contacts: "Contacts",
     learn_with_me: "Learn Russian with me on:",
 
@@ -173,8 +173,8 @@ const I18N = {
     nav_products: "Магазин",
     nav_audio: "Аудиокниги",
 
-    about_title: "Всем привет, друзья! Меня зовут Геннадий. Я преподаватель русского языка и автор книг и учебных материалов",
-    about_p1: "Я помогаю ученикам быстрее и увереннее осваивать русский язык. Более 1000 проведённых уроков, высокий рейтинг и успешный опыт работы с учениками разных уровней: от первых шагов до уверенного владения языком.",
+    about_title: "Всем привет, друзья! Меня зовут Геннадий. Я преподаватель русского языка и автор книг",
+    about_p1: "Я помогаю ученикам разных уровней быстрее осваивать русский язык. Более 1000 проведённых уроков и высокий рейтинг.",
     contacts: "Контакты",
     learn_with_me: "Учи русский язык со мной на платформах:",
 
