@@ -316,7 +316,6 @@ function AudioBookTile({ book, onOpen, comingSoonText }) {
             src={book.cover}
             alt={book.title}
             className="w-16 h-16 rounded-xl object-cover flex-none"
-            loading="lazy"
             decoding="async"
             sizes="64px"
           />
@@ -432,7 +431,6 @@ function ProductCard({ item, t, lang }) {
               src={item.image}
               alt={item.title}
               className="w-full h-full object-contain block"
-              loading="lazy"
               decoding="async"
               sizes="(max-width: 1024px) 90vw, 360px"
             />
@@ -959,7 +957,6 @@ const prefetchAudiobooksOnce = useCallback(() => {
                         src={selectedBook.cover}
                         alt={selectedBook.title}
                         className="w-20 h-20 rounded-2xl object-cover shadow flex-none md:hidden"
-                        loading="lazy"
                         decoding="async"
                         sizes="80px"
                       />
@@ -1009,7 +1006,6 @@ const prefetchAudiobooksOnce = useCallback(() => {
                     src={selectedBook.cover}
                     alt={selectedBook.title}
                     className="hidden md:block w-full aspect-square object-cover rounded-2xl shadow md:col-span-1"
-                    loading="lazy"
                     decoding="async"
                     sizes="(max-width: 1024px) 40vw, 360px"
                   />
