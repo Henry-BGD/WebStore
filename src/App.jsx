@@ -692,11 +692,11 @@ export default function App() {
         <div className="w-full">
           <div className={`${CONTAINER} py-3 flex items-center justify-between gap-4 ${TOPBAR_H}`}>
             <div className="flex items-center gap-3 min-w-0">
-              <img
-                src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=240&auto=format&fit=crop"
-                alt="logo"
-                className="w-9 h-9 rounded-xl"
-              />
+                <img
+  src="/logo.png"
+  alt="Genndy Bogdanov"
+  className="w-9 h-9 rounded-xl object-cover transition-transform duration-200 ease-out hover:scale-[1.04] hover:rotate-1"
+/> 
               <div className="min-w-0">
                 <p className="font-semibold leading-tight truncate">{t("name")}</p>
                 <p className="text-xs opacity-70 truncate">{t("tagline")}</p>
