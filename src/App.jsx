@@ -49,7 +49,6 @@ function useSwipeTabs({ enabled, onPrev, onNext, thresholdPx = 60, restraintPx =
       const dx = t.clientX - startX.current;
       const dy = t.clientY - startY.current;
 
-      // If user scrolls vertically → stop tracking
       if (Math.abs(dy) > restraintPx && Math.abs(dy) > Math.abs(dx)) {
         tracking.current = false;
       }
@@ -70,8 +69,8 @@ function useSwipeTabs({ enabled, onPrev, onNext, thresholdPx = 60, restraintPx =
 
       if (Math.abs(dy) > restraintPx) return;
 
-      if (dx > thresholdPx) onPrev?.(); // swipe right
-      else if (dx < -thresholdPx) onNext?.(); // swipe left
+      if (dx > thresholdPx) onPrev?.();
+      else if (dx < -thresholdPx) onNext?.();
     },
     [enabled, onPrev, onNext, thresholdPx, restraintPx]
   );
@@ -93,18 +92,18 @@ const PRODUCTS = [
     description: "Word-by-word translation, stress marks, grammar explanations, exercises, audio included.",
   },
 
-   // ✅ NEW — Chekhov (coming soon)
+  // ✅ NEW — Chekhov (coming soon)
   {
     id: "prod-ru-book-2",
     title: "Russian Short Stories by Anton Chekhov",
     kind: "A2-B2 Level",
-    price: 14.99, // можешь оставить, или поставить null — см. ниже
-    image: "/Product_Chekhov.png", // ты добавишь позже
-    externalUrl: "", // пусто, потому что пока не продаётся
+    price: 14.99,
+    image: "/Product_Chekhov.png",
+    externalUrl: "",
     marketplace: "amazon",
     badges: ["RU-EN", "Paper Book", "Audio"],
     description: "Coming soon.",
-    disabled: true, // ✅ ключевой флаг
+    disabled: true,
   },
 ];
 
@@ -113,7 +112,8 @@ const AUDIO_BOOKS = [
     id: "tolstoy-short-stories",
     title: "Russian Short Stories",
     cover: "/Audio_External_Leo.png",
-    description: "by Leo Tolstoy",
+    author: "by Leo Tolstoy",
+    comingSoon: false,
     tracks: [
       { id: "kostochka", title: "Косточка (The Pit)", src: "/audio/kostochka.mp3" },
       { id: "kotenok", title: "Котёнок (The Kitten)", src: "/audio/kotenok.mp3" },
@@ -129,12 +129,10 @@ const AUDIO_BOOKS = [
     id: "chekhov-short-stories",
     title: "Russian Short Stories",
     cover: "/Audio_External_Chekhov.png",
-    description: {
     author: "by Anton Chekhov",
     comingSoon: true,
-    },
-    tracks: [], // пока пусто
-    disabled: true, // ✅ флаг
+    tracks: [],
+    disabled: true,
   },
 ];
 
@@ -148,7 +146,8 @@ const I18N = {
     nav_audio: "Audiobooks",
 
     about_title: "Hi everyone! I’m Genndy. I’m a Russian language teacher and the author of books",
-    about_p1: "I help learners at all levels learn Russian faster and with confidence. I’ve taught over 1,000 lessons and consistently maintain a high rating.",
+    about_p1:
+      "I help learners at all levels learn Russian faster and with confidence. I’ve taught over 1,000 lessons and consistently maintain a high rating.",
     contacts: "Contacts",
     learn_with_me: "Learn Russian with me on:",
 
@@ -167,6 +166,7 @@ const I18N = {
     listen: "Listen",
     pause: "Pause",
     download: "Download",
+    coming_soon: "coming soon",
   },
 
   ru: {
@@ -196,6 +196,7 @@ const I18N = {
     listen: "Слушать",
     pause: "Пауза",
     download: "Скачать",
+    coming_soon: "скоро",
   },
 };
 
@@ -212,9 +213,7 @@ function NavPill({ active, onClick, children, size = "md" }) {
         "whitespace-nowrap",
         "rounded-full border transition-all duration-200 select-none",
         "active:scale-[0.97]",
-        // ✅ убираем странные “полукруги” на мобилках (tap highlight)
         "[-webkit-tap-highlight-color:transparent]",
-        // ✅ вместо странного эффекта — красивая обводка (как у outline-кнопок)
         "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
         active
           ? "bg-blue-600 text-white border-blue-600 shadow-md font-semibold"
@@ -274,7 +273,23 @@ function EmptyState({ title, subtitle, className = "" }) {
   );
 }
 
-function AudioBookTile({ book, onOpen }) {
+// ✅ helper: безопасно печатаем автора + жирный coming soon
+function BookAuthorLine({ author, comingSoon, comingSoonText }) {
+  if (!author && !comingSoon) return null;
+
+  return (
+    <p className="text-sm text-slate-600 line-clamp-2">
+      {author}
+      {comingSoon ? (
+        <span className="font-semibold text-slate-700">
+          {" "}({comingSoonText})
+        </span>
+      ) : null}
+    </p>
+  );
+}
+
+function AudioBookTile({ book, onOpen, comingSoonText }) {
   const isDisabled = !!book.disabled;
 
   return (
@@ -294,25 +309,20 @@ function AudioBookTile({ book, onOpen }) {
         ].join(" ")}
       >
         <div className="flex gap-4 items-center">
-          <img src={book.cover} alt={book.title} className="w-16 h-16 rounded-xl object-cover flex-none" />
+          <img
+            src={book.cover}
+            alt={book.title}
+            className="w-16 h-16 rounded-xl object-cover flex-none"
+            loading="lazy"
+          />
           <div className="min-w-0">
-            <p className="font-semibold truncate">
-              {book.title}
-            </p>
-          {book.description && (
-  <p className="text-sm text-slate-600 line-clamp-2">
-    {book.disabled ? (
-      <>
-        {book.description.replace("(coming soon)", "").trim()}{" "}
-        <span className="font-semibold text-slate-700">
-          (coming soon)
-        </span>
-      </>
-    ) : (
-      book.description
-    )}
-  </p>
-)}
+            <p className="font-semibold truncate">{book.title}</p>
+
+            <BookAuthorLine
+              author={book.author}
+              comingSoon={!!book.comingSoon}
+              comingSoonText={comingSoonText}
+            />
           </div>
         </div>
       </Card>
@@ -413,12 +423,7 @@ function ProductCard({ item, t, lang }) {
   const isDisabled = !!item.disabled;
 
   return (
-    <Card
-      className={[
-        "overflow-hidden border border-slate-200 flex flex-col bg-white",
-        isDisabled ? "opacity-80" : "",
-      ].join(" ")}
-    >
+    <Card className={["overflow-hidden border border-slate-200 flex flex-col bg-white", isDisabled ? "opacity-80" : ""].join(" ")}>
       <CardHeader className="p-0">
         <div className="relative">
           <div className="w-full aspect-[4/3] bg-white">
@@ -442,9 +447,8 @@ function ProductCard({ item, t, lang }) {
 
       <CardContent className="p-4 pt-2 flex flex-col flex-grow -mt-3">
         <div className="space-y-1">
-          <CardTitle className="text-base leading-snug font-semibold break-words">
-        {item.title}
-          </CardTitle>
+          {/* ✅ чуть меньше шрифт для всех карточек */}
+          <CardTitle className="text-base leading-snug font-semibold break-words">{item.title}</CardTitle>
           <p className="text-sm text-slate-600">{item.kind}</p>
         </div>
 
@@ -456,16 +460,9 @@ function ProductCard({ item, t, lang }) {
           </span>
 
           {isDisabled ? (
-            <Button
-              variant="outline"
-              type="button"
-              disabled
-              className="flex items-center gap-2 opacity-70 cursor-not-allowed"
-            >
+            <Button variant="outline" type="button" disabled className="flex items-center gap-2 opacity-70 cursor-not-allowed">
               <ExternalLink className="w-4 h-4" />
-              <span className="whitespace-nowrap">
-                {lang === "ru" ? "Скоро в продаже" : "Coming soon"}
-              </span>
+              <span className="whitespace-nowrap">{lang === "ru" ? "Скоро в продаже" : "Coming soon"}</span>
             </Button>
           ) : (
             <a href={item.externalUrl} target="_blank" rel="noopener noreferrer" className="inline-flex">
@@ -483,6 +480,7 @@ function ProductCard({ item, t, lang }) {
 
 // ================== APP ==================
 export default function App() {
+  // -------- language --------
   const detectLanguage = () => {
     try {
       const saved = localStorage.getItem("lang");
@@ -506,6 +504,7 @@ export default function App() {
     } catch {}
   };
 
+  // -------- tab --------
   const detectTab = () => {
     try {
       const saved = localStorage.getItem("tab");
@@ -523,6 +522,7 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [tab]);
 
+  // -------- store search --------
   const [query, setQuery] = useState("");
 
   const filteredProducts = useMemo(() => {
@@ -535,8 +535,16 @@ export default function App() {
 
   const clearQuery = () => setQuery("");
 
+  // -------- audiobooks --------
   const [audioBookId, setAudioBookId] = useState(null);
   const selectedBook = useMemo(() => AUDIO_BOOKS.find((b) => b.id === audioBookId) || null, [audioBookId]);
+
+  // ✅ страховка: если каким-то образом выбран disabled-book (или битый id) — сбрасываем
+  useEffect(() => {
+    if (!audioBookId) return;
+    const found = AUDIO_BOOKS.find((b) => b.id === audioBookId);
+    if (!found || found.disabled) setAudioBookId(null);
+  }, [audioBookId]);
 
   const audioRef = useRef(null);
   const [currentTrack, setCurrentTrack] = useState(null);
@@ -643,6 +651,7 @@ export default function App() {
     }
   }, [audioBookId, stopAudio]);
 
+  // -------- mobile detection (for swipe) --------
   const [isMobile, setIsMobile] = useState(() => {
     if (typeof window === "undefined") return false;
     return window.matchMedia("(max-width: 768px)").matches;
@@ -663,6 +672,7 @@ export default function App() {
     };
   }, []);
 
+  // -------- swipe tab navigation --------
   const TABS_ORDER = ["about", "products", "free-audio"];
 
   const goPrevTab = useCallback(() => {
@@ -708,11 +718,12 @@ export default function App() {
         <div className="w-full">
           <div className={`${CONTAINER} py-3 flex items-center justify-between gap-4 ${TOPBAR_H}`}>
             <div className="flex items-center gap-3 min-w-0">
-                <img
-  src="/logo.png"
-  alt="Genndy Bogdanov"
-  className="w-9 h-9 rounded-xl object-cover transition-transform duration-200 ease-out hover:scale-[1.04] hover:rotate-1"
-/> 
+              <img
+                src="/logo.png"
+                alt="Genndy Bogdanov"
+                className="w-9 h-9 rounded-xl object-cover transition-transform duration-200 ease-out hover:scale-[1.04] hover:rotate-1"
+                loading="lazy"
+              />
               <div className="min-w-0">
                 <p className="font-semibold leading-tight truncate">{t("name")}</p>
                 <p className="text-xs opacity-70 truncate">{t("tagline")}</p>
@@ -764,12 +775,11 @@ export default function App() {
         onTouchMove={swipeHandlers.onTouchMove}
         onTouchEnd={swipeHandlers.onTouchEnd}
       >
+        {/* ABOUT */}
         {tab === "about" && (
           <section className="grid md:grid-cols-3 gap-8 items-start">
             <div className="md:col-span-2 space-y-4">
-              <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight break-words">
-                {t("about_title")}
-              </h1>
+              <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight break-words">{t("about_title")}</h1>
               <p className="leading-relaxed text-slate-700">{t("about_p1")}</p>
             </div>
 
@@ -790,25 +800,15 @@ export default function App() {
               </div>
             </Card>
 
-            {/* ✅ обновлённый блок: фото 3:4 без кропа + desktop центрирование текста */}
             <Card className="md:col-span-3 border border-slate-200">
               <div className="p-5">
                 <div className="flex items-start gap-5">
-                  {/* FIX: строго 3:4, без обрезки */}
                   <div className="flex-none w-28 sm:w-32 md:w-36 aspect-[3/4] rounded-2xl overflow-hidden bg-white shadow">
-                    <img
-                      src="/Portrait_1.jpg"
-                      alt="Portrait"
-                      className="w-full h-full object-contain"
-                      loading="lazy"
-                    />
+                    <img src="/Portrait_1.jpg" alt="Portrait" className="w-full h-full object-contain" loading="lazy" />
                   </div>
 
-                  {/* Mobile: слева; Desktop: центрируем этот блок в карточке */}
                   <div className="min-w-0 flex-1 md:flex md:flex-col md:items-center md:text-center">
-                    <h3 className="text-lg sm:text-xl font-semibold leading-snug">
-                      {t("learn_with_me")}
-                    </h3>
+                    <h3 className="text-lg sm:text-xl font-semibold leading-snug">{t("learn_with_me")}</h3>
 
                     <div className="mt-3 flex flex-col gap-2 w-full max-w-[260px]">
                       <ExternalLinkChip href="https://preply.com/en/?pref=ODkzOTkyOQ==&id=1759522486.457389&ep=w1">
@@ -826,6 +826,7 @@ export default function App() {
           </section>
         )}
 
+        {/* PRODUCTS */}
         {tab === "products" && (
           <section className="space-y-6">
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -864,6 +865,7 @@ export default function App() {
           </section>
         )}
 
+        {/* AUDIOBOOKS */}
         {tab === "free-audio" && (
           <section className="space-y-6">
             {!audioBookId && (
@@ -875,7 +877,12 @@ export default function App() {
                 ) : (
                   <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {AUDIO_BOOKS.map((book) => (
-                      <AudioBookTile key={book.id} book={book} onOpen={setAudioBookId} />
+                      <AudioBookTile
+                        key={book.id}
+                        book={book}
+                        onOpen={setAudioBookId}
+                        comingSoonText={t("coming_soon")}
+                      />
                     ))}
                   </div>
                 )}
@@ -891,13 +898,20 @@ export default function App() {
                         src={selectedBook.cover}
                         alt={selectedBook.title}
                         className="w-20 h-20 rounded-2xl object-cover shadow flex-none md:hidden"
+                        loading="lazy"
                       />
 
                       <div className="min-w-0">
                         <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold leading-tight break-words">
                           {selectedBook.title}
                         </h1>
-                        <p className="text-slate-600 break-words">{selectedBook.description}</p>
+
+                        <p className="text-slate-600 break-words">
+                          {selectedBook.author}
+                          {selectedBook.comingSoon ? (
+                            <span className="font-semibold text-slate-700"> {" "}({t("coming_soon")})</span>
+                          ) : null}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -918,6 +932,8 @@ export default function App() {
                       className="w-1/2 md:w-auto flex gap-2 justify-center whitespace-nowrap"
                       type="button"
                       data-no-swipe="true"
+                      disabled={!selectedBook.tracks?.length}
+                      title={!selectedBook.tracks?.length ? t("audio_empty") : t("download_all")}
                     >
                       <Download className="w-4 h-4" />
                       {t("download_all")}
@@ -930,6 +946,7 @@ export default function App() {
                     src={selectedBook.cover}
                     alt={selectedBook.title}
                     className="hidden md:block w-full aspect-square object-cover rounded-2xl shadow md:col-span-1"
+                    loading="lazy"
                   />
 
                   <div className="md:col-span-2 space-y-3">
