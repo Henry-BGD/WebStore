@@ -85,7 +85,7 @@ const PRODUCTS = [
     title: "Russian Short Stories by Leo Tolstoy",
     kind: "A1-B1 Level",
     price: 12.99,
-    image: "/Product_Leo.png",
+    image: "/Product_Leo.webp",
     externalUrl: "https://amazon.example/your-book",
     marketplace: "amazon",
     badges: ["RU-EN", "Paper Book", "Audio"],
@@ -98,7 +98,7 @@ const PRODUCTS = [
     title: "Russian Short Stories by Anton Chekhov",
     kind: "A2-B2 Level",
     price: 14.99,
-    image: "/Product_Chekhov.png",
+    image: "/Product_Chekhov.webp",
     externalUrl: "",
     marketplace: "amazon",
     badges: ["RU-EN", "Paper Book", "Audio"],
@@ -111,7 +111,7 @@ const AUDIO_BOOKS = [
   {
     id: "tolstoy-short-stories",
     title: "Russian Short Stories",
-    cover: "/Audio_External_Leo.png",
+    cover: "/Audio_External_Leo.webp",
     author: "by Leo Tolstoy",
     comingSoon: false,
     tracks: [
@@ -128,7 +128,7 @@ const AUDIO_BOOKS = [
   {
     id: "chekhov-short-stories",
     title: "Russian Short Stories",
-    cover: "/Audio_External_Chekhov.png",
+    cover: "/Audio_External_Chekhov.webp",
     author: "by Anton Chekhov",
     comingSoon: true,
     tracks: [],
@@ -177,7 +177,8 @@ const I18N = {
     nav_audio: "Аудиокниги",
 
     about_title: "Всем привет, друзья! Меня зовут Геннадий. Я\u00A0преподаватель русского языка и автор книг",
-    about_p1: "Я помогаю ученикам разных уровней быстрее осваивать русский язык. Более 1000 проведённых уроков и высокий рейтинг.",
+    about_p1:
+      "Я помогаю ученикам разных уровней быстрее осваивать русский язык. Более 1000 проведённых уроков и высокий рейтинг.",
     contacts: "Контакты",
     learn_with_me: "Учи русский язык со мной на платформах:",
 
@@ -282,7 +283,8 @@ function BookAuthorLine({ author, comingSoon, comingSoonText }) {
       {author}
       {comingSoon ? (
         <span className="font-semibold text-slate-700">
-          {" "}({comingSoonText})
+          {" "}
+          ({comingSoonText})
         </span>
       ) : null}
     </p>
@@ -314,15 +316,13 @@ function AudioBookTile({ book, onOpen, comingSoonText }) {
             alt={book.title}
             className="w-16 h-16 rounded-xl object-cover flex-none"
             loading="lazy"
+            decoding="async"
+            sizes="64px"
           />
           <div className="min-w-0">
             <p className="font-semibold truncate">{book.title}</p>
 
-            <BookAuthorLine
-              author={book.author}
-              comingSoon={!!book.comingSoon}
-              comingSoonText={comingSoonText}
-            />
+            <BookAuthorLine author={book.author} comingSoon={!!book.comingSoon} comingSoonText={comingSoonText} />
           </div>
         </div>
       </Card>
@@ -432,6 +432,8 @@ function ProductCard({ item, t, lang }) {
               alt={item.title}
               className="w-full h-full object-contain block"
               loading="lazy"
+              decoding="async"
+              sizes="(max-width: 1024px) 90vw, 360px"
             />
           </div>
 
@@ -447,7 +449,6 @@ function ProductCard({ item, t, lang }) {
 
       <CardContent className="p-4 pt-2 flex flex-col flex-grow -mt-3">
         <div className="space-y-1">
-          {/* ✅ чуть меньше шрифт для всех карточек */}
           <CardTitle className="text-base leading-snug font-semibold break-words">{item.title}</CardTitle>
           <p className="text-sm text-slate-600">{item.kind}</p>
         </div>
@@ -480,7 +481,6 @@ function ProductCard({ item, t, lang }) {
 
 // ================== APP ==================
 export default function App() {
-  // -------- language --------
   const detectLanguage = () => {
     try {
       const saved = localStorage.getItem("lang");
@@ -504,7 +504,6 @@ export default function App() {
     } catch {}
   };
 
-  // -------- tab --------
   const detectTab = () => {
     try {
       const saved = localStorage.getItem("tab");
@@ -522,7 +521,6 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [tab]);
 
-  // -------- store search --------
   const [query, setQuery] = useState("");
 
   const filteredProducts = useMemo(() => {
@@ -535,11 +533,9 @@ export default function App() {
 
   const clearQuery = () => setQuery("");
 
-  // -------- audiobooks --------
   const [audioBookId, setAudioBookId] = useState(null);
   const selectedBook = useMemo(() => AUDIO_BOOKS.find((b) => b.id === audioBookId) || null, [audioBookId]);
 
-  // ✅ страховка: если каким-то образом выбран disabled-book (или битый id) — сбрасываем
   useEffect(() => {
     if (!audioBookId) return;
     const found = AUDIO_BOOKS.find((b) => b.id === audioBookId);
@@ -651,7 +647,6 @@ export default function App() {
     }
   }, [audioBookId, stopAudio]);
 
-  // -------- mobile detection (for swipe) --------
   const [isMobile, setIsMobile] = useState(() => {
     if (typeof window === "undefined") return false;
     return window.matchMedia("(max-width: 768px)").matches;
@@ -672,7 +667,6 @@ export default function App() {
     };
   }, []);
 
-  // -------- swipe tab navigation --------
   const TABS_ORDER = ["about", "products", "free-audio"];
 
   const goPrevTab = useCallback(() => {
@@ -719,10 +713,13 @@ export default function App() {
           <div className={`${CONTAINER} py-3 flex items-center justify-between gap-4 ${TOPBAR_H}`}>
             <div className="flex items-center gap-3 min-w-0">
               <img
-                src="/logo.png"
+                src="/logo.webp"
                 alt="Genndy Bogdanov"
                 className="w-9 h-9 rounded-xl object-cover transition-transform duration-200 ease-out hover:scale-[1.04] hover:rotate-1"
-                loading="lazy"
+                loading="eager"
+                decoding="async"
+                fetchpriority="high"
+                sizes="36px"
               />
               <div className="min-w-0">
                 <p className="font-semibold leading-tight truncate">{t("name")}</p>
@@ -804,7 +801,15 @@ export default function App() {
               <div className="p-5">
                 <div className="flex items-start gap-5">
                   <div className="flex-none w-28 sm:w-32 md:w-36 aspect-[3/4] rounded-2xl overflow-hidden bg-white shadow">
-                    <img src="/Portrait_1.jpg" alt="Portrait" className="w-full h-full object-contain" loading="lazy" />
+                    <img
+                      src="/Portrait_1.webp"
+                      alt="Portrait"
+                      className="w-full h-full object-contain"
+                      loading="eager"
+                      decoding="async"
+                      fetchpriority="high"
+                      sizes="(max-width: 640px) 112px, (max-width: 768px) 128px, 144px"
+                    />
                   </div>
 
                   <div className="min-w-0 flex-1 md:flex md:flex-col md:items-center md:text-center">
@@ -899,6 +904,8 @@ export default function App() {
                         alt={selectedBook.title}
                         className="w-20 h-20 rounded-2xl object-cover shadow flex-none md:hidden"
                         loading="lazy"
+                        decoding="async"
+                        sizes="80px"
                       />
 
                       <div className="min-w-0">
@@ -947,6 +954,8 @@ export default function App() {
                     alt={selectedBook.title}
                     className="hidden md:block w-full aspect-square object-cover rounded-2xl shadow md:col-span-1"
                     loading="lazy"
+                    decoding="async"
+                    sizes="(max-width: 1024px) 40vw, 360px"
                   />
 
                   <div className="md:col-span-2 space-y-3">
