@@ -90,6 +90,14 @@ const PRODUCTS = [
     marketplace: "amazon",
     badges: ["RU-EN", "Paper Book", "Audio"],
     description: "Word-by-word translation, stress marks, grammar explanations, exercises, audio included.",
+     keywords: [
+      // RU
+      "лев", "толстой", "лев толстой", "л.н. толстой", "толстого",
+      "рассказы", "короткие рассказы", "короткие", "книга", "бумажная книга", "печатная книга",
+      "аудио", "аудиокнига", "двуязычная", "ru-en", "перевод", "слово за словом", "билингвальный", "на русском", "русский",,
+      // EN
+      "leo", "tolstoy", "short stories", "paper book", "paperback", "book", "audio", "bilingual", "ru-en", "russian"
+    ],
   },
 
   // ✅ NEW — Chekhov (coming soon)
@@ -104,6 +112,14 @@ const PRODUCTS = [
     badges: ["RU-EN", "Paper Book", "Audio"],
     description: "Coming soon.",
     disabled: true,
+         keywords: [
+      // RU
+      "антон", "чехов", "антон чехов", "а.п. чехов", "чехова",
+      "рассказы", "короткие рассказы", "короткие", "книга", "бумажная книга", "печатная книга",
+      "аудио", "аудиокнига", "двуязычная", "ru-en", "перевод", "слово за словом", "билингвальный", "на русском", "русский",,
+      // EN
+      "antoon", "chekhov", "short stories", "paper book", "paperback", "book", "audio", "bilingual", "ru-en", "russian"
+    ],
   },
 ];
 
@@ -575,13 +591,38 @@ const prefetchAudiobooksOnce = useCallback(() => {
 
   const [query, setQuery] = useState("");
 
-  const filteredProducts = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return PRODUCTS;
-    return PRODUCTS.filter((p) =>
-      [p.title, p.kind, p.description, ...(p.badges || [])].join(" ").toLowerCase().includes(q)
+const normalize = (s) =>
+  (s || "")
+    .toString()
+    .toLowerCase()
+    .replace(/ё/g, "е")
+    .replace(/[^\p{L}\p{N}\s]+/gu, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+const filteredProducts = useMemo(() => {
+  const q = normalize(query);
+  if (!q) return PRODUCTS;
+
+  // разбиваем запрос на слова: "бумажная книга лев толстой..."
+  const tokens = q.split(" ").filter(Boolean);
+
+  return PRODUCTS.filter((p) => {
+    const haystack = normalize(
+      [
+        p.title,
+        p.kind,
+        p.description,
+        ...(p.badges || []),
+        ...(p.keywords || []), // ✅ главное
+      ].join(" ")
     );
-  }, [query]);
+
+    // ✅ стратегия: карточка подходит, если ВСЕ токены встречаются где-то в haystack
+    // (если хочешь мягче — скажи, сделаю "минимум N слов совпало")
+    return tokens.every((t) => haystack.includes(t));
+  });
+}, [query]);
 
   const clearQuery = () => setQuery("");
 
