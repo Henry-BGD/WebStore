@@ -128,8 +128,11 @@ const AUDIO_BOOKS = [
   {
     id: "chekhov-short-stories",
     title: "Russian Short Stories",
-    cover: "/Audio_External_Chekhov.png", // добавишь позже
-    description: "by Anton Chekhov (coming soon)",
+    cover: "/Audio_External_Chekhov.png",
+    description: {
+    author: "by Anton Chekhov",
+    comingSoon: true,
+    },
     tracks: [], // пока пусто
     disabled: true, // ✅ флаг
   },
@@ -296,7 +299,20 @@ function AudioBookTile({ book, onOpen }) {
             <p className="font-semibold truncate">
               {book.title}
             </p>
-            {book.description && <p className="text-sm text-slate-600 line-clamp-2">{book.description}</p>}
+          {book.description && (
+  <p className="text-sm text-slate-600 line-clamp-2">
+    {book.disabled ? (
+      <>
+        {book.description.replace("(coming soon)", "").trim()}{" "}
+        <span className="font-semibold text-slate-700">
+          (coming soon)
+        </span>
+      </>
+    ) : (
+      book.description
+    )}
+  </p>
+)}
           </div>
         </div>
       </Card>
