@@ -42,7 +42,6 @@ function useSwipeTabs({ enabled, onPrev, onNext, thresholdPx = 60, restraintPx =
   const onTouchMove = useCallback(
     (e) => {
       if (!enabled || !tracking.current) return;
-
       const t = e.touches?.[0];
       if (!t) return;
 
@@ -90,17 +89,16 @@ const PRODUCTS = [
     marketplace: "amazon",
     badges: ["RU-EN", "Paper Book", "Audio"],
     description: "Word-by-word translation, stress marks, grammar explanations, exercises, audio included.",
-     keywords: [
+    keywords: [
       // RU
       "лев", "толстой", "лев толстой", "л.н. толстой", "толстого",
       "рассказы", "короткие рассказы", "короткие", "книга", "бумажная книга", "печатная книга",
-      "аудио", "аудиокнига", "двуязычная", "ru-en", "перевод", "слово за словом", "билингвальный", "на русском", "русский",,
+      "аудио", "аудиокнига", "двуязычная", "ru-en", "перевод", "слово за словом", "билингвальный", "на русском", "русский",
       // EN
       "leo", "tolstoy", "short stories", "paper book", "paperback", "book", "audio", "bilingual", "ru-en", "russian"
     ],
   },
 
-  // ✅ NEW — Chekhov (coming soon)
   {
     id: "prod-ru-book-2",
     title: "Russian Short Stories by Anton Chekhov",
@@ -112,13 +110,13 @@ const PRODUCTS = [
     badges: ["RU-EN", "Paper Book", "Audio"],
     description: "Coming soon.",
     disabled: true,
-         keywords: [
+    keywords: [
       // RU
       "антон", "чехов", "антон чехов", "а.п. чехов", "чехова",
       "рассказы", "короткие рассказы", "короткие", "книга", "бумажная книга", "печатная книга",
-      "аудио", "аудиокнига", "двуязычная", "ru-en", "перевод", "слово за словом", "билингвальный", "на русском", "русский",,
+      "аудио", "аудиокнига", "двуязычная", "ru-en", "перевод", "слово за словом", "билингвальный", "на русском", "русский",
       // EN
-      "antoon", "chekhov", "short stories", "paper book", "paperback", "book", "audio", "bilingual", "ru-en", "russian"
+      "anton", "chekhov", "short stories", "paper book", "paperback", "book", "audio", "bilingual", "ru-en", "russian"
     ],
   },
 ];
@@ -139,8 +137,6 @@ const AUDIO_BOOKS = [
       { id: "jump", title: "Прыжок (The Jump)", src: "/audio/jump.mp3" },
     ],
   },
-
-  // ✅ NEW — Chekhov (coming soon)
   {
     id: "chekhov-short-stories",
     title: "Russian Short Stories",
@@ -291,7 +287,6 @@ function EmptyState({ title, subtitle, className = "" }) {
   );
 }
 
-// ✅ helper: безопасно печатаем автора + жирный coming soon
 function BookAuthorLine({ author, comingSoon, comingSoonText }) {
   if (!author && !comingSoon) return null;
 
@@ -299,10 +294,7 @@ function BookAuthorLine({ author, comingSoon, comingSoonText }) {
     <p className="text-sm text-slate-600 line-clamp-2">
       {author}
       {comingSoon ? (
-        <span className="font-semibold text-slate-700">
-          {" "}
-          ({comingSoonText})
-        </span>
+        <span className="font-semibold text-slate-700"> {" "}({comingSoonText})</span>
       ) : null}
     </p>
   );
@@ -333,11 +325,11 @@ function AudioBookTile({ book, onOpen, comingSoonText }) {
             alt={book.title}
             className="w-16 h-16 rounded-xl object-cover flex-none"
             decoding="async"
+            loading="eager"
             sizes="64px"
           />
           <div className="min-w-0">
             <p className="font-semibold truncate">{book.title}</p>
-
             <BookAuthorLine author={book.author} comingSoon={!!book.comingSoon} comingSoonText={comingSoonText} />
           </div>
         </div>
@@ -434,7 +426,6 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
   );
 }
 
-// ================== PRODUCT CARD ==================
 function ProductCard({ item, t, lang }) {
   const isDisabled = !!item.disabled;
 
@@ -448,6 +439,7 @@ function ProductCard({ item, t, lang }) {
               alt={item.title}
               className="w-full h-full object-contain block"
               decoding="async"
+              loading="eager"
               sizes="(max-width: 1024px) 90vw, 360px"
             />
           </div>
@@ -494,12 +486,13 @@ function ProductCard({ item, t, lang }) {
   );
 }
 
-// ================== helper для фоновой предзагрузки ==================
+// ================== prefetch helpers ==================
+const preloadedSet = new Set();
 function preloadImages(urls = []) {
   if (typeof window === "undefined") return;
-
   urls.forEach((url) => {
-    if (!url) return;
+    if (!url || preloadedSet.has(url)) return;
+    preloadedSet.add(url);
     const img = new Image();
     img.decoding = "async";
     img.src = url;
@@ -522,14 +515,11 @@ export default function App() {
   };
 
   const PREFETCH_AFTER_ABOUT = [
-  // store images
-  "/Product_Leo.webp",
-  "/Product_Chekhov.webp",
-
-  // audiobooks covers
-  "/Audio_External_Leo.webp",
-  "/Audio_External_Chekhov.webp",
-];
+    "/Product_Leo.webp",
+    "/Product_Chekhov.webp",
+    "/Audio_External_Leo.webp",
+    "/Audio_External_Chekhov.webp",
+  ];
 
   const [lang, setLang] = useState(() => detectLanguage());
   const t = (key) => I18N[lang]?.[key] ?? I18N.en[key] ?? key;
@@ -558,74 +548,64 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [tab]);
 
+  // runtime title/description (приятно, но OG всё равно в index.html)
   useEffect(() => {
-  if (typeof window === "undefined") return;
+    document.title = lang === "ru"
+      ? "Геннадий Богданов — русский язык"
+      : "Genndy Bogdanov — Learn Russian";
+  }, [lang]);
 
-  // Хотим: сначала отрисовать About, потом в фоне прогреть остальное
-  // Прогреваем только один раз за сессию
-  const key = "prefetch_done_v1";
-  if (sessionStorage.getItem(key)) return;
+  // мягкий префетч один раз после первого рендера (как только About появился)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const key = "prefetch_done_v2";
+    if (sessionStorage.getItem(key)) return;
 
-  const run = () => {
+    const run = () => {
+      preloadImages(PREFETCH_AFTER_ABOUT);
+      sessionStorage.setItem(key, "1");
+    };
+
+    if ("requestIdleCallback" in window) window.requestIdleCallback(run, { timeout: 1500 });
+    else setTimeout(run, 500);
+  }, []);
+
+  // прогрев по hover Audiobooks (тоже один раз)
+  const hasPrefetchedRef = useRef(false);
+  const prefetchAudiobooksOnce = useCallback(() => {
+    if (hasPrefetchedRef.current) return;
+    hasPrefetchedRef.current = true;
     preloadImages(PREFETCH_AFTER_ABOUT);
-    sessionStorage.setItem(key, "1");
-  };
+  }, []);
 
-  // Самый мягкий вариант — когда браузеру “не занято”
-  if ("requestIdleCallback" in window) {
-    window.requestIdleCallback(run, { timeout: 2000 });
-  } else {
-    setTimeout(run, 700);
-  }
-}, []);
-
-  // 🔥 one-time prefetch guard
-const hasPrefetchedRef = useRef(false);
-
-const prefetchAudiobooksOnce = useCallback(() => {
-  if (hasPrefetchedRef.current) return;
-
-  hasPrefetchedRef.current = true;
-  preloadImages(PREFETCH_AFTER_ABOUT);
-}, []);
-
+  // -------- store search --------
   const [query, setQuery] = useState("");
 
-const normalize = (s) =>
-  (s || "")
-    .toString()
-    .toLowerCase()
-    .replace(/ё/g, "е")
-    .replace(/[^\p{L}\p{N}\s]+/gu, " ")
-    .replace(/\s+/g, " ")
-    .trim();
+  const normalize = (s) =>
+    (s || "")
+      .toString()
+      .toLowerCase()
+      .replace(/ё/g, "е")
+      .replace(/[^\p{L}\p{N}\s]+/gu, " ")
+      .replace(/\s+/g, " ")
+      .trim();
 
-const filteredProducts = useMemo(() => {
-  const q = normalize(query);
-  if (!q) return PRODUCTS;
+  const filteredProducts = useMemo(() => {
+    const q = normalize(query);
+    if (!q) return PRODUCTS;
+    const tokens = q.split(" ").filter(Boolean);
 
-  // разбиваем запрос на слова: "бумажная книга лев толстой..."
-  const tokens = q.split(" ").filter(Boolean);
-
-  return PRODUCTS.filter((p) => {
-    const haystack = normalize(
-      [
-        p.title,
-        p.kind,
-        p.description,
-        ...(p.badges || []),
-        ...(p.keywords || []), // ✅ главное
-      ].join(" ")
-    );
-
-    // ✅ стратегия: карточка подходит, если ВСЕ токены встречаются где-то в haystack
-    // (если хочешь мягче — скажи, сделаю "минимум N слов совпало")
-    return tokens.every((t) => haystack.includes(t));
-  });
-}, [query]);
+    return PRODUCTS.filter((p) => {
+      const haystack = normalize(
+        [p.title, p.kind, p.description, ...(p.badges || []), ...(p.keywords || [])].join(" ")
+      );
+      return tokens.every((tok) => haystack.includes(tok));
+    });
+  }, [query]);
 
   const clearQuery = () => setQuery("");
 
+  // -------- audiobooks --------
   const [audioBookId, setAudioBookId] = useState(null);
   const selectedBook = useMemo(() => AUDIO_BOOKS.find((b) => b.id === audioBookId) || null, [audioBookId]);
 
@@ -713,7 +693,6 @@ const filteredProducts = useMemo(() => {
 
   function downloadAllAudio() {
     if (!selectedBook?.tracks?.length) return;
-
     selectedBook.tracks.forEach((tr) => {
       if (!tr.src || tr.src === "#") return;
       const a = document.createElement("a");
@@ -740,6 +719,7 @@ const filteredProducts = useMemo(() => {
     }
   }, [audioBookId, stopAudio]);
 
+  // -------- mobile detection (for swipe) --------
   const [isMobile, setIsMobile] = useState(() => {
     if (typeof window === "undefined") return false;
     return window.matchMedia("(max-width: 768px)").matches;
@@ -766,7 +746,6 @@ const filteredProducts = useMemo(() => {
     setTab((prev) => {
       const i = TABS_ORDER.indexOf(prev);
       if (i <= 0) return prev;
-
       const nextTab = TABS_ORDER[i - 1];
       if (nextTab !== "free-audio") setAudioBookId(null);
       return nextTab;
@@ -777,7 +756,6 @@ const filteredProducts = useMemo(() => {
     setTab((prev) => {
       const i = TABS_ORDER.indexOf(prev);
       if (i === -1 || i >= TABS_ORDER.length - 1) return prev;
-
       const nextTab = TABS_ORDER[i + 1];
       if (nextTab !== "free-audio") setAudioBookId(null);
       return nextTab;
@@ -789,6 +767,11 @@ const filteredProducts = useMemo(() => {
     onPrev: goPrevTab,
     onNext: goNextTab,
   });
+
+  // ✅ вкладки НЕ размонтируются — скрываем через hidden (картинки грузятся заранее)
+  const showAbout = tab === "about";
+  const showProducts = tab === "products";
+  const showAudio = tab === "free-audio";
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
@@ -835,25 +818,25 @@ const filteredProducts = useMemo(() => {
           <div className="w-full">
             <div className={`${CONTAINER} py-3`}>
               <div className="flex items-center gap-3 overflow-x-auto no-scrollbar flex-nowrap">
-                <NavPill active={tab === "about"} onClick={() => setTab("about")}>
+                <NavPill active={showAbout} onClick={() => setTab("about")}>
                   {t("nav_about")}
                 </NavPill>
 
-                <NavPill active={tab === "products"} onClick={() => setTab("products")}>
+                <NavPill active={showProducts} onClick={() => setTab("products")}>
                   {t("nav_products")}
                 </NavPill>
 
-               <NavPill
-  active={tab === "free-audio"}
-  onMouseEnter={prefetchAudiobooksOnce}
-  onFocus={prefetchAudiobooksOnce}
-  onClick={() => {
-    setTab("free-audio");
-    setAudioBookId(null);
-  }}
->
-  {t("nav_audio")}
-</NavPill> 
+                <NavPill
+                  active={showAudio}
+                  onMouseEnter={prefetchAudiobooksOnce}
+                  onFocus={prefetchAudiobooksOnce}
+                  onClick={() => {
+                    setTab("free-audio");
+                    setAudioBookId(null);
+                  }}
+                >
+                  {t("nav_audio")}
+                </NavPill>
               </div>
             </div>
           </div>
@@ -867,9 +850,9 @@ const filteredProducts = useMemo(() => {
         onTouchMove={swipeHandlers.onTouchMove}
         onTouchEnd={swipeHandlers.onTouchEnd}
       >
-        {/* ABOUT */}
-        {tab === "about" && (
-          <section className="grid md:grid-cols-3 gap-8 items-start">
+        {/* ABOUT (always mounted) */}
+        <section className={showAbout ? "" : "hidden"} aria-hidden={!showAbout}>
+          <div className="grid md:grid-cols-3 gap-8 items-start">
             <div className="md:col-span-2 space-y-4">
               <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight break-words">{t("about_title")}</h1>
               <p className="leading-relaxed text-slate-700">{t("about_p1")}</p>
@@ -923,12 +906,12 @@ const filteredProducts = useMemo(() => {
                 </div>
               </div>
             </Card>
-          </section>
-        )}
+          </div>
+        </section>
 
-        {/* PRODUCTS */}
-        {tab === "products" && (
-          <section className="space-y-6">
+        {/* PRODUCTS (always mounted) */}
+        <section className={showProducts ? "" : "hidden"} aria-hidden={!showProducts}>
+          <div className="space-y-6">
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
               <div className="relative">
                 <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -962,12 +945,12 @@ const filteredProducts = useMemo(() => {
                 filteredProducts.map((p) => <ProductCard key={p.id} item={p} t={t} lang={lang} />)
               )}
             </div>
-          </section>
-        )}
+          </div>
+        </section>
 
-        {/* AUDIOBOOKS */}
-        {tab === "free-audio" && (
-          <section className="space-y-6">
+        {/* AUDIOBOOKS (always mounted) */}
+        <section className={showAudio ? "" : "hidden"} aria-hidden={!showAudio}>
+          <div className="space-y-6">
             {!audioBookId && (
               <>
                 <p className="text-slate-700">{t("audio_choose")}</p>
@@ -999,6 +982,7 @@ const filteredProducts = useMemo(() => {
                         alt={selectedBook.title}
                         className="w-20 h-20 rounded-2xl object-cover shadow flex-none md:hidden"
                         decoding="async"
+                        loading="eager"
                         sizes="80px"
                       />
 
@@ -1048,6 +1032,7 @@ const filteredProducts = useMemo(() => {
                     alt={selectedBook.title}
                     className="hidden md:block w-full aspect-square object-cover rounded-2xl shadow md:col-span-1"
                     decoding="async"
+                    loading="eager"
                     sizes="(max-width: 1024px) 40vw, 360px"
                   />
 
@@ -1073,8 +1058,8 @@ const filteredProducts = useMemo(() => {
                 </div>
               </>
             )}
-          </section>
-        )}
+          </div>
+        </section>
       </main>
 
       <footer className="mt-auto py-6 text-center text-xs text-slate-500 border-t">
