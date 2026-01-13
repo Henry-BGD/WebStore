@@ -235,7 +235,7 @@ const I18N = {
     buy_etsy: "Buy on Etsy",
     buy_generic: "Buy",
 
-    audio_choose: "Choose a book to listen to or download",
+    audio_choose: "Choose an audiobook to listen to or download",
     audio_empty: "No audiobooks available yet.",
     back: "Back",
     download_all: "Download all",
@@ -268,7 +268,7 @@ const I18N = {
     buy_etsy: "Купить на Etsy",
     buy_generic: "Купить",
 
-    audio_choose: "Выберите книгу, чтобы послушать или загрузить материалы",
+    audio_choose: "Выберите аудиокнигу для прослушивания или загрузки",
     audio_empty: "Пока нет доступных аудиокниг.",
     back: "Назад",
     download_all: "Скачать всё",
