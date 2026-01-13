@@ -275,9 +275,6 @@ const I18N = {
 };
 
 // ================== THEME ==================
-// По умолчанию: светлая.
-// Тёмная — только если системная/браузерная prefers-color-scheme: dark,
-// ИЛИ если пользователь вручную переключил (тогда сохраняем выбор).
 function getSystemTheme() {
   try {
     if (typeof window === "undefined" || !window.matchMedia) return "light";
@@ -289,10 +286,10 @@ function getSystemTheme() {
 
 function detectTheme() {
   try {
-    const saved = localStorage.getItem("theme_user"); // только явный выбор пользователя
+    const saved = localStorage.getItem("theme_user");
     if (saved === "dark" || saved === "light") return saved;
   } catch {}
-  return getSystemTheme(); // иначе — системная (которая по сути: light по умолчанию, dark только если включено)
+  return getSystemTheme();
 }
 
 function applyThemeToHtml(theme) {
@@ -353,14 +350,7 @@ function LinkButton({ href, children, className = "", disabled = false, title, "
   }
 
   return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={[base, enabledCls, className].join(" ")}
-      title={title}
-      aria-label={ariaLabel}
-    >
+    <a href={href} target="_blank" rel="noopener noreferrer" className={[base, enabledCls, className].join(" ")} title={title} aria-label={ariaLabel}>
       {children}
     </a>
   );
@@ -451,14 +441,7 @@ function AudioBookTile({ book, onOpen, comingSoonText }) {
         ].join(" ")}
       >
         <div className="flex gap-4 items-center">
-          <img
-            src={book.cover}
-            alt={book.title}
-            className="w-16 h-16 rounded-xl object-cover flex-none"
-            decoding="async"
-            loading="eager"
-            sizes="64px"
-          />
+          <img src={book.cover} alt={book.title} className="w-16 h-16 rounded-xl object-cover flex-none" decoding="async" loading="eager" sizes="64px" />
           <div className="min-w-0">
             <p className="font-semibold truncate text-slate-900 dark:text-slate-100">{book.title}</p>
             <BookAuthorLine author={book.author} comingSoon={!!book.comingSoon} comingSoonText={comingSoonText} />
@@ -476,6 +459,7 @@ function formatTime(sec) {
   return `${m}:${String(s).padStart(2, "0")}`;
 }
 
+// ✅ (4) tighter track rows: уменьшаем padding/радиусы/зазоры без уменьшения кнопок
 function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime, duration }) {
   const activeAndPlaying = isActive && isPlaying;
   const showScrubber = isActive;
@@ -492,18 +476,21 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
         isActive ? "shadow-sm dark:shadow-none" : "",
       ].join(" ")}
     >
-      <CardContent className="p-3">
-        <div className="flex items-center justify-between gap-2">
+      {/* было p-3 -> стало p-2 (и меньше отступы по вертикали) */}
+      <CardContent className="p-2">
+        {/* gap уменьшили: 2 -> 1.5, и вертикальные отступы минимальные */}
+        <div className="flex items-center justify-between gap-1.5">
           <div className="min-w-0">
             <p className="font-medium truncate text-[14px] leading-snug text-slate-900 dark:text-slate-100">{track.title}</p>
 
             {showScrubber && (
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 tabular-nums">
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 tabular-nums">
                 {formatTime(safeTime)} / {formatTime(safeDuration)}
               </p>
             )}
           </div>
 
+          {/* ✅ кнопки НЕ трогаем по размеру */}
           <div className="flex items-center gap-2 flex-none">
             <button
               type="button"
@@ -547,7 +534,7 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
         </div>
 
         {showScrubber && (
-          <div className="mt-2">
+          <div className="mt-1.5">
             <input
               type="range"
               role="slider"
@@ -569,8 +556,10 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
 }
 
 // ================== ProductCard ==================
-// 3) скругления
-// 4) в dark: делаем мягкую светлую подложку внутри карточки (особенно под изображение)
+// ✅ changes requested:
+// 1) dark: подложка посветлее (чуть-чуть) — и для контента, и для области изображения
+// 2) скруглить область изображения и обрезать углы (overflow-hidden + rounded-*)
+// 3) badges в dark должны выглядеть как в light (т.е. светлые чипсы)
 function ProductCard({ item, t, lang }) {
   const isDisabled = !!item.disabled;
   const canBuy = !isDisabled && !!item.externalUrl;
@@ -578,29 +567,40 @@ function ProductCard({ item, t, lang }) {
   return (
     <Card
       className={[
-        "overflow-hidden border flex flex-col rounded-2xl", // ✅ скругление
+        "overflow-hidden border flex flex-col rounded-2xl",
         "bg-white border-slate-200",
         "dark:bg-slate-950 dark:border-slate-800",
         isDisabled ? "opacity-80" : "",
       ].join(" ")}
     >
       <CardHeader className="p-0">
-        <div className="relative">
-          {/* ✅ подложка под картинку: в dark слегка светлая, чтобы чёрные линии читались */}
-          <div className="w-full aspect-[4/3] bg-white dark:bg-slate-100/10">
-            <img
-              src={item.image}
-              alt={item.title}
-              className="w-full h-full object-contain block"
-              decoding="async"
-              loading="eager"
-              sizes="(max-width: 1024px) 90vw, 360px"
-            />
+        <div className="relative p-3">
+          {/* ✅ (2) rounded + overflow-hidden для ровных углов картинки */}
+          <div className="rounded-2xl overflow-hidden">
+            {/* ✅ (1) подложка посветлее в dark, чтобы чёрный рисунок читался */}
+            <div className="w-full aspect-[4/3] bg-white dark:bg-slate-200/20">
+              <img
+                src={item.image}
+                alt={item.title}
+                className="w-full h-full object-contain block"
+                decoding="async"
+                loading="eager"
+                sizes="(max-width: 1024px) 90vw, 360px"
+              />
+            </div>
           </div>
 
-          <div className="absolute top-2 left-2 flex flex-wrap gap-1">
+          <div className="absolute top-5 left-5 flex flex-wrap gap-1.5">
             {item.badges?.map((b) => (
-              <Badge key={b} className="px-2 py-0.5 text-[11px] font-normal leading-none">
+              // ✅ (3) в dark такие же светлые чипсы как в light
+              <Badge
+                key={b}
+                className={[
+                  "px-2 py-0.5 text-[11px] font-normal leading-none",
+                  "bg-slate-100 text-slate-700 border border-slate-200",
+                  "dark:bg-slate-100 dark:text-slate-700 dark:border-slate-200",
+                ].join(" ")}
+              >
                 {b}
               </Badge>
             ))}
@@ -608,16 +608,16 @@ function ProductCard({ item, t, lang }) {
         </div>
       </CardHeader>
 
-      {/* ✅ В dark — лёгкая “подсветка” контента карточки, но тусклая */}
-      <CardContent className="p-4 pt-3 flex flex-col flex-grow dark:bg-slate-100/5">
+      {/* ✅ (1) В dark — чуть светлее “подложка” контента */}
+      <CardContent className="p-4 pt-3 flex flex-col flex-grow dark:bg-slate-200/10">
         <div className="space-y-1">
           <CardTitle className="text-base leading-snug font-semibold break-words text-slate-900 dark:text-slate-100">
             {item.title}
           </CardTitle>
-          <p className="text-sm text-slate-600 dark:text-slate-400">{item.kind}</p>
+          <p className="text-sm text-slate-600 dark:text-slate-300">{item.kind}</p>
         </div>
 
-        <p className="mt-2 text-sm text-slate-700 dark:text-slate-300 leading-snug">{item.description}</p>
+        <p className="mt-2 text-sm text-slate-700 dark:text-slate-200 leading-snug">{item.description}</p>
 
         <div className="mt-auto pt-3 flex items-center justify-between gap-3">
           <span className="text-xl font-semibold tabular-nums text-slate-900 dark:text-slate-100">
@@ -694,7 +694,6 @@ export default function App() {
     applyThemeToHtml(theme);
   }, [theme]);
 
-  // Если пользователь НЕ выбирал тему вручную — следуем за системой.
   useEffect(() => {
     if (typeof window === "undefined" || !window.matchMedia) return;
 
@@ -702,7 +701,7 @@ export default function App() {
     const handler = () => {
       try {
         const saved = localStorage.getItem("theme_user");
-        if (saved === "dark" || saved === "light") return; // пользователь явно выбрал
+        if (saved === "dark" || saved === "light") return;
       } catch {}
       setTheme(mq.matches ? "dark" : "light");
     };
@@ -820,6 +819,8 @@ export default function App() {
     const onPlay = () => setIsPlaying(true);
     const onPause = () => setIsPlaying(false);
 
+    // Если хочешь "сбрасывать активный трек" при ended — верни это:
+    // setCurrentTrack(null);
     const onEnded = () => {
       setIsPlaying(false);
       setCurrentTime(0);
@@ -1068,12 +1069,7 @@ export default function App() {
               <div className="text-sm space-y-1 text-slate-700 dark:text-slate-300">
                 <p>E-mail: genndybogdanov@gmail.com</p>
                 <p>
-                  <a
-                    className="underline hover:text-slate-900 dark:hover:text-white break-all"
-                    href="https://substack.com/@gbogdanov"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  <a className="underline hover:text-slate-900 dark:hover:text-white break-all" href="https://substack.com/@gbogdanov" target="_blank" rel="noopener noreferrer">
                     Substack
                   </a>
                 </p>
@@ -1228,7 +1224,8 @@ export default function App() {
                     sizes="(max-width: 1024px) 40vw, 360px"
                   />
 
-                  <div className="md:col-span-2 space-y-2 sm:space-y-3">
+                  {/* ✅ (4) уменьшили gap между строками: было space-y-2 sm:space-y-3 -> стало space-y-1.5 */}
+                  <div className="md:col-span-2 space-y-1.5 sm:space-y-2">
                     {selectedBook.tracks?.length ? (
                       selectedBook.tracks.map((tr) => (
                         <TrackRow
@@ -1254,23 +1251,16 @@ export default function App() {
         </section>
       </main>
 
-      {/* FOOTER:
-          1) возвращаем нормальную "прежнюю" высоту
-          2) кнопку темы — вправо, строго под RU|ENG
-          3) кнопку темы уменьшаем ~на 40% */}
       <footer className="mt-auto border-t border-slate-200 dark:border-slate-800">
         <div className={`${CONTAINER} py-5`}>
           <div className="flex items-center justify-between gap-4">
-            <div className="text-xs text-slate-500 dark:text-slate-500">
-              © {new Date().getFullYear()} Genndy Bogdanov
-            </div>
+            <div className="text-xs text-slate-500 dark:text-slate-500">© {new Date().getFullYear()} Genndy Bogdanov</div>
 
             <div className="flex justify-end">
               <button
                 type="button"
                 onClick={toggleTheme}
                 className={[
-                  // ✅ smaller by ~40%
                   "inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium transition",
                   "border-slate-200 bg-white text-slate-800 hover:bg-slate-50 active:scale-[0.98]",
                   "dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800/70",
