@@ -3,14 +3,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/Card.j
 import { Button } from "./components/ui/Button.jsx";
 import { Input } from "./components/ui/Input.jsx";
 import { Badge } from "./components/ui/Badge.jsx";
-import { ExternalLink, Download, Play, Pause, X, Search, Sun, Moon } from "lucide-react";
+import { ExternalLink, Download, Play, Pause, X, Search, Sun, Moon, ChevronLeft, ChevronRight } from "lucide-react";
 
 // ================== LAYOUT ==================
 const CONTAINER = "w-full max-w-6xl mx-auto px-4 sm:px-8";
 const TOPBAR_H = "min-h-[64px]";
 
 // ================== SWIPE TABS HOOK ==================
-function useSwipeTabs({ enabled, onPrev, onNext, thresholdPx = 60, lockPx = 10, restraintPx = 40 }) {
+function useSwipeTabs({ enabled, onPrev, onNext, thresholdPx = 60, lockPx = 10, restraintPx = 40, onProgress }) {
   const startX = useRef(0);
   const startY = useRef(0);
   const tracking = useRef(false);
@@ -35,8 +35,9 @@ function useSwipeTabs({ enabled, onPrev, onNext, thresholdPx = 60, lockPx = 10, 
       startY.current = t.clientY;
       tracking.current = true;
       axisLock.current = null;
+      onProgress?.({ active: true, dx: 0, dy: 0 });
     },
-    [enabled]
+    [enabled, onProgress]
   );
 
   const onTouchMove = useCallback(
@@ -56,14 +57,19 @@ function useSwipeTabs({ enabled, onPrev, onNext, thresholdPx = 60, lockPx = 10, 
 
       if (axisLock.current === "y") {
         tracking.current = false;
+        onProgress?.({ active: false, dx: 0, dy: 0 });
         return;
       }
 
       if (axisLock.current === "x" && Math.abs(dy) > restraintPx && Math.abs(dy) > Math.abs(dx)) {
         tracking.current = false;
+        onProgress?.({ active: false, dx: 0, dy: 0 });
+        return;
       }
+
+      if (axisLock.current === "x") onProgress?.({ active: true, dx, dy });
     },
-    [enabled, lockPx, restraintPx]
+    [enabled, lockPx, restraintPx, onProgress]
   );
 
   const onTouchEnd = useCallback(
@@ -77,12 +83,14 @@ function useSwipeTabs({ enabled, onPrev, onNext, thresholdPx = 60, lockPx = 10, 
       const dx = t.clientX - startX.current;
       const dy = t.clientY - startY.current;
 
+      onProgress?.({ active: false, dx: 0, dy: 0 });
+
       if (axisLock.current === "y" && Math.abs(dy) > restraintPx) return;
 
       if (dx > thresholdPx) onPrev?.();
       else if (dx < -thresholdPx) onNext?.();
     },
-    [enabled, onPrev, onNext, thresholdPx, restraintPx]
+    [enabled, onPrev, onNext, thresholdPx, restraintPx, onProgress]
   );
 
   return { onTouchStart, onTouchMove, onTouchEnd };
@@ -327,7 +335,6 @@ function NavPill({ active, onClick, children, size = "md", className = "", ...pr
   );
 }
 
-// Link that looks like a button (no <button> inside <a>)
 function LinkButton({ href, children, className = "", disabled = false, title, "aria-label": ariaLabel }) {
   const base =
     "inline-flex items-center justify-center gap-2 rounded-xl border px-4 py-2 text-sm font-medium " +
@@ -452,14 +459,7 @@ function AudioBookTile({ book, onOpen, comingSoonText }) {
   );
 }
 
-function formatTime(sec) {
-  if (!Number.isFinite(sec) || sec < 0) return "0:00";
-  const m = Math.floor(sec / 60);
-  const s = Math.floor(sec % 60);
-  return `${m}:${String(s).padStart(2, "0")}`;
-}
-
-// ✅ (4) tighter track rows: уменьшаем padding/радиусы/зазоры без уменьшения кнопок
+// ================== SUPER COMPACT TRACK ROW ==================
 function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime, duration }) {
   const activeAndPlaying = isActive && isPlaying;
   const showScrubber = isActive;
@@ -468,73 +468,21 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
   const safeTime = Number.isFinite(currentTime) && currentTime >= 0 ? currentTime : 0;
 
   return (
-    <Card
+    <div
       className={[
-        "border transition rounded-2xl",
-        "bg-white border-slate-200",
-        "dark:bg-slate-950 dark:border-slate-800",
-        isActive ? "shadow-sm dark:shadow-none" : "",
+        "flex items-center justify-between gap-3",
+        "px-3 py-1.5", // 🔥 super compact
+        "rounded-xl border transition",
+        "border-slate-200 bg-white",
+        "dark:border-slate-800 dark:bg-slate-900/60",
+        isActive ? "ring-1 ring-blue-500/40" : "hover:bg-slate-50 dark:hover:bg-slate-900/80",
       ].join(" ")}
     >
-      {/* было p-3 -> стало p-2 (и меньше отступы по вертикали) */}
-      <CardContent className="p-2">
-        {/* gap уменьшили: 2 -> 1.5, и вертикальные отступы минимальные */}
-        <div className="flex items-center justify-between gap-1.5">
-          <div className="min-w-0">
-            <p className="font-medium truncate text-[14px] leading-snug text-slate-900 dark:text-slate-100">{track.title}</p>
-
-            {showScrubber && (
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 tabular-nums">
-                {formatTime(safeTime)} / {formatTime(safeDuration)}
-              </p>
-            )}
-          </div>
-
-          {/* ✅ кнопки НЕ трогаем по размеру */}
-          <div className="flex items-center gap-2 flex-none">
-            <button
-              type="button"
-              onClick={() => onToggle(track)}
-              className={[
-                "h-9 w-9 inline-flex items-center justify-center rounded-xl border transition",
-                "border-slate-200 bg-white hover:bg-slate-50 active:scale-[0.98]",
-                "dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800/70",
-                "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
-                "dark:focus-visible:ring-blue-500/40 dark:focus-visible:ring-offset-slate-950",
-                "[-webkit-tap-highlight-color:transparent]",
-                isActive ? "shadow-sm dark:shadow-none" : "",
-              ].join(" ")}
-              aria-label={activeAndPlaying ? t("pause") : t("listen")}
-              title={activeAndPlaying ? t("pause") : t("listen")}
-              aria-pressed={activeAndPlaying}
-              data-no-swipe="true"
-            >
-              {activeAndPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-            </button>
-
-            {track.src && track.src !== "#" && (
-              <a href={track.src} download className="inline-flex" aria-label={`${t("download")}: ${track.title}`}>
-                <span
-                  className={[
-                    "h-9 w-9 inline-flex items-center justify-center rounded-xl border transition",
-                    "border-slate-200 bg-white hover:bg-slate-50 active:scale-[0.98]",
-                    "dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800/70",
-                    "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
-                    "dark:focus-visible:ring-blue-500/40 dark:focus-visible:ring-offset-slate-950",
-                    "[-webkit-tap-highlight-color:transparent]",
-                  ].join(" ")}
-                  title={t("download")}
-                  data-no-swipe="true"
-                >
-                  <Download className="w-4 h-4" />
-                </span>
-              </a>
-            )}
-          </div>
-        </div>
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-medium text-slate-900 dark:text-slate-100">{track.title}</p>
 
         {showScrubber && (
-          <div className="mt-1.5">
+          <div className="mt-1">
             <input
               type="range"
               role="slider"
@@ -550,16 +498,51 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
             />
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+
+      <div className="flex items-center gap-2 flex-none">
+        <button
+          type="button"
+          onClick={() => onToggle(track)}
+          className={[
+            "h-9 w-9 inline-flex items-center justify-center rounded-xl border transition",
+            "border-slate-200 bg-white hover:bg-slate-50 active:scale-[0.98]",
+            "dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800/70",
+            "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
+            "dark:focus-visible:ring-blue-500/40 dark:focus-visible:ring-offset-slate-950",
+            "[-webkit-tap-highlight-color:transparent]",
+          ].join(" ")}
+          aria-label={activeAndPlaying ? t("pause") : t("listen")}
+          title={activeAndPlaying ? t("pause") : t("listen")}
+          aria-pressed={activeAndPlaying}
+          data-no-swipe="true"
+        >
+          {activeAndPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+        </button>
+
+        {track.src && track.src !== "#" && (
+          <a href={track.src} download className="inline-flex" aria-label={`${t("download")}: ${track.title}`} data-no-swipe="true">
+            <span
+              className={[
+                "h-9 w-9 inline-flex items-center justify-center rounded-xl border transition",
+                "border-slate-200 bg-white hover:bg-slate-50 active:scale-[0.98]",
+                "dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800/70",
+                "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
+                "dark:focus-visible:ring-blue-500/40 dark:focus-visible:ring-offset-slate-950",
+                "[-webkit-tap-highlight-color:transparent]",
+              ].join(" ")}
+              title={t("download")}
+            >
+              <Download className="w-4 h-4" />
+            </span>
+          </a>
+        )}
+      </div>
+    </div>
   );
 }
 
 // ================== ProductCard ==================
-// ✅ changes requested:
-// 1) dark: подложка посветлее (чуть-чуть) — и для контента, и для области изображения
-// 2) скруглить область изображения и обрезать углы (overflow-hidden + rounded-*)
-// 3) badges в dark должны выглядеть как в light (т.е. светлые чипсы)
 function ProductCard({ item, t, lang }) {
   const isDisabled = !!item.disabled;
   const canBuy = !isDisabled && !!item.externalUrl;
@@ -575,10 +558,9 @@ function ProductCard({ item, t, lang }) {
     >
       <CardHeader className="p-0">
         <div className="relative p-3">
-          {/* ✅ (2) rounded + overflow-hidden для ровных углов картинки */}
           <div className="rounded-2xl overflow-hidden">
-            {/* ✅ (1) подложка посветлее в dark, чтобы чёрный рисунок читался */}
-            <div className="w-full aspect-[4/3] bg-white dark:bg-slate-200/20">
+            {/* ✅ (3) brighter underlay in dark (still slightly muted) */}
+            <div className="w-full aspect-[4/3] bg-white dark:bg-slate-200/55">
               <img
                 src={item.image}
                 alt={item.title}
@@ -590,13 +572,14 @@ function ProductCard({ item, t, lang }) {
             </div>
           </div>
 
-          <div className="absolute top-5 left-5 flex flex-wrap gap-1.5">
+          {/* ✅ (4) badges smaller + pushed максимально влево */}
+          <div className="absolute top-4 left-4 flex flex-wrap gap-1">
             {item.badges?.map((b) => (
-              // ✅ (3) в dark такие же светлые чипсы как в light
               <Badge
                 key={b}
                 className={[
-                  "px-2 py-0.5 text-[11px] font-normal leading-none",
+                  "px-1.5 py-0.5",          // smaller pill
+                  "text-[10px] leading-none", // ✅ one step smaller
                   "bg-slate-100 text-slate-700 border border-slate-200",
                   "dark:bg-slate-100 dark:text-slate-700 dark:border-slate-200",
                 ].join(" ")}
@@ -608,7 +591,6 @@ function ProductCard({ item, t, lang }) {
         </div>
       </CardHeader>
 
-      {/* ✅ (1) В dark — чуть светлее “подложка” контента */}
       <CardContent className="p-4 pt-3 flex flex-col flex-grow dark:bg-slate-200/10">
         <div className="space-y-1">
           <CardTitle className="text-base leading-snug font-semibold break-words text-slate-900 dark:text-slate-100">
@@ -819,14 +801,14 @@ export default function App() {
     const onPlay = () => setIsPlaying(true);
     const onPause = () => setIsPlaying(false);
 
-    // Если хочешь "сбрасывать активный трек" при ended — верни это:
-    // setCurrentTrack(null);
     const onEnded = () => {
       setIsPlaying(false);
       setCurrentTime(0);
       try {
         audio.currentTime = 0;
       } catch {}
+      // если хочешь — сброс активного трека:
+      // setCurrentTrack(null);
     };
 
     const onTime = () => setCurrentTime(audio.currentTime || 0);
@@ -965,6 +947,9 @@ export default function App() {
     });
   }, []);
 
+  // ================== SWIPE ANIMATIONS (modern) ==================
+  const [swipeAnim, setSwipeAnim] = useState({ active: false, dx: 0 });
+
   const swipeHandlers = useSwipeTabs({
     enabled: isMobile && !isPlaying,
     onPrev: goPrevTab,
@@ -972,14 +957,31 @@ export default function App() {
     thresholdPx: 60,
     lockPx: 10,
     restraintPx: 40,
+    onProgress: ({ active, dx }) => setSwipeAnim({ active, dx }),
   });
 
   const showAbout = tab === "about";
   const showProducts = tab === "products";
   const showAudio = tab === "free-audio";
 
+  // transform for swipe preview (content follows finger a bit)
+  const clampedDx = Math.max(-120, Math.min(120, swipeAnim.dx || 0));
+  const swipeTranslate = swipeAnim.active ? clampedDx * 0.25 : 0; // gentle
+  const swipeRotate = swipeAnim.active ? clampedDx * 0.01 : 0; // tiny
+  const swipeOpacity = swipeAnim.active ? 0.98 : 1;
+
+  // edge hints (chevrons)
+  const hintLeft = swipeAnim.active && clampedDx > 18;
+  const hintRight = swipeAnim.active && clampedDx < -18;
+
   return (
     <div className="min-h-screen flex flex-col bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100">
+      <style>{`
+        @media (prefers-reduced-motion: reduce) {
+          .swipe-anim { transition: none !important; }
+        }
+      `}</style>
+
       <a
         href="#content"
         className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[9999] bg-white dark:bg-slate-950 border dark:border-slate-800 rounded-lg px-3 py-2 shadow"
@@ -1051,204 +1053,239 @@ export default function App() {
 
       <main
         id="content"
-        className={`flex-1 ${CONTAINER} py-4 sm:py-8`}
+        className={`flex-1 ${CONTAINER} py-4 sm:py-8 relative`}
         onTouchStart={swipeHandlers.onTouchStart}
         onTouchMove={swipeHandlers.onTouchMove}
         onTouchEnd={swipeHandlers.onTouchEnd}
       >
-        {/* ABOUT */}
-        <section hidden={!showAbout} aria-hidden={!showAbout}>
-          <div className="grid md:grid-cols-3 gap-6 sm:gap-8 items-start">
-            <div className="md:col-span-2 space-y-4">
-              <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight break-words">{t("about_title")}</h1>
-              <p className="leading-relaxed text-slate-700 dark:text-slate-300">{t("about_p1")}</p>
-            </div>
-
-            <Card className="p-5 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl">
-              <CardTitle className="mb-2">{t("contacts")}</CardTitle>
-              <div className="text-sm space-y-1 text-slate-700 dark:text-slate-300">
-                <p>E-mail: genndybogdanov@gmail.com</p>
-                <p>
-                  <a className="underline hover:text-slate-900 dark:hover:text-white break-all" href="https://substack.com/@gbogdanov" target="_blank" rel="noopener noreferrer">
-                    Substack
-                  </a>
-                </p>
-              </div>
-            </Card>
-
-            <Card className="md:col-span-3 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl">
-              <div className="p-5">
-                <div className="flex items-start gap-5">
-                  <div className="flex-none w-28 sm:w-32 md:w-36 aspect-[3/4] rounded-2xl overflow-hidden bg-white dark:bg-slate-950 shadow">
-                    <img
-                      src="/Portrait_1.webp"
-                      alt="Portrait"
-                      className="w-full h-full object-contain"
-                      loading="eager"
-                      decoding="async"
-                      fetchPriority="high"
-                      sizes="(max-width: 640px) 112px, (max-width: 768px) 128px, 144px"
-                    />
-                  </div>
-
-                  <div className="min-w-0 flex-1 md:flex md:flex-col md:items-center md:text-center">
-                    <h3 className="text-lg sm:text-xl font-semibold leading-snug">{t("learn_with_me")}</h3>
-
-                    <div className="mt-3 flex flex-col gap-2 w-full max-w-[260px]">
-                      <ExternalLinkChip href="https://preply.com/en/?pref=ODkzOTkyOQ==&id=1759522486.457389&ep=w1">Preply</ExternalLinkChip>
-                      <ExternalLinkChip href="https://www.italki.com/affshare?ref=af11775706">italki</ExternalLinkChip>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Card>
+        {/* swipe edge hints */}
+        <div className="pointer-events-none absolute inset-y-0 left-0 w-10 flex items-center justify-start">
+          <div
+            className={[
+              "swipe-anim flex items-center gap-1 text-slate-400 dark:text-slate-500",
+              hintLeft ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-2",
+            ].join(" ")}
+            style={{ transition: "opacity 180ms ease, transform 180ms ease" }}
+          >
+            <ChevronLeft className="w-5 h-5" />
           </div>
-        </section>
+        </div>
 
-        {/* PRODUCTS */}
-        <section hidden={!showProducts} aria-hidden={!showProducts}>
-          <div className="space-y-4 sm:space-y-6">
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-              <div className="relative">
-                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                <Input
-                  aria-label={t("products_search")}
-                  placeholder={t("products_search")}
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  className="w-full pl-9 pr-10 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-100"
-                />
-                {!!query && (
-                  <button
-                    type="button"
-                    onClick={clearQuery}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
-                    aria-label={t("search_clear")}
-                    title={t("search_clear")}
-                    data-no-swipe="true"
-                  >
-                    <X className="w-4 h-4 text-slate-500 dark:text-slate-300" />
-                  </button>
-                )}
+        <div className="pointer-events-none absolute inset-y-0 right-0 w-10 flex items-center justify-end">
+          <div
+            className={[
+              "swipe-anim flex items-center gap-1 text-slate-400 dark:text-slate-500",
+              hintRight ? "opacity-100 translate-x-0" : "opacity-0 translate-x-2",
+            ].join(" ")}
+            style={{ transition: "opacity 180ms ease, transform 180ms ease" }}
+          >
+            <ChevronRight className="w-5 h-5" />
+          </div>
+        </div>
+
+        {/* content with swipe-follow animation */}
+        <div
+          className="swipe-anim"
+          style={{
+            transform: `translateX(${swipeTranslate}px) rotate(${swipeRotate}deg)`,
+            opacity: swipeOpacity,
+            transition: swipeAnim.active ? "none" : "transform 240ms cubic-bezier(.2,.8,.2,1), opacity 240ms ease",
+            willChange: swipeAnim.active ? "transform" : "auto",
+          }}
+        >
+          {/* ABOUT */}
+          <section hidden={!showAbout} aria-hidden={!showAbout}>
+            <div className="grid md:grid-cols-3 gap-6 sm:gap-8 items-start">
+              <div className="md:col-span-2 space-y-4">
+                <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight break-words">{t("about_title")}</h1>
+                <p className="leading-relaxed text-slate-700 dark:text-slate-300">{t("about_p1")}</p>
               </div>
 
-              <div className="hidden sm:block lg:col-span-2" />
-
-              {filteredProducts.length === 0 ? (
-                <div>
-                  <EmptyState title={t("not_found")} subtitle={t("try_another")} className="max-w-[32rem]" />
+              <Card className="p-5 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl">
+                <CardTitle className="mb-2">{t("contacts")}</CardTitle>
+                <div className="text-sm space-y-1 text-slate-700 dark:text-slate-300">
+                  <p>E-mail: genndybogdanov@gmail.com</p>
+                  <p>
+                    <a className="underline hover:text-slate-900 dark:hover:text-white break-all" href="https://substack.com/@gbogdanov" target="_blank" rel="noopener noreferrer">
+                      Substack
+                    </a>
+                  </p>
                 </div>
-              ) : (
-                filteredProducts.map((p) => <ProductCard key={p.id} item={p} t={t} lang={lang} />)
-              )}
-            </div>
-          </div>
-        </section>
+              </Card>
 
-        {/* AUDIOBOOKS */}
-        <section hidden={!showAudio} aria-hidden={!showAudio}>
-          <div className="space-y-4 sm:space-y-6">
-            {!audioBookId && (
-              <>
-                <p className="text-slate-700 dark:text-slate-300">{t("audio_choose")}</p>
-
-                {AUDIO_BOOKS.length === 0 ? (
-                  <EmptyState title={t("audio_empty")} />
-                ) : (
-                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {AUDIO_BOOKS.map((book) => (
-                      <AudioBookTile key={book.id} book={book} onOpen={setAudioBookId} comingSoonText={t("coming_soon")} />
-                    ))}
-                  </div>
-                )}
-              </>
-            )}
-
-            {audioBookId && selectedBook && (
-              <>
-                <div className="mb-4 sm:mb-6 flex flex-col gap-3 sm:gap-4 md:flex-row md:items-start md:justify-between">
-                  <div className="order-2 md:order-1 w-full">
-                    <div className="flex items-center gap-4 md:block">
+              <Card className="md:col-span-3 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl">
+                <div className="p-5">
+                  <div className="flex items-start gap-5">
+                    <div className="flex-none w-28 sm:w-32 md:w-36 aspect-[3/4] rounded-2xl overflow-hidden bg-white dark:bg-slate-950 shadow">
                       <img
-                        src={selectedBook.cover}
-                        alt={selectedBook.title}
-                        className="w-20 h-20 rounded-2xl object-cover shadow flex-none md:hidden"
-                        decoding="async"
+                        src="/Portrait_1.webp"
+                        alt="Portrait"
+                        className="w-full h-full object-contain"
                         loading="eager"
-                        sizes="80px"
+                        decoding="async"
+                        fetchPriority="high"
+                        sizes="(max-width: 640px) 112px, (max-width: 768px) 128px, 144px"
                       />
+                    </div>
 
-                      <div className="min-w-0">
-                        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold leading-tight break-words">{selectedBook.title}</h1>
+                    <div className="min-w-0 flex-1 md:flex md:flex-col md:items-center md:text-center">
+                      <h3 className="text-lg sm:text-xl font-semibold leading-snug">{t("learn_with_me")}</h3>
 
-                        <p className="text-slate-600 dark:text-slate-400 break-words">
-                          {selectedBook.author}
-                          {selectedBook.comingSoon ? <span className="font-semibold text-slate-700 dark:text-slate-200"> {" "}({t("coming_soon")})</span> : null}
-                        </p>
+                      <div className="mt-3 flex flex-col gap-2 w-full max-w-[260px]">
+                        <ExternalLinkChip href="https://preply.com/en/?pref=ODkzOTkyOQ==&id=1759522486.457389&ep=w1">Preply</ExternalLinkChip>
+                        <ExternalLinkChip href="https://www.italki.com/affshare?ref=af11775706">italki</ExternalLinkChip>
                       </div>
                     </div>
                   </div>
-
-                  <div className="order-1 md:order-2 flex gap-3 w-full md:w-auto">
-                    <Button
-                      variant="outline"
-                      onClick={() => setAudioBookId(null)}
-                      className="w-1/2 md:w-auto whitespace-nowrap dark:bg-slate-900 dark:border-slate-700"
-                      type="button"
-                      data-no-swipe="true"
-                    >
-                      ← {t("back")}
-                    </Button>
-
-                    <Button
-                      onClick={downloadAllAudio}
-                      className="w-1/2 md:w-auto flex gap-2 justify-center whitespace-nowrap"
-                      type="button"
-                      data-no-swipe="true"
-                      disabled={!selectedBook.tracks?.length}
-                      title={!selectedBook.tracks?.length ? t("audio_empty") : t("download_all")}
-                    >
-                      <Download className="w-4 h-4" />
-                      {t("download_all")}
-                    </Button>
-                  </div>
                 </div>
+              </Card>
+            </div>
+          </section>
 
-                <div className="grid md:grid-cols-3 gap-5 sm:gap-6 items-start">
-                  <img
-                    src={selectedBook.cover}
-                    alt={selectedBook.title}
-                    className="hidden md:block w-full aspect-square object-cover rounded-2xl shadow md:col-span-1"
-                    decoding="async"
-                    loading="eager"
-                    sizes="(max-width: 1024px) 40vw, 360px"
+          {/* PRODUCTS */}
+          <section hidden={!showProducts} aria-hidden={!showProducts}>
+            <div className="space-y-4 sm:space-y-6">
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                <div className="relative">
+                  <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <Input
+                    aria-label={t("products_search")}
+                    placeholder={t("products_search")}
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    className="w-full pl-9 pr-10 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-100"
                   />
-
-                  {/* ✅ (4) уменьшили gap между строками: было space-y-2 sm:space-y-3 -> стало space-y-1.5 */}
-                  <div className="md:col-span-2 space-y-1.5 sm:space-y-2">
-                    {selectedBook.tracks?.length ? (
-                      selectedBook.tracks.map((tr) => (
-                        <TrackRow
-                          key={tr.id}
-                          track={tr}
-                          isActive={currentTrack?.id === tr.id}
-                          isPlaying={isPlaying}
-                          onToggle={toggleTrack}
-                          onSeek={seekTo}
-                          t={t}
-                          currentTime={currentTrack?.id === tr.id ? currentTime : 0}
-                          duration={currentTrack?.id === tr.id ? duration : 0}
-                        />
-                      ))
-                    ) : (
-                      <EmptyState title={t("not_found")} subtitle={t("audio_empty")} />
-                    )}
-                  </div>
+                  {!!query && (
+                    <button
+                      type="button"
+                      onClick={clearQuery}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 active:scale-[0.98] transition"
+                      aria-label={t("search_clear")}
+                      title={t("search_clear")}
+                      data-no-swipe="true"
+                    >
+                      <X className="w-4 h-4 text-slate-500 dark:text-slate-300" />
+                    </button>
+                  )}
                 </div>
-              </>
-            )}
-          </div>
-        </section>
+
+                <div className="hidden sm:block lg:col-span-2" />
+
+                {filteredProducts.length === 0 ? (
+                  <div>
+                    <EmptyState title={t("not_found")} subtitle={t("try_another")} className="max-w-[32rem]" />
+                  </div>
+                ) : (
+                  filteredProducts.map((p) => <ProductCard key={p.id} item={p} t={t} lang={lang} />)
+                )}
+              </div>
+            </div>
+          </section>
+
+          {/* AUDIOBOOKS */}
+          <section hidden={!showAudio} aria-hidden={!showAudio}>
+            <div className="space-y-4 sm:space-y-6">
+              {!audioBookId && (
+                <>
+                  <p className="text-slate-700 dark:text-slate-300">{t("audio_choose")}</p>
+
+                  {AUDIO_BOOKS.length === 0 ? (
+                    <EmptyState title={t("audio_empty")} />
+                  ) : (
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {AUDIO_BOOKS.map((book) => (
+                        <AudioBookTile key={book.id} book={book} onOpen={setAudioBookId} comingSoonText={t("coming_soon")} />
+                      ))}
+                    </div>
+                  )}
+                </>
+              )}
+
+              {audioBookId && selectedBook && (
+                <>
+                  <div className="mb-4 sm:mb-6 flex flex-col gap-3 sm:gap-4 md:flex-row md:items-start md:justify-between">
+                    <div className="order-2 md:order-1 w-full">
+                      <div className="flex items-center gap-4 md:block">
+                        <img
+                          src={selectedBook.cover}
+                          alt={selectedBook.title}
+                          className="w-20 h-20 rounded-2xl object-cover shadow flex-none md:hidden"
+                          decoding="async"
+                          loading="eager"
+                          sizes="80px"
+                        />
+
+                        <div className="min-w-0">
+                          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold leading-tight break-words">{selectedBook.title}</h1>
+
+                          <p className="text-slate-600 dark:text-slate-400 break-words">
+                            {selectedBook.author}
+                            {selectedBook.comingSoon ? <span className="font-semibold text-slate-700 dark:text-slate-200"> {" "}({t("coming_soon")})</span> : null}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="order-1 md:order-2 flex gap-3 w-full md:w-auto">
+                      <Button
+                        variant="outline"
+                        onClick={() => setAudioBookId(null)}
+                        className="w-1/2 md:w-auto whitespace-nowrap dark:bg-slate-900 dark:border-slate-700 active:scale-[0.98] transition"
+                        type="button"
+                        data-no-swipe="true"
+                      >
+                        ← {t("back")}
+                      </Button>
+
+                      <Button
+                        onClick={downloadAllAudio}
+                        className="w-1/2 md:w-auto flex gap-2 justify-center whitespace-nowrap active:scale-[0.98] transition"
+                        type="button"
+                        data-no-swipe="true"
+                        disabled={!selectedBook.tracks?.length}
+                        title={!selectedBook.tracks?.length ? t("audio_empty") : t("download_all")}
+                      >
+                        <Download className="w-4 h-4" />
+                        {t("download_all")}
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="grid md:grid-cols-3 gap-5 sm:gap-6 items-start">
+                    <img
+                      src={selectedBook.cover}
+                      alt={selectedBook.title}
+                      className="hidden md:block w-full aspect-square object-cover rounded-2xl shadow md:col-span-1"
+                      decoding="async"
+                      loading="eager"
+                      sizes="(max-width: 1024px) 40vw, 360px"
+                    />
+
+                    <div className="md:col-span-2 space-y-2">
+                      {selectedBook.tracks?.length ? (
+                        selectedBook.tracks.map((tr) => (
+                          <TrackRow
+                            key={tr.id}
+                            track={tr}
+                            isActive={currentTrack?.id === tr.id}
+                            isPlaying={isPlaying}
+                            onToggle={toggleTrack}
+                            onSeek={seekTo}
+                            t={t}
+                            currentTime={currentTrack?.id === tr.id ? currentTime : 0}
+                            duration={currentTrack?.id === tr.id ? duration : 0}
+                          />
+                        ))
+                      ) : (
+                        <EmptyState title={t("not_found")} subtitle={t("audio_empty")} />
+                      )}
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+          </section>
+        </div>
       </main>
 
       <footer className="mt-auto border-t border-slate-200 dark:border-slate-800">
