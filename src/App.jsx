@@ -3,17 +3,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/Card.j
 import { Button } from "./components/ui/Button.jsx";
 import { Input } from "./components/ui/Input.jsx";
 import { Badge } from "./components/ui/Badge.jsx";
-import { ExternalLink, Download, Play, Pause, X, Search } from "lucide-react";
+import { ExternalLink, Download, Play, Pause, X, Search, Sun, Moon } from "lucide-react";
 
 // ================== LAYOUT ==================
-const CONTAINER = "w-full max-w-6xl mx-auto px-4 sm:px-8"; // чуть компактнее на мобиле
+const CONTAINER = "w-full max-w-6xl mx-auto px-4 sm:px-8";
 const TOPBAR_H = "min-h-[64px]";
 
 // ================== SWIPE TABS HOOK ==================
-// Улучшенный свайп:
-// - не "залипает" между Store <-> Audiobooks
-// - "нажал и повёл, не отпуская" → переключает при отпускании
-// - блокируем свайп только на инпутах/слайдере и элементах data-no-swipe
 function useSwipeTabs({ enabled, onPrev, onNext, thresholdPx = 60, lockPx = 10, restraintPx = 40 }) {
   const startX = useRef(0);
   const startY = useRef(0);
@@ -63,7 +59,6 @@ function useSwipeTabs({ enabled, onPrev, onNext, thresholdPx = 60, lockPx = 10, 
         return;
       }
 
-      // если горизонталь уже "захвачена", допускаем небольшой вертикальный дрейф
       if (axisLock.current === "x" && Math.abs(dy) > restraintPx && Math.abs(dy) > Math.abs(dx)) {
         tracking.current = false;
       }
@@ -82,7 +77,6 @@ function useSwipeTabs({ enabled, onPrev, onNext, thresholdPx = 60, lockPx = 10, 
       const dx = t.clientX - startX.current;
       const dy = t.clientY - startY.current;
 
-      // если это был вертикальный скролл — не переключаем
       if (axisLock.current === "y" && Math.abs(dy) > restraintPx) return;
 
       if (dx > thresholdPx) onPrev?.();
@@ -241,6 +235,10 @@ const I18N = {
     pause: "Pause",
     download: "Download",
     coming_soon: "coming soon",
+
+    theme: "Theme",
+    theme_light: "Light",
+    theme_dark: "Dark",
   },
 
   ru: {
@@ -271,8 +269,37 @@ const I18N = {
     pause: "Пауза",
     download: "Скачать",
     coming_soon: "скоро",
+
+    theme: "Тема",
+    theme_light: "Светлая",
+    theme_dark: "Тёмная",
   },
 };
+
+// ================== THEME ==================
+function detectTheme() {
+  try {
+    const saved = localStorage.getItem("theme");
+    if (saved === "dark" || saved === "light") return saved;
+    const prefersDark =
+      typeof window !== "undefined" &&
+      window.matchMedia &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches;
+    return prefersDark ? "dark" : "light";
+  } catch {
+    return "light";
+  }
+}
+
+function applyThemeToHtml(theme) {
+  if (typeof document === "undefined") return;
+  const root = document.documentElement;
+  if (theme === "dark") root.classList.add("dark");
+  else root.classList.remove("dark");
+
+  // nice for system UI controls + built-in scrollbars
+  root.style.colorScheme = theme;
+}
 
 // ================== UI HELPERS ==================
 function NavPill({ active, onClick, children, size = "md", className = "", ...props }) {
@@ -285,14 +312,14 @@ function NavPill({ active, onClick, children, size = "md", className = "", ...pr
       {...props}
       className={[
         padding,
-        "whitespace-nowrap",
-        "rounded-full border transition-all duration-200 select-none",
+        "whitespace-nowrap rounded-full border transition-all duration-200 select-none",
         "active:scale-[0.97]",
         "[-webkit-tap-highlight-color:transparent]",
         "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
+        "dark:focus-visible:ring-blue-500/40 dark:focus-visible:ring-offset-slate-950",
         active
           ? "bg-blue-600 text-white border-blue-600 shadow-md font-semibold"
-          : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:border-slate-300",
+          : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:border-slate-300 dark:bg-slate-900 dark:text-slate-100 dark:border-slate-700 dark:hover:bg-slate-800/70 dark:hover:border-slate-600",
         className,
       ].join(" ")}
     >
@@ -301,15 +328,18 @@ function NavPill({ active, onClick, children, size = "md", className = "", ...pr
   );
 }
 
-// A link that looks like a button (no <button> inside <a>)
+// Link that looks like a button (no <button> inside <a>)
 function LinkButton({ href, children, className = "", disabled = false, title, "aria-label": ariaLabel }) {
   const base =
     "inline-flex items-center justify-center gap-2 rounded-xl border px-4 py-2 text-sm font-medium " +
     "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white " +
+    "dark:focus-visible:ring-blue-500/40 dark:focus-visible:ring-offset-slate-950 " +
     "[-webkit-tap-highlight-color:transparent]";
 
-  const enabledCls = "border-slate-200 bg-white text-slate-800 hover:bg-slate-50 active:scale-[0.98]";
-  const disabledCls = "border-slate-200 bg-white text-slate-400 opacity-70 cursor-not-allowed";
+  const enabledCls =
+    "border-slate-200 bg-white text-slate-800 hover:bg-slate-50 active:scale-[0.98] " +
+    "dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800/70";
+  const disabledCls = "border-slate-200 bg-white text-slate-400 opacity-70 cursor-not-allowed dark:border-slate-700 dark:bg-slate-900 dark:text-slate-500";
 
   if (disabled || !href) {
     return (
@@ -342,10 +372,14 @@ function ExternalLinkChip({ href, children, className = "" }) {
       className={[
         "block w-full",
         "inline-flex items-center justify-between gap-3",
-        "rounded-xl border border-slate-200 bg-white",
-        "px-3 py-2 text-sm font-medium text-slate-800",
-        "hover:bg-slate-50 active:scale-[0.99]",
+        "rounded-xl border",
+        "px-3 py-2 text-sm font-medium",
+        "transition",
+        "border-slate-200 bg-white text-slate-800 hover:bg-slate-50",
+        "dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800/70",
+        "active:scale-[0.99]",
         "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
+        "dark:focus-visible:ring-blue-500/40 dark:focus-visible:ring-offset-slate-950",
         "[-webkit-tap-highlight-color:transparent]",
         className,
       ].join(" ")}
@@ -372,10 +406,10 @@ function productBuyLabel(item, t) {
 
 function EmptyState({ title, subtitle, className = "" }) {
   return (
-    <Card className={["border border-slate-200", className].join(" ")}>
+    <Card className={["border border-slate-200 dark:border-slate-800", "dark:bg-slate-950", className].join(" ")}>
       <CardContent className="p-6">
-        <p className="font-semibold">{title}</p>
-        {subtitle && <p className="text-sm text-slate-600 mt-1">{subtitle}</p>}
+        <p className="font-semibold text-slate-900 dark:text-slate-100">{title}</p>
+        {subtitle && <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">{subtitle}</p>}
       </CardContent>
     </Card>
   );
@@ -385,9 +419,9 @@ function BookAuthorLine({ author, comingSoon, comingSoonText }) {
   if (!author && !comingSoon) return null;
 
   return (
-    <p className="text-sm text-slate-600 line-clamp-2">
+    <p className="text-sm text-slate-600 dark:text-slate-400 line-clamp-2">
       {author}
-      {comingSoon ? <span className="font-semibold text-slate-700"> {" "}({comingSoonText})</span> : null}
+      {comingSoon ? <span className="font-semibold text-slate-700 dark:text-slate-200"> {" "}({comingSoonText})</span> : null}
     </p>
   );
 }
@@ -405,7 +439,14 @@ function AudioBookTile({ book, onOpen, comingSoonText }) {
       type="button"
       disabled={isDisabled}
     >
-      <Card className={["p-4 border border-slate-200 transition", isDisabled ? "opacity-70 cursor-not-allowed" : "hover:shadow"].join(" ")}>
+      <Card
+        className={[
+          "p-4 border transition",
+          "bg-white border-slate-200",
+          "dark:bg-slate-950 dark:border-slate-800",
+          isDisabled ? "opacity-70 cursor-not-allowed" : "hover:shadow dark:hover:shadow-none",
+        ].join(" ")}
+      >
         <div className="flex gap-4 items-center">
           <img
             src={book.cover}
@@ -416,7 +457,7 @@ function AudioBookTile({ book, onOpen, comingSoonText }) {
             sizes="64px"
           />
           <div className="min-w-0">
-            <p className="font-semibold truncate">{book.title}</p>
+            <p className="font-semibold truncate text-slate-900 dark:text-slate-100">{book.title}</p>
             <BookAuthorLine author={book.author} comingSoon={!!book.comingSoon} comingSoonText={comingSoonText} />
           </div>
         </div>
@@ -432,10 +473,6 @@ function formatTime(sec) {
   return `${m}:${String(s).padStart(2, "0")}`;
 }
 
-// ================== TrackRow (компактнее) ==================
-// Запросы:
-// 2) уменьшить кнопки Play/Pause и Download ~15%
-// 2) максимально уменьшить высоту блока
 function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime, duration }) {
   const activeAndPlaying = isActive && isPlaying;
   const showScrubber = isActive;
@@ -444,14 +481,21 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
   const safeTime = Number.isFinite(currentTime) && currentTime >= 0 ? currentTime : 0;
 
   return (
-    <Card className={["border border-slate-200 transition", isActive ? "shadow-sm" : ""].join(" ")}>
-      <CardContent className="p-3"> {/* было p-4 */}
+    <Card
+      className={[
+        "border transition",
+        "bg-white border-slate-200",
+        "dark:bg-slate-950 dark:border-slate-800",
+        isActive ? "shadow-sm dark:shadow-none" : "",
+      ].join(" ")}
+    >
+      <CardContent className="p-3">
         <div className="flex items-center justify-between gap-2">
           <div className="min-w-0">
-            <p className="font-medium truncate text-[14px] leading-snug">{track.title}</p>
+            <p className="font-medium truncate text-[14px] leading-snug text-slate-900 dark:text-slate-100">{track.title}</p>
 
             {showScrubber && (
-              <p className="text-[11px] text-slate-500 mt-1 tabular-nums">
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 tabular-nums">
                 {formatTime(safeTime)} / {formatTime(safeDuration)}
               </p>
             )}
@@ -462,33 +506,37 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
               type="button"
               onClick={() => onToggle(track)}
               className={[
-                "h-9 w-9 inline-flex items-center justify-center rounded-xl border", // было h-10 w-10
+                "h-9 w-9 inline-flex items-center justify-center rounded-xl border transition",
                 "border-slate-200 bg-white hover:bg-slate-50 active:scale-[0.98]",
+                "dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800/70",
                 "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
+                "dark:focus-visible:ring-blue-500/40 dark:focus-visible:ring-offset-slate-950",
                 "[-webkit-tap-highlight-color:transparent]",
-                isActive ? "shadow-sm" : "",
+                isActive ? "shadow-sm dark:shadow-none" : "",
               ].join(" ")}
               aria-label={activeAndPlaying ? t("pause") : t("listen")}
               title={activeAndPlaying ? t("pause") : t("listen")}
               aria-pressed={activeAndPlaying}
               data-no-swipe="true"
             >
-              {activeAndPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />} {/* было w-5 h-5 */}
+              {activeAndPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
             </button>
 
             {track.src && track.src !== "#" && (
               <a href={track.src} download className="inline-flex" aria-label={`${t("download")}: ${track.title}`}>
                 <span
                   className={[
-                    "h-9 w-9 inline-flex items-center justify-center rounded-xl border", // было h-10 w-10
+                    "h-9 w-9 inline-flex items-center justify-center rounded-xl border transition",
                     "border-slate-200 bg-white hover:bg-slate-50 active:scale-[0.98]",
+                    "dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800/70",
                     "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
+                    "dark:focus-visible:ring-blue-500/40 dark:focus-visible:ring-offset-slate-950",
                     "[-webkit-tap-highlight-color:transparent]",
                   ].join(" ")}
                   title={t("download")}
                   data-no-swipe="true"
                 >
-                  <Download className="w-4 h-4" /> {/* было w-5 h-5 */}
+                  <Download className="w-4 h-4" />
                 </span>
               </a>
             )}
@@ -496,7 +544,7 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
         </div>
 
         {showScrubber && (
-          <div className="mt-2"> {/* было mt-3 */}
+          <div className="mt-2">
             <input
               type="range"
               role="slider"
@@ -522,10 +570,10 @@ function ProductCard({ item, t, lang }) {
   const canBuy = !isDisabled && !!item.externalUrl;
 
   return (
-    <Card className={["overflow-hidden border border-slate-200 flex flex-col bg-white", isDisabled ? "opacity-80" : ""].join(" ")}>
+    <Card className={["overflow-hidden border flex flex-col", "bg-white border-slate-200", "dark:bg-slate-950 dark:border-slate-800", isDisabled ? "opacity-80" : ""].join(" ")}>
       <CardHeader className="p-0">
         <div className="relative">
-          <div className="w-full aspect-[4/3] bg-white">
+          <div className="w-full aspect-[4/3] bg-white dark:bg-slate-950">
             <img
               src={item.image}
               alt={item.title}
@@ -548,18 +596,25 @@ function ProductCard({ item, t, lang }) {
 
       <CardContent className="p-4 pt-2 flex flex-col flex-grow -mt-3">
         <div className="space-y-1">
-          <CardTitle className="text-base leading-snug font-semibold break-words">{item.title}</CardTitle>
-          <p className="text-sm text-slate-600">{item.kind}</p>
+          <CardTitle className="text-base leading-snug font-semibold break-words text-slate-900 dark:text-slate-100">{item.title}</CardTitle>
+          <p className="text-sm text-slate-600 dark:text-slate-400">{item.kind}</p>
         </div>
 
-        <p className="mt-2 text-sm text-slate-700 leading-snug">{item.description}</p>
+        <p className="mt-2 text-sm text-slate-700 dark:text-slate-300 leading-snug">{item.description}</p>
 
         <div className="mt-auto pt-3 flex items-center justify-between gap-3">
-          <span className="text-xl font-semibold tabular-nums">{Number.isFinite(item.price) ? currencyUSD(item.price) : "—"}</span>
+          <span className="text-xl font-semibold tabular-nums text-slate-900 dark:text-slate-100">
+            {Number.isFinite(item.price) ? currencyUSD(item.price) : "—"}
+          </span>
 
           {isDisabled ? (
             <span className="inline-flex">
-              <Button variant="outline" type="button" disabled className="flex items-center gap-2 opacity-70 cursor-not-allowed">
+              <Button
+                variant="outline"
+                type="button"
+                disabled
+                className="flex items-center gap-2 opacity-70 cursor-not-allowed dark:bg-slate-900 dark:border-slate-700"
+              >
                 <ExternalLink className="w-4 h-4" />
                 <span className="whitespace-nowrap">{lang === "ru" ? "Скоро в продаже" : "Coming soon"}</span>
               </Button>
@@ -591,6 +646,7 @@ function preloadImages(urls = []) {
 
 // ================== APP ==================
 export default function App() {
+  // ---- language ----
   const detectLanguage = () => {
     try {
       const saved = localStorage.getItem("lang");
@@ -604,8 +660,6 @@ export default function App() {
     }
   };
 
-  const PREFETCH_AFTER_ABOUT = ["/Product_Leo.webp", "/Product_Chekhov.webp", "/Audio_External_Leo.webp", "/Audio_External_Chekhov.webp"];
-
   const [lang, setLang] = useState(() => detectLanguage());
   const t = (key) => I18N[lang]?.[key] ?? I18N.en[key] ?? key;
 
@@ -616,6 +670,41 @@ export default function App() {
     } catch {}
   };
 
+  // ---- theme ----
+  const [theme, setTheme] = useState(() => detectTheme());
+
+  useEffect(() => {
+    applyThemeToHtml(theme);
+    try {
+      localStorage.setItem("theme", theme);
+    } catch {}
+  }, [theme]);
+
+  // keep in sync if system preference changes AND user has no explicit choice
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return;
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
+
+    const handler = () => {
+      try {
+        const saved = localStorage.getItem("theme");
+        if (saved === "dark" || saved === "light") return; // user explicitly set
+      } catch {}
+      setTheme(mq.matches ? "dark" : "light");
+    };
+
+    if (mq.addEventListener) mq.addEventListener("change", handler);
+    else mq.addListener(handler);
+
+    return () => {
+      if (mq.removeEventListener) mq.removeEventListener("change", handler);
+      else mq.removeListener(handler);
+    };
+  }, []);
+
+  const toggleTheme = () => setTheme((p) => (p === "dark" ? "light" : "dark"));
+
+  // ---- tabs ----
   const detectTab = () => {
     try {
       const saved = localStorage.getItem("tab");
@@ -636,6 +725,9 @@ export default function App() {
   useEffect(() => {
     document.title = lang === "ru" ? "Геннадий Богданов — русский язык" : "Genndy Bogdanov — Learn Russian";
   }, [lang]);
+
+  // ---- prefetch ----
+  const PREFETCH_AFTER_ABOUT = ["/Product_Leo.webp", "/Product_Chekhov.webp", "/Audio_External_Leo.webp", "/Audio_External_Chekhov.webp"];
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -658,7 +750,7 @@ export default function App() {
     preloadImages(PREFETCH_AFTER_ABOUT);
   }, []);
 
-  // -------- store search --------
+  // ---- store search ----
   const [query, setQuery] = useState("");
 
   const normalize = (s) =>
@@ -683,7 +775,7 @@ export default function App() {
 
   const clearQuery = () => setQuery("");
 
-  // -------- audiobooks --------
+  // ---- audiobooks ----
   const [audioBookId, setAudioBookId] = useState(null);
   const selectedBook = useMemo(() => AUDIO_BOOKS.find((b) => b.id === audioBookId) || null, [audioBookId]);
 
@@ -706,17 +798,12 @@ export default function App() {
     const onPlay = () => setIsPlaying(true);
     const onPause = () => setIsPlaying(false);
 
-    // ✅ ended: сбрасываем UI/позицию, чтобы ничего не "висело"
     const onEnded = () => {
       setIsPlaying(false);
       setCurrentTime(0);
-      setDuration((d) => (Number.isFinite(d) ? d : 0));
       try {
         audio.currentTime = 0;
       } catch {}
-      // оставляем currentTrack (подсветка активного) — но scrubber будет на 0:00
-      // если хочешь полностью снять активность, раскомментируй:
-      // setCurrentTrack(null);
     };
 
     const onTime = () => setCurrentTime(audio.currentTime || 0);
@@ -812,7 +899,7 @@ export default function App() {
     }
   }, [audioBookId, stopAudio]);
 
-  // -------- mobile detection (for swipe) --------
+  // ---- mobile detection (for swipe) ----
   const [isMobile, setIsMobile] = useState(() => {
     if (typeof window === "undefined") return false;
     return window.matchMedia("(max-width: 768px)").matches;
@@ -869,17 +956,17 @@ export default function App() {
   const showAudio = tab === "free-audio";
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <div className="min-h-screen flex flex-col bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100">
       <a
         href="#content"
-        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[9999] bg-white border rounded-lg px-3 py-2 shadow"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[9999] bg-white dark:bg-slate-950 border dark:border-slate-800 rounded-lg px-3 py-2 shadow"
       >
         Skip to content
       </a>
 
       <audio ref={audioRef} preload="none" />
 
-      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur border-b">
+      <header className="sticky top-0 z-50 bg-white/80 dark:bg-slate-950/75 backdrop-blur border-b border-slate-200 dark:border-slate-800">
         <div className="w-full">
           <div className={`${CONTAINER} py-3 flex items-center justify-between gap-4 ${TOPBAR_H}`}>
             <div className="flex items-center gap-3 min-w-0">
@@ -909,24 +996,16 @@ export default function App() {
           </div>
         </div>
 
-        <nav className="border-t">
+        <nav className="border-t border-slate-200 dark:border-slate-800">
           <div className="w-full">
             <div className={`${CONTAINER} py-3`}>
-              {/* ✅ Mobile: вкладки растягиваем на ширину (по 1/3), Desktop: как раньше */}
+              {/* Mobile: равномерно по ширине; Desktop: как раньше */}
               <div className="flex w-full items-center gap-2 sm:gap-3 overflow-x-hidden sm:overflow-x-auto no-scrollbar">
-                <NavPill
-                  active={showAbout}
-                  onClick={() => setTab("about")}
-                  className="flex-1 text-center sm:flex-none"
-                >
+                <NavPill active={showAbout} onClick={() => setTab("about")} className="flex-1 text-center sm:flex-none">
                   {t("nav_about")}
                 </NavPill>
 
-                <NavPill
-                  active={showProducts}
-                  onClick={() => setTab("products")}
-                  className="flex-1 text-center sm:flex-none"
-                >
+                <NavPill active={showProducts} onClick={() => setTab("products")} className="flex-1 text-center sm:flex-none">
                   {t("nav_products")}
                 </NavPill>
 
@@ -948,8 +1027,6 @@ export default function App() {
         </nav>
       </header>
 
-      {/* ✅ Убрали space-y с main, чтобы не появлялись “пустые зоны” из-за hidden-class.
-          И используем HTML-атрибут hidden для секций (Tailwind space-y его понимает). */}
       <main
         id="content"
         className={`flex-1 ${CONTAINER} py-4 sm:py-8`}
@@ -962,25 +1039,25 @@ export default function App() {
           <div className="grid md:grid-cols-3 gap-6 sm:gap-8 items-start">
             <div className="md:col-span-2 space-y-4">
               <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight break-words">{t("about_title")}</h1>
-              <p className="leading-relaxed text-slate-700">{t("about_p1")}</p>
+              <p className="leading-relaxed text-slate-700 dark:text-slate-300">{t("about_p1")}</p>
             </div>
 
-            <Card className="p-5 border border-slate-200">
+            <Card className="p-5 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
               <CardTitle className="mb-2">{t("contacts")}</CardTitle>
-              <div className="text-sm space-y-1">
+              <div className="text-sm space-y-1 text-slate-700 dark:text-slate-300">
                 <p>E-mail: genndybogdanov@gmail.com</p>
                 <p>
-                  <a className="underline hover:text-slate-900 break-all" href="https://substack.com/@gbogdanov" target="_blank" rel="noopener noreferrer">
+                  <a className="underline hover:text-slate-900 dark:hover:text-white break-all" href="https://substack.com/@gbogdanov" target="_blank" rel="noopener noreferrer">
                     Substack
                   </a>
                 </p>
               </div>
             </Card>
 
-            <Card className="md:col-span-3 border border-slate-200">
+            <Card className="md:col-span-3 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
               <div className="p-5">
                 <div className="flex items-start gap-5">
-                  <div className="flex-none w-28 sm:w-32 md:w-36 aspect-[3/4] rounded-2xl overflow-hidden bg-white shadow">
+                  <div className="flex-none w-28 sm:w-32 md:w-36 aspect-[3/4] rounded-2xl overflow-hidden bg-white dark:bg-slate-950 shadow">
                     <img
                       src="/Portrait_1.webp"
                       alt="Portrait"
@@ -1017,18 +1094,18 @@ export default function App() {
                   placeholder={t("products_search")}
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  className="w-full pl-9 pr-10"
+                  className="w-full pl-9 pr-10 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-100"
                 />
                 {!!query && (
                   <button
                     type="button"
                     onClick={clearQuery}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-lg hover:bg-slate-100"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
                     aria-label={t("search_clear")}
                     title={t("search_clear")}
                     data-no-swipe="true"
                   >
-                    <X className="w-4 h-4 text-slate-500" />
+                    <X className="w-4 h-4 text-slate-500 dark:text-slate-300" />
                   </button>
                 )}
               </div>
@@ -1051,7 +1128,7 @@ export default function App() {
           <div className="space-y-4 sm:space-y-6">
             {!audioBookId && (
               <>
-                <p className="text-slate-700">{t("audio_choose")}</p>
+                <p className="text-slate-700 dark:text-slate-300">{t("audio_choose")}</p>
 
                 {AUDIO_BOOKS.length === 0 ? (
                   <EmptyState title={t("audio_empty")} />
@@ -1082,9 +1159,9 @@ export default function App() {
                       <div className="min-w-0">
                         <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold leading-tight break-words">{selectedBook.title}</h1>
 
-                        <p className="text-slate-600 break-words">
+                        <p className="text-slate-600 dark:text-slate-400 break-words">
                           {selectedBook.author}
-                          {selectedBook.comingSoon ? <span className="font-semibold text-slate-700"> {" "}({t("coming_soon")})</span> : null}
+                          {selectedBook.comingSoon ? <span className="font-semibold text-slate-700 dark:text-slate-200"> {" "}({t("coming_soon")})</span> : null}
                         </p>
                       </div>
                     </div>
@@ -1094,7 +1171,7 @@ export default function App() {
                     <Button
                       variant="outline"
                       onClick={() => setAudioBookId(null)}
-                      className="w-1/2 md:w-auto whitespace-nowrap"
+                      className="w-1/2 md:w-auto whitespace-nowrap dark:bg-slate-900 dark:border-slate-700"
                       type="button"
                       data-no-swipe="true"
                     >
@@ -1151,7 +1228,37 @@ export default function App() {
         </section>
       </main>
 
-      <footer className="mt-auto py-6 text-center text-xs text-slate-500 border-t">© {new Date().getFullYear()} Genndy Bogdanov</footer>
+      {/* ✅ Footer: переключатель темы — под RU|ENG, внизу */}
+      <footer className="mt-auto border-t border-slate-200 dark:border-slate-800">
+        <div className={`${CONTAINER} py-6`}>
+          <div className="flex flex-col items-center gap-3">
+            {/* "позиция под RU | ENG" — визуально такой же блок кнопок */}
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={toggleTheme}
+                className={[
+                  "inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition",
+                  "border-slate-200 bg-white text-slate-800 hover:bg-slate-50 active:scale-[0.98]",
+                  "dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800/70",
+                  "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
+                  "dark:focus-visible:ring-blue-500/40 dark:focus-visible:ring-offset-slate-950",
+                  "[-webkit-tap-highlight-color:transparent]",
+                ].join(" ")}
+                aria-label={`${t("theme")}: ${theme === "dark" ? t("theme_dark") : t("theme_light")}`}
+                title={`${t("theme")}: ${theme === "dark" ? t("theme_dark") : t("theme_light")}`}
+              >
+                {theme === "dark" ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
+                <span>{theme === "dark" ? t("theme_dark") : t("theme_light")}</span>
+              </button>
+            </div>
+
+            <div className="text-center text-xs text-slate-500 dark:text-slate-500">
+              © {new Date().getFullYear()} Genndy Bogdanov
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
