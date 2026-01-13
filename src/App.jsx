@@ -236,7 +236,6 @@ const I18N = {
     download: "Download",
     coming_soon: "coming soon",
 
-    theme: "Theme",
     theme_light: "Light",
     theme_dark: "Dark",
   },
@@ -270,25 +269,30 @@ const I18N = {
     download: "Скачать",
     coming_soon: "скоро",
 
-    theme: "Тема",
     theme_light: "Светлая",
     theme_dark: "Тёмная",
   },
 };
 
 // ================== THEME ==================
-function detectTheme() {
+// По умолчанию: светлая.
+// Тёмная — только если системная/браузерная prefers-color-scheme: dark,
+// ИЛИ если пользователь вручную переключил (тогда сохраняем выбор).
+function getSystemTheme() {
   try {
-    const saved = localStorage.getItem("theme");
-    if (saved === "dark" || saved === "light") return saved;
-    const prefersDark =
-      typeof window !== "undefined" &&
-      window.matchMedia &&
-      window.matchMedia("(prefers-color-scheme: dark)").matches;
-    return prefersDark ? "dark" : "light";
+    if (typeof window === "undefined" || !window.matchMedia) return "light";
+    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
   } catch {
     return "light";
   }
+}
+
+function detectTheme() {
+  try {
+    const saved = localStorage.getItem("theme_user"); // только явный выбор пользователя
+    if (saved === "dark" || saved === "light") return saved;
+  } catch {}
+  return getSystemTheme(); // иначе — системная (которая по сути: light по умолчанию, dark только если включено)
 }
 
 function applyThemeToHtml(theme) {
@@ -296,8 +300,6 @@ function applyThemeToHtml(theme) {
   const root = document.documentElement;
   if (theme === "dark") root.classList.add("dark");
   else root.classList.remove("dark");
-
-  // nice for system UI controls + built-in scrollbars
   root.style.colorScheme = theme;
 }
 
@@ -339,7 +341,8 @@ function LinkButton({ href, children, className = "", disabled = false, title, "
   const enabledCls =
     "border-slate-200 bg-white text-slate-800 hover:bg-slate-50 active:scale-[0.98] " +
     "dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800/70";
-  const disabledCls = "border-slate-200 bg-white text-slate-400 opacity-70 cursor-not-allowed dark:border-slate-700 dark:bg-slate-900 dark:text-slate-500";
+  const disabledCls =
+    "border-slate-200 bg-white text-slate-400 opacity-70 cursor-not-allowed dark:border-slate-700 dark:bg-slate-900 dark:text-slate-500";
 
   if (disabled || !href) {
     return (
@@ -406,7 +409,7 @@ function productBuyLabel(item, t) {
 
 function EmptyState({ title, subtitle, className = "" }) {
   return (
-    <Card className={["border border-slate-200 dark:border-slate-800", "dark:bg-slate-950", className].join(" ")}>
+    <Card className={["border border-slate-200 dark:border-slate-800", "bg-white dark:bg-slate-950", "rounded-2xl", className].join(" ")}>
       <CardContent className="p-6">
         <p className="font-semibold text-slate-900 dark:text-slate-100">{title}</p>
         {subtitle && <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">{subtitle}</p>}
@@ -441,7 +444,7 @@ function AudioBookTile({ book, onOpen, comingSoonText }) {
     >
       <Card
         className={[
-          "p-4 border transition",
+          "p-4 border transition rounded-2xl",
           "bg-white border-slate-200",
           "dark:bg-slate-950 dark:border-slate-800",
           isDisabled ? "opacity-70 cursor-not-allowed" : "hover:shadow dark:hover:shadow-none",
@@ -483,7 +486,7 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
   return (
     <Card
       className={[
-        "border transition",
+        "border transition rounded-2xl",
         "bg-white border-slate-200",
         "dark:bg-slate-950 dark:border-slate-800",
         isActive ? "shadow-sm dark:shadow-none" : "",
@@ -565,15 +568,26 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
   );
 }
 
+// ================== ProductCard ==================
+// 3) скругления
+// 4) в dark: делаем мягкую светлую подложку внутри карточки (особенно под изображение)
 function ProductCard({ item, t, lang }) {
   const isDisabled = !!item.disabled;
   const canBuy = !isDisabled && !!item.externalUrl;
 
   return (
-    <Card className={["overflow-hidden border flex flex-col", "bg-white border-slate-200", "dark:bg-slate-950 dark:border-slate-800", isDisabled ? "opacity-80" : ""].join(" ")}>
+    <Card
+      className={[
+        "overflow-hidden border flex flex-col rounded-2xl", // ✅ скругление
+        "bg-white border-slate-200",
+        "dark:bg-slate-950 dark:border-slate-800",
+        isDisabled ? "opacity-80" : "",
+      ].join(" ")}
+    >
       <CardHeader className="p-0">
         <div className="relative">
-          <div className="w-full aspect-[4/3] bg-white dark:bg-slate-950">
+          {/* ✅ подложка под картинку: в dark слегка светлая, чтобы чёрные линии читались */}
+          <div className="w-full aspect-[4/3] bg-white dark:bg-slate-100/10">
             <img
               src={item.image}
               alt={item.title}
@@ -584,7 +598,7 @@ function ProductCard({ item, t, lang }) {
             />
           </div>
 
-          <div className="absolute top-1 left-1 flex flex-wrap gap-1">
+          <div className="absolute top-2 left-2 flex flex-wrap gap-1">
             {item.badges?.map((b) => (
               <Badge key={b} className="px-2 py-0.5 text-[11px] font-normal leading-none">
                 {b}
@@ -594,9 +608,12 @@ function ProductCard({ item, t, lang }) {
         </div>
       </CardHeader>
 
-      <CardContent className="p-4 pt-2 flex flex-col flex-grow -mt-3">
+      {/* ✅ В dark — лёгкая “подсветка” контента карточки, но тусклая */}
+      <CardContent className="p-4 pt-3 flex flex-col flex-grow dark:bg-slate-100/5">
         <div className="space-y-1">
-          <CardTitle className="text-base leading-snug font-semibold break-words text-slate-900 dark:text-slate-100">{item.title}</CardTitle>
+          <CardTitle className="text-base leading-snug font-semibold break-words text-slate-900 dark:text-slate-100">
+            {item.title}
+          </CardTitle>
           <p className="text-sm text-slate-600 dark:text-slate-400">{item.kind}</p>
         </div>
 
@@ -675,20 +692,17 @@ export default function App() {
 
   useEffect(() => {
     applyThemeToHtml(theme);
-    try {
-      localStorage.setItem("theme", theme);
-    } catch {}
   }, [theme]);
 
-  // keep in sync if system preference changes AND user has no explicit choice
+  // Если пользователь НЕ выбирал тему вручную — следуем за системой.
   useEffect(() => {
     if (typeof window === "undefined" || !window.matchMedia) return;
-    const mq = window.matchMedia("(prefers-color-scheme: dark)");
 
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
     const handler = () => {
       try {
-        const saved = localStorage.getItem("theme");
-        if (saved === "dark" || saved === "light") return; // user explicitly set
+        const saved = localStorage.getItem("theme_user");
+        if (saved === "dark" || saved === "light") return; // пользователь явно выбрал
       } catch {}
       setTheme(mq.matches ? "dark" : "light");
     };
@@ -702,7 +716,15 @@ export default function App() {
     };
   }, []);
 
-  const toggleTheme = () => setTheme((p) => (p === "dark" ? "light" : "dark"));
+  const toggleTheme = () => {
+    setTheme((prev) => {
+      const next = prev === "dark" ? "light" : "dark";
+      try {
+        localStorage.setItem("theme_user", next);
+      } catch {}
+      return next;
+    });
+  };
 
   // ---- tabs ----
   const detectTab = () => {
@@ -999,7 +1021,6 @@ export default function App() {
         <nav className="border-t border-slate-200 dark:border-slate-800">
           <div className="w-full">
             <div className={`${CONTAINER} py-3`}>
-              {/* Mobile: равномерно по ширине; Desktop: как раньше */}
               <div className="flex w-full items-center gap-2 sm:gap-3 overflow-x-hidden sm:overflow-x-auto no-scrollbar">
                 <NavPill active={showAbout} onClick={() => setTab("about")} className="flex-1 text-center sm:flex-none">
                   {t("nav_about")}
@@ -1042,19 +1063,24 @@ export default function App() {
               <p className="leading-relaxed text-slate-700 dark:text-slate-300">{t("about_p1")}</p>
             </div>
 
-            <Card className="p-5 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
+            <Card className="p-5 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl">
               <CardTitle className="mb-2">{t("contacts")}</CardTitle>
               <div className="text-sm space-y-1 text-slate-700 dark:text-slate-300">
                 <p>E-mail: genndybogdanov@gmail.com</p>
                 <p>
-                  <a className="underline hover:text-slate-900 dark:hover:text-white break-all" href="https://substack.com/@gbogdanov" target="_blank" rel="noopener noreferrer">
+                  <a
+                    className="underline hover:text-slate-900 dark:hover:text-white break-all"
+                    href="https://substack.com/@gbogdanov"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     Substack
                   </a>
                 </p>
               </div>
             </Card>
 
-            <Card className="md:col-span-3 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
+            <Card className="md:col-span-3 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl">
               <div className="p-5">
                 <div className="flex items-start gap-5">
                   <div className="flex-none w-28 sm:w-32 md:w-36 aspect-[3/4] rounded-2xl overflow-hidden bg-white dark:bg-slate-950 shadow">
@@ -1228,33 +1254,36 @@ export default function App() {
         </section>
       </main>
 
-      {/* ✅ Footer: переключатель темы — под RU|ENG, внизу */}
+      {/* FOOTER:
+          1) возвращаем нормальную "прежнюю" высоту
+          2) кнопку темы — вправо, строго под RU|ENG
+          3) кнопку темы уменьшаем ~на 40% */}
       <footer className="mt-auto border-t border-slate-200 dark:border-slate-800">
-        <div className={`${CONTAINER} py-6`}>
-          <div className="flex flex-col items-center gap-3">
-            {/* "позиция под RU | ENG" — визуально такой же блок кнопок */}
-            <div className="flex items-center gap-2">
+        <div className={`${CONTAINER} py-5`}>
+          <div className="flex items-center justify-between gap-4">
+            <div className="text-xs text-slate-500 dark:text-slate-500">
+              © {new Date().getFullYear()} Genndy Bogdanov
+            </div>
+
+            <div className="flex justify-end">
               <button
                 type="button"
                 onClick={toggleTheme}
                 className={[
-                  "inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition",
+                  // ✅ smaller by ~40%
+                  "inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium transition",
                   "border-slate-200 bg-white text-slate-800 hover:bg-slate-50 active:scale-[0.98]",
                   "dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800/70",
                   "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
                   "dark:focus-visible:ring-blue-500/40 dark:focus-visible:ring-offset-slate-950",
                   "[-webkit-tap-highlight-color:transparent]",
                 ].join(" ")}
-                aria-label={`${t("theme")}: ${theme === "dark" ? t("theme_dark") : t("theme_light")}`}
-                title={`${t("theme")}: ${theme === "dark" ? t("theme_dark") : t("theme_light")}`}
+                aria-label={theme === "dark" ? t("theme_dark") : t("theme_light")}
+                title={theme === "dark" ? t("theme_dark") : t("theme_light")}
               >
-                {theme === "dark" ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
+                {theme === "dark" ? <Moon className="w-3.5 h-3.5" /> : <Sun className="w-3.5 h-3.5" />}
                 <span>{theme === "dark" ? t("theme_dark") : t("theme_light")}</span>
               </button>
-            </div>
-
-            <div className="text-center text-xs text-slate-500 dark:text-slate-500">
-              © {new Date().getFullYear()} Genndy Bogdanov
             </div>
           </div>
         </div>
