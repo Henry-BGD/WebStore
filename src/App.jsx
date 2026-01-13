@@ -6,14 +6,14 @@ import { Badge } from "./components/ui/Badge.jsx";
 import { ExternalLink, Download, Play, Pause, X, Search } from "lucide-react";
 
 // ================== LAYOUT ==================
-const CONTAINER = "w-full max-w-6xl mx-auto px-8";
+const CONTAINER = "w-full max-w-6xl mx-auto px-4 sm:px-8"; // чуть компактнее на мобиле
 const TOPBAR_H = "min-h-[64px]";
 
 // ================== SWIPE TABS HOOK ==================
-// Fixes:
-// - Allow swipe starting on buttons/links (previously ignored) to avoid "stuck" feeling on Audiobooks/Store.
-// - Add direction-lock, so "tap then drag without lifting" consistently switches on release.
-// - Avoid accidental cancellation from small vertical drift once horizontal intent is detected.
+// Улучшенный свайп:
+// - не "залипает" между Store <-> Audiobooks
+// - "нажал и повёл, не отпуская" → переключает при отпускании
+// - блокируем свайп только на инпутах/слайдере и элементах data-no-swipe
 function useSwipeTabs({ enabled, onPrev, onNext, thresholdPx = 60, lockPx = 10, restraintPx = 40 }) {
   const startX = useRef(0);
   const startY = useRef(0);
@@ -52,25 +52,20 @@ function useSwipeTabs({ enabled, onPrev, onNext, thresholdPx = 60, lockPx = 10, 
       const dx = t.clientX - startX.current;
       const dy = t.clientY - startY.current;
 
-      // Lock axis after a small movement (prevents "animation but no switch" issue)
       if (!axisLock.current) {
         const adx = Math.abs(dx);
         const ady = Math.abs(dy);
-        if (adx >= lockPx || ady >= lockPx) {
-          axisLock.current = adx > ady ? "x" : "y";
-        }
+        if (adx >= lockPx || ady >= lockPx) axisLock.current = adx > ady ? "x" : "y";
       }
 
-      // If the user is clearly scrolling vertically, cancel swipe tracking
       if (axisLock.current === "y") {
         tracking.current = false;
         return;
       }
 
-      // If locked to horizontal, ignore vertical drift up to restraint
-      if (axisLock.current === "x" && Math.abs(dy) > restraintPx) {
-        // still allow if it’s basically horizontal; only cancel if it becomes too vertical
-        if (Math.abs(dy) > Math.abs(dx)) tracking.current = false;
+      // если горизонталь уже "захвачена", допускаем небольшой вертикальный дрейф
+      if (axisLock.current === "x" && Math.abs(dy) > restraintPx && Math.abs(dy) > Math.abs(dx)) {
+        tracking.current = false;
       }
     },
     [enabled, lockPx, restraintPx]
@@ -87,8 +82,8 @@ function useSwipeTabs({ enabled, onPrev, onNext, thresholdPx = 60, lockPx = 10, 
       const dx = t.clientX - startX.current;
       const dy = t.clientY - startY.current;
 
-      // If user performed a vertical scroll, do not switch tabs
-      if (Math.abs(dy) > restraintPx && axisLock.current === "y") return;
+      // если это был вертикальный скролл — не переключаем
+      if (axisLock.current === "y" && Math.abs(dy) > restraintPx) return;
 
       if (dx > thresholdPx) onPrev?.();
       else if (dx < -thresholdPx) onNext?.();
@@ -112,7 +107,6 @@ const PRODUCTS = [
     badges: ["RU-EN", "Paper Book", "Audio"],
     description: "Word-by-word translation, stress marks, grammar explanations, exercises, audio included.",
     keywords: [
-      // RU
       "лев",
       "толстой",
       "лев толстой",
@@ -133,7 +127,6 @@ const PRODUCTS = [
       "билингвальный",
       "на русском",
       "русский",
-      // EN
       "leo",
       "tolstoy",
       "short stories",
@@ -142,11 +135,9 @@ const PRODUCTS = [
       "book",
       "audio",
       "bilingual",
-      "ru-en",
       "russian",
     ],
   },
-
   {
     id: "prod-ru-book-2",
     title: "Russian Short Stories by Anton Chekhov",
@@ -159,7 +150,6 @@ const PRODUCTS = [
     description: "Coming soon.",
     disabled: true,
     keywords: [
-      // RU
       "антон",
       "чехов",
       "антон чехов",
@@ -180,7 +170,6 @@ const PRODUCTS = [
       "билингвальный",
       "на русском",
       "русский",
-      // EN
       "anton",
       "chekhov",
       "short stories",
@@ -189,7 +178,6 @@ const PRODUCTS = [
       "book",
       "audio",
       "bilingual",
-      "ru-en",
       "russian",
     ],
   },
@@ -287,7 +275,7 @@ const I18N = {
 };
 
 // ================== UI HELPERS ==================
-function NavPill({ active, onClick, children, size = "md", ...props }) {
+function NavPill({ active, onClick, children, size = "md", className = "", ...props }) {
   const padding = size === "sm" ? "px-3 py-1.5 text-xs" : "px-5 py-2.5 text-sm";
 
   return (
@@ -305,6 +293,7 @@ function NavPill({ active, onClick, children, size = "md", ...props }) {
         active
           ? "bg-blue-600 text-white border-blue-600 shadow-md font-semibold"
           : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:border-slate-300",
+        className,
       ].join(" ")}
     >
       {children}
@@ -312,7 +301,7 @@ function NavPill({ active, onClick, children, size = "md", ...props }) {
   );
 }
 
-// Link that looks like a button (no <button> inside <a>)
+// A link that looks like a button (no <button> inside <a>)
 function LinkButton({ href, children, className = "", disabled = false, title, "aria-label": ariaLabel }) {
   const base =
     "inline-flex items-center justify-center gap-2 rounded-xl border px-4 py-2 text-sm font-medium " +
@@ -416,12 +405,7 @@ function AudioBookTile({ book, onOpen, comingSoonText }) {
       type="button"
       disabled={isDisabled}
     >
-      <Card
-        className={[
-          "p-4 border border-slate-200 transition",
-          isDisabled ? "opacity-70 cursor-not-allowed" : "hover:shadow",
-        ].join(" ")}
-      >
+      <Card className={["p-4 border border-slate-200 transition", isDisabled ? "opacity-70 cursor-not-allowed" : "hover:shadow"].join(" ")}>
         <div className="flex gap-4 items-center">
           <img
             src={book.cover}
@@ -448,6 +432,10 @@ function formatTime(sec) {
   return `${m}:${String(s).padStart(2, "0")}`;
 }
 
+// ================== TrackRow (компактнее) ==================
+// Запросы:
+// 2) уменьшить кнопки Play/Pause и Download ~15%
+// 2) максимально уменьшить высоту блока
 function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime, duration }) {
   const activeAndPlaying = isActive && isPlaying;
   const showScrubber = isActive;
@@ -457,13 +445,13 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
 
   return (
     <Card className={["border border-slate-200 transition", isActive ? "shadow-sm" : ""].join(" ")}>
-      <CardContent className="p-4">
-        <div className="flex items-center justify-between gap-3">
+      <CardContent className="p-3"> {/* было p-4 */}
+        <div className="flex items-center justify-between gap-2">
           <div className="min-w-0">
-            <p className="font-medium truncate">{track.title}</p>
+            <p className="font-medium truncate text-[14px] leading-snug">{track.title}</p>
 
             {showScrubber && (
-              <p className="text-xs text-slate-500 mt-1 tabular-nums">
+              <p className="text-[11px] text-slate-500 mt-1 tabular-nums">
                 {formatTime(safeTime)} / {formatTime(safeDuration)}
               </p>
             )}
@@ -474,7 +462,7 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
               type="button"
               onClick={() => onToggle(track)}
               className={[
-                "h-10 w-10 inline-flex items-center justify-center rounded-xl border",
+                "h-9 w-9 inline-flex items-center justify-center rounded-xl border", // было h-10 w-10
                 "border-slate-200 bg-white hover:bg-slate-50 active:scale-[0.98]",
                 "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
                 "[-webkit-tap-highlight-color:transparent]",
@@ -485,14 +473,14 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
               aria-pressed={activeAndPlaying}
               data-no-swipe="true"
             >
-              {activeAndPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
+              {activeAndPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />} {/* было w-5 h-5 */}
             </button>
 
             {track.src && track.src !== "#" && (
               <a href={track.src} download className="inline-flex" aria-label={`${t("download")}: ${track.title}`}>
                 <span
                   className={[
-                    "h-10 w-10 inline-flex items-center justify-center rounded-xl border",
+                    "h-9 w-9 inline-flex items-center justify-center rounded-xl border", // было h-10 w-10
                     "border-slate-200 bg-white hover:bg-slate-50 active:scale-[0.98]",
                     "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
                     "[-webkit-tap-highlight-color:transparent]",
@@ -500,7 +488,7 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
                   title={t("download")}
                   data-no-swipe="true"
                 >
-                  <Download className="w-5 h-5" />
+                  <Download className="w-4 h-4" /> {/* было w-5 h-5 */}
                 </span>
               </a>
             )}
@@ -508,7 +496,7 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
         </div>
 
         {showScrubber && (
-          <div className="mt-3">
+          <div className="mt-2"> {/* было mt-3 */}
             <input
               type="range"
               role="slider"
@@ -567,9 +555,7 @@ function ProductCard({ item, t, lang }) {
         <p className="mt-2 text-sm text-slate-700 leading-snug">{item.description}</p>
 
         <div className="mt-auto pt-3 flex items-center justify-between gap-3">
-          <span className="text-xl font-semibold tabular-nums">
-            {Number.isFinite(item.price) ? currencyUSD(item.price) : "—"}
-          </span>
+          <span className="text-xl font-semibold tabular-nums">{Number.isFinite(item.price) ? currencyUSD(item.price) : "—"}</span>
 
           {isDisabled ? (
             <span className="inline-flex">
@@ -647,12 +633,10 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [tab]);
 
-  // runtime title/description (OG всё равно в index.html)
   useEffect(() => {
     document.title = lang === "ru" ? "Геннадий Богданов — русский язык" : "Genndy Bogdanov — Learn Russian";
   }, [lang]);
 
-  // мягкий префетч один раз после первого рендера
   useEffect(() => {
     if (typeof window === "undefined") return;
     const key = "prefetch_done_v2";
@@ -667,7 +651,6 @@ export default function App() {
     else setTimeout(run, 500);
   }, []);
 
-  // прогрев по hover Audiobooks (тоже один раз)
   const hasPrefetchedRef = useRef(false);
   const prefetchAudiobooksOnce = useCallback(() => {
     if (hasPrefetchedRef.current) return;
@@ -723,15 +706,16 @@ export default function App() {
     const onPlay = () => setIsPlaying(true);
     const onPause = () => setIsPlaying(false);
 
-    // ✅ ended: сбрасываем UI и позицию
+    // ✅ ended: сбрасываем UI/позицию, чтобы ничего не "висело"
     const onEnded = () => {
       setIsPlaying(false);
       setCurrentTime(0);
-      // делаем реальный сброс позиции, чтобы scrubber не "залипал" в конце
+      setDuration((d) => (Number.isFinite(d) ? d : 0));
       try {
         audio.currentTime = 0;
       } catch {}
-      // по желанию можно снять активный трек полностью:
+      // оставляем currentTrack (подсветка активного) — но scrubber будет на 0:00
+      // если хочешь полностью снять активность, раскомментируй:
       // setCurrentTrack(null);
     };
 
@@ -780,7 +764,6 @@ export default function App() {
       if (currentTrack?.id !== track.id) {
         audio.src = track.src;
         setCurrentTrack(track);
-        // сброс времени под новый трек
         setCurrentTime(0);
         setDuration(0);
       }
@@ -873,7 +856,7 @@ export default function App() {
   }, []);
 
   const swipeHandlers = useSwipeTabs({
-    enabled: isMobile && !isPlaying, // когда играет — свайп блокируем, чтобы не бесить случайными переключениями
+    enabled: isMobile && !isPlaying,
     onPrev: goPrevTab,
     onNext: goNextTab,
     thresholdPx: 60,
@@ -881,7 +864,6 @@ export default function App() {
     restraintPx: 40,
   });
 
-  // вкладки НЕ размонтируются — скрываем через hidden
   const showAbout = tab === "about";
   const showProducts = tab === "products";
   const showAudio = tab === "free-audio";
@@ -907,7 +889,7 @@ export default function App() {
                 className="w-9 h-9 rounded-xl object-cover transition-transform duration-200 ease-out hover:scale-[1.04] hover:rotate-1"
                 loading="eager"
                 decoding="async"
-                fetchPriority="high"   // ✅ React prop name
+                fetchPriority="high"
                 sizes="36px"
               />
               <div className="min-w-0">
@@ -930,12 +912,21 @@ export default function App() {
         <nav className="border-t">
           <div className="w-full">
             <div className={`${CONTAINER} py-3`}>
-              <div className="flex items-center gap-3 overflow-x-auto no-scrollbar flex-nowrap">
-                <NavPill active={showAbout} onClick={() => setTab("about")}>
+              {/* ✅ Mobile: вкладки растягиваем на ширину (по 1/3), Desktop: как раньше */}
+              <div className="flex w-full items-center gap-2 sm:gap-3 overflow-x-hidden sm:overflow-x-auto no-scrollbar">
+                <NavPill
+                  active={showAbout}
+                  onClick={() => setTab("about")}
+                  className="flex-1 text-center sm:flex-none"
+                >
                   {t("nav_about")}
                 </NavPill>
 
-                <NavPill active={showProducts} onClick={() => setTab("products")}>
+                <NavPill
+                  active={showProducts}
+                  onClick={() => setTab("products")}
+                  className="flex-1 text-center sm:flex-none"
+                >
                   {t("nav_products")}
                 </NavPill>
 
@@ -947,6 +938,7 @@ export default function App() {
                     setTab("free-audio");
                     setAudioBookId(null);
                   }}
+                  className="flex-1 text-center sm:flex-none"
                 >
                   {t("nav_audio")}
                 </NavPill>
@@ -956,16 +948,18 @@ export default function App() {
         </nav>
       </header>
 
+      {/* ✅ Убрали space-y с main, чтобы не появлялись “пустые зоны” из-за hidden-class.
+          И используем HTML-атрибут hidden для секций (Tailwind space-y его понимает). */}
       <main
         id="content"
-        className={`flex-1 ${CONTAINER} py-8 space-y-10`}
+        className={`flex-1 ${CONTAINER} py-4 sm:py-8`}
         onTouchStart={swipeHandlers.onTouchStart}
         onTouchMove={swipeHandlers.onTouchMove}
         onTouchEnd={swipeHandlers.onTouchEnd}
       >
-        {/* ABOUT (always mounted) */}
-        <section className={showAbout ? "" : "hidden"} aria-hidden={!showAbout}>
-          <div className="grid md:grid-cols-3 gap-8 items-start">
+        {/* ABOUT */}
+        <section hidden={!showAbout} aria-hidden={!showAbout}>
+          <div className="grid md:grid-cols-3 gap-6 sm:gap-8 items-start">
             <div className="md:col-span-2 space-y-4">
               <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight break-words">{t("about_title")}</h1>
               <p className="leading-relaxed text-slate-700">{t("about_p1")}</p>
@@ -976,12 +970,7 @@ export default function App() {
               <div className="text-sm space-y-1">
                 <p>E-mail: genndybogdanov@gmail.com</p>
                 <p>
-                  <a
-                    className="underline hover:text-slate-900 break-all"
-                    href="https://substack.com/@gbogdanov"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  <a className="underline hover:text-slate-900 break-all" href="https://substack.com/@gbogdanov" target="_blank" rel="noopener noreferrer">
                     Substack
                   </a>
                 </p>
@@ -998,7 +987,7 @@ export default function App() {
                       className="w-full h-full object-contain"
                       loading="eager"
                       decoding="async"
-                      fetchPriority="high"  // ✅ React prop name
+                      fetchPriority="high"
                       sizes="(max-width: 640px) 112px, (max-width: 768px) 128px, 144px"
                     />
                   </div>
@@ -1007,13 +996,8 @@ export default function App() {
                     <h3 className="text-lg sm:text-xl font-semibold leading-snug">{t("learn_with_me")}</h3>
 
                     <div className="mt-3 flex flex-col gap-2 w-full max-w-[260px]">
-                      <ExternalLinkChip href="https://preply.com/en/?pref=ODkzOTkyOQ==&id=1759522486.457389&ep=w1">
-                        Preply
-                      </ExternalLinkChip>
-
-                      <ExternalLinkChip href="https://www.italki.com/affshare?ref=af11775706">
-                        italki
-                      </ExternalLinkChip>
+                      <ExternalLinkChip href="https://preply.com/en/?pref=ODkzOTkyOQ==&id=1759522486.457389&ep=w1">Preply</ExternalLinkChip>
+                      <ExternalLinkChip href="https://www.italki.com/affshare?ref=af11775706">italki</ExternalLinkChip>
                     </div>
                   </div>
                 </div>
@@ -1022,10 +1006,10 @@ export default function App() {
           </div>
         </section>
 
-        {/* PRODUCTS (always mounted) */}
-        <section className={showProducts ? "" : "hidden"} aria-hidden={!showProducts}>
-          <div className="space-y-6">
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* PRODUCTS */}
+        <section hidden={!showProducts} aria-hidden={!showProducts}>
+          <div className="space-y-4 sm:space-y-6">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               <div className="relative">
                 <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 <Input
@@ -1062,9 +1046,9 @@ export default function App() {
           </div>
         </section>
 
-        {/* AUDIOBOOKS (always mounted) */}
-        <section className={showAudio ? "" : "hidden"} aria-hidden={!showAudio}>
-          <div className="space-y-6">
+        {/* AUDIOBOOKS */}
+        <section hidden={!showAudio} aria-hidden={!showAudio}>
+          <div className="space-y-4 sm:space-y-6">
             {!audioBookId && (
               <>
                 <p className="text-slate-700">{t("audio_choose")}</p>
@@ -1074,12 +1058,7 @@ export default function App() {
                 ) : (
                   <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {AUDIO_BOOKS.map((book) => (
-                      <AudioBookTile
-                        key={book.id}
-                        book={book}
-                        onOpen={setAudioBookId}
-                        comingSoonText={t("coming_soon")}
-                      />
+                      <AudioBookTile key={book.id} book={book} onOpen={setAudioBookId} comingSoonText={t("coming_soon")} />
                     ))}
                   </div>
                 )}
@@ -1088,7 +1067,7 @@ export default function App() {
 
             {audioBookId && selectedBook && (
               <>
-                <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                <div className="mb-4 sm:mb-6 flex flex-col gap-3 sm:gap-4 md:flex-row md:items-start md:justify-between">
                   <div className="order-2 md:order-1 w-full">
                     <div className="flex items-center gap-4 md:block">
                       <img
@@ -1101,21 +1080,17 @@ export default function App() {
                       />
 
                       <div className="min-w-0">
-                        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold leading-tight break-words">
-                          {selectedBook.title}
-                        </h1>
+                        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold leading-tight break-words">{selectedBook.title}</h1>
 
                         <p className="text-slate-600 break-words">
                           {selectedBook.author}
-                          {selectedBook.comingSoon ? (
-                            <span className="font-semibold text-slate-700"> {" "}({t("coming_soon")})</span>
-                          ) : null}
+                          {selectedBook.comingSoon ? <span className="font-semibold text-slate-700"> {" "}({t("coming_soon")})</span> : null}
                         </p>
                       </div>
                     </div>
                   </div>
 
-                  <div className="order-1 md:order-2 flex gap-3 md:gap-3 w-full md:w-auto">
+                  <div className="order-1 md:order-2 flex gap-3 w-full md:w-auto">
                     <Button
                       variant="outline"
                       onClick={() => setAudioBookId(null)}
@@ -1140,7 +1115,7 @@ export default function App() {
                   </div>
                 </div>
 
-                <div className="grid md:grid-cols-3 gap-6 items-start">
+                <div className="grid md:grid-cols-3 gap-5 sm:gap-6 items-start">
                   <img
                     src={selectedBook.cover}
                     alt={selectedBook.title}
@@ -1150,7 +1125,7 @@ export default function App() {
                     sizes="(max-width: 1024px) 40vw, 360px"
                   />
 
-                  <div className="md:col-span-2 space-y-3">
+                  <div className="md:col-span-2 space-y-2 sm:space-y-3">
                     {selectedBook.tracks?.length ? (
                       selectedBook.tracks.map((tr) => (
                         <TrackRow
