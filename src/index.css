@@ -2,14 +2,55 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ================================
+   ROOT / COLOR SCHEME
+================================ */
 :root {
   color-scheme: light;
 }
 
+/* ================================
+   BASE BODY STYLES
+================================ */
 body {
   @apply bg-gradient-to-b from-white to-slate-50 text-slate-900;
 }
 
-/* hide scrollbar but keep scroll */
-.no-scrollbar::-webkit-scrollbar { display: none; }
-.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+/* ================================
+   HIDE ALL SCROLLBARS (X + Y)
+   BUT KEEP SCROLLING WORKING
+================================ */
+
+/* Firefox */
+* {
+  scrollbar-width: none;
+}
+
+/* Chrome / Edge / Safari */
+*::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+/* ================================
+   PREVENT HORIZONTAL SCROLL
+   (very important for mobile swipe UIs)
+================================ */
+html,
+body {
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ================================
+   OPTIONAL UTILITY (if you want control)
+================================ */
+@layer utilities {
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
