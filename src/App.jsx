@@ -3,14 +3,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/Card.j
 import { Button } from "./components/ui/Button.jsx";
 import { Input } from "./components/ui/Input.jsx";
 import { Badge } from "./components/ui/Badge.jsx";
-import { ExternalLink, Download, Play, Pause, X, Search, Sun, Moon, ChevronLeft, ChevronRight } from "lucide-react";
+import { ExternalLink, Download, Play, Pause, X, Search, Sun, Moon } from "lucide-react";
 
 // ================== LAYOUT ==================
 const CONTAINER = "w-full max-w-6xl mx-auto px-4 sm:px-8";
 const TOPBAR_H = "min-h-[64px]";
 
 // ================== SWIPE TABS HOOK ==================
-function useSwipeTabs({ enabled, onPrev, onNext, thresholdPx = 60, lockPx = 10, restraintPx = 40, onProgress }) {
+function useSwipeTabs({ enabled, onPrev, onNext, thresholdPx = 60, lockPx = 10, restraintPx = 40 }) {
   const startX = useRef(0);
   const startY = useRef(0);
   const tracking = useRef(false);
@@ -35,9 +35,8 @@ function useSwipeTabs({ enabled, onPrev, onNext, thresholdPx = 60, lockPx = 10, 
       startY.current = t.clientY;
       tracking.current = true;
       axisLock.current = null;
-      onProgress?.({ active: true, dx: 0, dy: 0 });
     },
-    [enabled, onProgress]
+    [enabled]
   );
 
   const onTouchMove = useCallback(
@@ -57,19 +56,14 @@ function useSwipeTabs({ enabled, onPrev, onNext, thresholdPx = 60, lockPx = 10, 
 
       if (axisLock.current === "y") {
         tracking.current = false;
-        onProgress?.({ active: false, dx: 0, dy: 0 });
         return;
       }
 
       if (axisLock.current === "x" && Math.abs(dy) > restraintPx && Math.abs(dy) > Math.abs(dx)) {
         tracking.current = false;
-        onProgress?.({ active: false, dx: 0, dy: 0 });
-        return;
       }
-
-      if (axisLock.current === "x") onProgress?.({ active: true, dx, dy });
     },
-    [enabled, lockPx, restraintPx, onProgress]
+    [enabled, lockPx, restraintPx]
   );
 
   const onTouchEnd = useCallback(
@@ -83,14 +77,12 @@ function useSwipeTabs({ enabled, onPrev, onNext, thresholdPx = 60, lockPx = 10, 
       const dx = t.clientX - startX.current;
       const dy = t.clientY - startY.current;
 
-      onProgress?.({ active: false, dx: 0, dy: 0 });
-
       if (axisLock.current === "y" && Math.abs(dy) > restraintPx) return;
 
       if (dx > thresholdPx) onPrev?.();
       else if (dx < -thresholdPx) onNext?.();
     },
-    [enabled, onPrev, onNext, thresholdPx, restraintPx, onProgress]
+    [enabled, onPrev, onNext, thresholdPx, restraintPx]
   );
 
   return { onTouchStart, onTouchMove, onTouchEnd };
@@ -235,7 +227,7 @@ const I18N = {
     buy_etsy: "Buy on Etsy",
     buy_generic: "Buy",
 
-    audio_choose: "Choose an audiobook to listen to or download",
+    audio_choose: "Choose a book to listen to or download",
     audio_empty: "No audiobooks available yet.",
     back: "Back",
     download_all: "Download all",
@@ -268,7 +260,7 @@ const I18N = {
     buy_etsy: "Купить на Etsy",
     buy_generic: "Купить",
 
-    audio_choose: "Выберите аудиокнигу для прослушивания или загрузки",
+    audio_choose: "Выберите книгу, чтобы послушать или загрузить материалы",
     audio_empty: "Пока нет доступных аудиокниг.",
     back: "Назад",
     download_all: "Скачать всё",
@@ -335,6 +327,7 @@ function NavPill({ active, onClick, children, size = "md", className = "", ...pr
   );
 }
 
+// Link that looks like a button (no <button> inside <a>)
 function LinkButton({ href, children, className = "", disabled = false, title, "aria-label": ariaLabel }) {
   const base =
     "inline-flex items-center justify-center gap-2 rounded-xl border px-4 py-2 text-sm font-medium " +
@@ -459,7 +452,14 @@ function AudioBookTile({ book, onOpen, comingSoonText }) {
   );
 }
 
-// ================== SUPER COMPACT TRACK ROW ==================
+function formatTime(sec) {
+  if (!Number.isFinite(sec) || sec < 0) return "0:00";
+  const m = Math.floor(sec / 60);
+  const s = Math.floor(sec % 60);
+  return `${m}:${String(s).padStart(2, "0")}`;
+}
+
+// ✅ (1) compact TrackRow + bigger title text WITHOUT changing block size
 function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime, duration }) {
   const activeAndPlaying = isActive && isPlaying;
   const showScrubber = isActive;
@@ -468,21 +468,80 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
   const safeTime = Number.isFinite(currentTime) && currentTime >= 0 ? currentTime : 0;
 
   return (
-    <div
+    <Card
       className={[
-        "flex items-center justify-between gap-3",
-        "px-3 py-1.5", // 🔥 super compact
-        "rounded-xl border transition",
-        "border-slate-200 bg-white",
-        "dark:border-slate-800 dark:bg-slate-900/60",
-        isActive ? "ring-1 ring-blue-500/40" : "hover:bg-slate-50 dark:hover:bg-slate-900/80",
+        "border transition rounded-2xl",
+        "bg-white border-slate-200",
+        "dark:bg-slate-950 dark:border-slate-800",
+        isActive ? "shadow-sm dark:shadow-none" : "",
       ].join(" ")}
     >
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-medium text-slate-900 dark:text-slate-100">{track.title}</p>
+      <CardContent className="p-2">
+        <div className="flex items-center justify-between gap-1.5">
+          <div className="min-w-0">
+            {/* ✅ requested title styling */}
+            <p
+              className="
+                font-medium truncate
+                text-[15px] sm:text-[15.5px]
+                leading-[1.1]
+                text-slate-900 dark:text-slate-100
+              "
+            >
+              {track.title}
+            </p>
+
+            {showScrubber && (
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 tabular-nums">
+                {formatTime(safeTime)} / {formatTime(safeDuration)}
+              </p>
+            )}
+          </div>
+
+          <div className="flex items-center gap-2 flex-none">
+            <button
+              type="button"
+              onClick={() => onToggle(track)}
+              className={[
+                "h-9 w-9 inline-flex items-center justify-center rounded-xl border transition",
+                "border-slate-200 bg-white hover:bg-slate-50 active:scale-[0.98]",
+                "dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800/70",
+                "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
+                "dark:focus-visible:ring-blue-500/40 dark:focus-visible:ring-offset-slate-950",
+                "[-webkit-tap-highlight-color:transparent]",
+                isActive ? "shadow-sm dark:shadow-none" : "",
+              ].join(" ")}
+              aria-label={activeAndPlaying ? t("pause") : t("listen")}
+              title={activeAndPlaying ? t("pause") : t("listen")}
+              aria-pressed={activeAndPlaying}
+              data-no-swipe="true"
+            >
+              {activeAndPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+            </button>
+
+            {track.src && track.src !== "#" && (
+              <a href={track.src} download className="inline-flex" aria-label={`${t("download")}: ${track.title}`}>
+                <span
+                  className={[
+                    "h-9 w-9 inline-flex items-center justify-center rounded-xl border transition",
+                    "border-slate-200 bg-white hover:bg-slate-50 active:scale-[0.98]",
+                    "dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800/70",
+                    "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
+                    "dark:focus-visible:ring-blue-500/40 dark:focus-visible:ring-offset-slate-950",
+                    "[-webkit-tap-highlight-color:transparent]",
+                  ].join(" ")}
+                  title={t("download")}
+                  data-no-swipe="true"
+                >
+                  <Download className="w-4 h-4" />
+                </span>
+              </a>
+            )}
+          </div>
+        </div>
 
         {showScrubber && (
-          <div className="mt-1">
+          <div className="mt-1.5">
             <input
               type="range"
               role="slider"
@@ -498,47 +557,8 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
             />
           </div>
         )}
-      </div>
-
-      <div className="flex items-center gap-2 flex-none">
-        <button
-          type="button"
-          onClick={() => onToggle(track)}
-          className={[
-            "h-9 w-9 inline-flex items-center justify-center rounded-xl border transition",
-            "border-slate-200 bg-white hover:bg-slate-50 active:scale-[0.98]",
-            "dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800/70",
-            "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
-            "dark:focus-visible:ring-blue-500/40 dark:focus-visible:ring-offset-slate-950",
-            "[-webkit-tap-highlight-color:transparent]",
-          ].join(" ")}
-          aria-label={activeAndPlaying ? t("pause") : t("listen")}
-          title={activeAndPlaying ? t("pause") : t("listen")}
-          aria-pressed={activeAndPlaying}
-          data-no-swipe="true"
-        >
-          {activeAndPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-        </button>
-
-        {track.src && track.src !== "#" && (
-          <a href={track.src} download className="inline-flex" aria-label={`${t("download")}: ${track.title}`} data-no-swipe="true">
-            <span
-              className={[
-                "h-9 w-9 inline-flex items-center justify-center rounded-xl border transition",
-                "border-slate-200 bg-white hover:bg-slate-50 active:scale-[0.98]",
-                "dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800/70",
-                "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
-                "dark:focus-visible:ring-blue-500/40 dark:focus-visible:ring-offset-slate-950",
-                "[-webkit-tap-highlight-color:transparent]",
-              ].join(" ")}
-              title={t("download")}
-            >
-              <Download className="w-4 h-4" />
-            </span>
-          </a>
-        )}
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -559,8 +579,7 @@ function ProductCard({ item, t, lang }) {
       <CardHeader className="p-0">
         <div className="relative p-3">
           <div className="rounded-2xl overflow-hidden">
-            {/* ✅ (3) brighter underlay in dark (still slightly muted) */}
-            <div className="w-full aspect-[4/3] bg-white dark:bg-slate-200/55">
+            <div className="w-full aspect-[4/3] bg-white dark:bg-slate-200/20">
               <img
                 src={item.image}
                 alt={item.title}
@@ -572,14 +591,12 @@ function ProductCard({ item, t, lang }) {
             </div>
           </div>
 
-          {/* ✅ (4) badges smaller + pushed максимально влево */}
-          <div className="absolute top-4 left-4 flex flex-wrap gap-1">
+          <div className="absolute top-5 left-5 flex flex-wrap gap-1.5">
             {item.badges?.map((b) => (
               <Badge
                 key={b}
                 className={[
-                  "px-1.5 py-0.5",          // smaller pill
-                  "text-[10px] leading-none", // ✅ one step smaller
+                  "px-2 py-0.5 text-[11px] font-normal leading-none",
                   "bg-slate-100 text-slate-700 border border-slate-200",
                   "dark:bg-slate-100 dark:text-slate-700 dark:border-slate-200",
                 ].join(" ")}
@@ -641,6 +658,57 @@ function preloadImages(urls = []) {
     img.decoding = "async";
     img.src = url;
   });
+}
+
+// ================== EASTER EGG MESSAGES ==================
+const EASTER = {
+  FIRST: "Привет! 👋",
+
+  // thresholds
+  AFTER_5: "Не нажимай больше! 😑",
+  AFTER_10: "Тебе что, нечего делать? 🗿",
+  AFTER_12: "Зачем я всегда ставлю точки над «ё»? 😵‍💫",
+  AFTER_15: "Сколько можно жать! 🤬",
+
+  SOBACHYE: 'Прочитай "Собачье сердце" Булгакова.',
+  SOBACHYE_FOLLOW: "Это крутая книга! 🙂",
+
+  TOLSTOY: "Кстати, почитай Толстого.",
+  TOLSTOY_FOLLOW: "Ни на что не намекаю, но ты можешь купить здесь книгу. 😏",
+
+  HOW_LONG: "Знаешь как долго делать такой сайт?",
+  HOW_LONG_FOLLOW: "Несмотря на это, он всё равно лагает. 😅",
+
+  ARBAT: "Ну что, зайдём в книжный на Арбате? 📚",
+  WALK: "Я буду идти вдоль поребрика, пока не пройду 50к шагов. 🚶‍♂️‍➡️",
+
+  YOU_LEARN: "Ты учишь русский язык? Круто. 😎",
+  NEVER_GIVE_UP: "Никогда не сдавайся! 💪",
+  YOU_ARE_GREAT: "Ты молодец! 👍",
+  IM_DONE: "Всё! Я больше не отвечаю. 🤐",
+  HARD_TO_PRESS: "Трудно жать кнопку? Я бы уже устал... 😵",
+
+  DOSTO: "Почему у Достоевского всегда всё так мрачно? 🌚",
+  READ_BOOKS: "Не теряй время - читай книги! 📖",
+  CHEKHOV: "У Чехова лучшие рассказы в мире! 😄",
+  DEAD_SOULS: "Где второй том «Мертвых душ»? 🤔",
+  GORKY: "Где Нобелевская премия Горького? 🥇",
+  LERMONTOV: '"... И ты, им преданный народ..." Лермонтов',
+  PISTOL: "Дайте Пушкину другой пистолет! 🔫",
+  PHONE: "Лучше читать, чем залипать в телефоне. 📱",
+  ENGLAND: "О, вы из Англии? 🎩",
+  AMAZING: "Этот web сайт просто amazing! 💫",
+  KAZBEK: "Главное на потерять коробку сижек «Казбек». 🚬",
+  OIL: "Кто-то уже разлил масло, главное чтобы оно не вспыхнуло... 🔥",
+
+  AI_SITE: "Я бы не сделал этот сайт без ИИ. 🤖",
+  AI_WORLD: "ИИ может уничтожить мир. Берегись! 💀",
+};
+
+function pickRandom(arr) {
+  if (!arr.length) return null;
+  const i = Math.floor(Math.random() * arr.length);
+  return arr[i];
 }
 
 // ================== APP ==================
@@ -807,8 +875,6 @@ export default function App() {
       try {
         audio.currentTime = 0;
       } catch {}
-      // если хочешь — сброс активного трека:
-      // setCurrentTrack(null);
     };
 
     const onTime = () => setCurrentTime(audio.currentTime || 0);
@@ -904,7 +970,7 @@ export default function App() {
     }
   }, [audioBookId, stopAudio]);
 
-  // ---- mobile detection (for swipe) ----
+  // ---- mobile detection (for swipe + easter placement) ----
   const [isMobile, setIsMobile] = useState(() => {
     if (typeof window === "undefined") return false;
     return window.matchMedia("(max-width: 768px)").matches;
@@ -947,9 +1013,6 @@ export default function App() {
     });
   }, []);
 
-  // ================== SWIPE ANIMATIONS (modern) ==================
-  const [swipeAnim, setSwipeAnim] = useState({ active: false, dx: 0 });
-
   const swipeHandlers = useSwipeTabs({
     enabled: isMobile && !isPlaying,
     onPrev: goPrevTab,
@@ -957,31 +1020,211 @@ export default function App() {
     thresholdPx: 60,
     lockPx: 10,
     restraintPx: 40,
-    onProgress: ({ active, dx }) => setSwipeAnim({ active, dx }),
   });
 
   const showAbout = tab === "about";
   const showProducts = tab === "products";
   const showAudio = tab === "free-audio";
 
-  // transform for swipe preview (content follows finger a bit)
-  const clampedDx = Math.max(-120, Math.min(120, swipeAnim.dx || 0));
-  const swipeTranslate = swipeAnim.active ? clampedDx * 0.25 : 0; // gentle
-  const swipeRotate = swipeAnim.active ? clampedDx * 0.01 : 0; // tiny
-  const swipeOpacity = swipeAnim.active ? 0.98 : 1;
+  // ================== EASTER EGG STATE ==================
+  const [eggText, setEggText] = useState("");
+  const [eggVisible, setEggVisible] = useState(false);
 
-  // edge hints (chevrons)
-  const hintLeft = swipeAnim.active && clampedDx > 18;
-  const hintRight = swipeAnim.active && clampedDx < -18;
+  // what has been shown (each message once)
+  const shownSetRef = useRef(new Set());
+  const shownCountRef = useRef(0);
+
+  // sequence forcing: after some messages must come a specific next message
+  const forcedNextRef = useRef(null);
+
+  // constraints "after X other messages"
+  const lastNeverGiveUpIndexRef = useRef(null); // index when NEVER_GIVE_UP was shown
+  const lastYouAreGreatIndexRef = useRef(null); // index when YOU_ARE_GREAT was shown
+
+  const hideEgg = useCallback(() => {
+    setEggVisible(false);
+  }, []);
+
+  // auto-hide timer
+  const eggTimerRef = useRef(null);
+  useEffect(() => {
+    if (!eggVisible) return;
+    if (eggTimerRef.current) clearTimeout(eggTimerRef.current);
+
+    eggTimerRef.current = setTimeout(() => {
+      setEggVisible(false);
+    }, 8000);
+
+    return () => {
+      if (eggTimerRef.current) clearTimeout(eggTimerRef.current);
+    };
+  }, [eggVisible, eggText]);
+
+  // hide on tab change (buttons or swipe)
+  useEffect(() => {
+    if (eggVisible) setEggVisible(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tab]);
+
+  const showEggMessage = useCallback(
+    (text) => {
+      // animate replace if already visible
+      if (eggVisible) {
+        setEggVisible(false);
+        setTimeout(() => {
+          setEggText(text);
+          setEggVisible(true);
+        }, 120);
+      } else {
+        setEggText(text);
+        setEggVisible(true);
+      }
+    },
+    [eggVisible]
+  );
+
+  const pickNextEasterMessage = useCallback(() => {
+    const shown = shownSetRef.current;
+    const count = shownCountRef.current;
+
+    // forced next always wins, but still "once"
+    if (forcedNextRef.current) {
+      const forced = forcedNextRef.current;
+      forcedNextRef.current = null;
+
+      if (!shown.has(forced)) return forced;
+      // if somehow already shown, fall through to normal picking
+    }
+
+    // very first message is fixed
+    if (count === 0 && !shown.has(EASTER.FIRST)) return EASTER.FIRST;
+
+    // build pool of eligible messages
+    const pool = [];
+
+    const addIfEligible = (msg, cond = true) => {
+      if (!cond) return;
+      if (!msg) return;
+      if (shown.has(msg)) return;
+      pool.push(msg);
+    };
+
+    // thresholds
+    addIfEligible(EASTER.AFTER_5, count >= 5);
+    addIfEligible(EASTER.AFTER_10, count >= 10);
+    addIfEligible(EASTER.AFTER_12, count >= 12);
+    addIfEligible(EASTER.AFTER_15, count >= 15);
+
+    // sequenced starters
+    addIfEligible(EASTER.SOBACHYE);
+    addIfEligible(EASTER.TOLSTOY);
+    addIfEligible(EASTER.HOW_LONG);
+
+    // other messages + conditions
+    addIfEligible(EASTER.DOSTO);
+    addIfEligible(EASTER.READ_BOOKS);
+    addIfEligible(EASTER.CHEKHOV);
+    addIfEligible(EASTER.DEAD_SOULS);
+    addIfEligible(EASTER.GORKY);
+    addIfEligible(EASTER.LERMONTOV, count >= 10);
+    addIfEligible(EASTER.PISTOL, count >= 8);
+    addIfEligible(EASTER.PHONE, count >= 5);
+    addIfEligible(EASTER.ENGLAND, count >= 5);
+    addIfEligible(EASTER.AMAZING, count >= 8);
+    addIfEligible(EASTER.KAZBEK, count >= 10);
+    addIfEligible(EASTER.OIL, count >= 14);
+
+    addIfEligible(EASTER.ARBAT, count >= 12);
+    addIfEligible(EASTER.WALK, count >= 14);
+
+    addIfEligible(EASTER.YOU_LEARN);
+    addIfEligible(EASTER.NEVER_GIVE_UP);
+
+    // "Ты молодец!" — only if NEVER_GIVE_UP was shown and at least 3 other messages passed
+    const neverIdx = lastNeverGiveUpIndexRef.current;
+    addIfEligible(EASTER.YOU_ARE_GREAT, neverIdx != null && count - neverIdx >= 4);
+
+    // "Всё! Я больше не отвечаю." — only if YOU_ARE_GREAT was shown and at least 3 other messages passed
+    const greatIdx = lastYouAreGreatIndexRef.current;
+    addIfEligible(EASTER.IM_DONE, greatIdx != null && count - greatIdx >= 4);
+
+    addIfEligible(EASTER.HARD_TO_PRESS, count >= 15);
+
+    addIfEligible(EASTER.AI_SITE, count >= 10);
+    addIfEligible(EASTER.AI_WORLD, count >= 14);
+
+    // If pool empty -> nothing new (we'll just re-show nothing; but spec: each once, so just do a tiny fallback)
+    const picked = pickRandom(pool);
+    return picked || null;
+  }, []);
+
+  const handleLogoClick = useCallback(() => {
+    const next = pickNextEasterMessage();
+    if (!next) return;
+
+    // mark shown + bump count
+    shownSetRef.current.add(next);
+
+    // update indices for "after 3 other" rules
+    const nextIndex = shownCountRef.current;
+    if (next === EASTER.NEVER_GIVE_UP) lastNeverGiveUpIndexRef.current = nextIndex;
+    if (next === EASTER.YOU_ARE_GREAT) lastYouAreGreatIndexRef.current = nextIndex;
+
+    // set forced follow-ups
+    if (next === EASTER.SOBACHYE) forcedNextRef.current = EASTER.SOBACHYE_FOLLOW;
+    if (next === EASTER.TOLSTOY) forcedNextRef.current = EASTER.TOLSTOY_FOLLOW;
+    if (next === EASTER.HOW_LONG) forcedNextRef.current = EASTER.HOW_LONG_FOLLOW;
+
+    shownCountRef.current = nextIndex + 1;
+
+    showEggMessage(next);
+  }, [pickNextEasterMessage, showEggMessage]);
+
+  // ================== EASTER TOAST UI ==================
+  const Toast = ({ variant }) => {
+    const isDesktop = variant === "desktop";
+
+    const base =
+      "pointer-events-auto select-none " +
+      "rounded-2xl border shadow-lg " +
+      "bg-white/95 text-slate-900 border-slate-200 " +
+      "dark:bg-slate-900/95 dark:text-slate-100 dark:border-slate-700 " +
+      "backdrop-blur " +
+      "transition-all duration-200 ease-out";
+
+    const anim = eggVisible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 -translate-y-2 scale-[0.98]";
+
+    const desktopCls =
+      "hidden md:inline-flex items-center " +
+      "whitespace-nowrap " +
+      "px-4 py-2 text-sm font-semibold " +
+      "max-w-[520px]";
+
+    const mobileCls =
+      "md:hidden " +
+      "px-4 py-3 text-sm font-semibold " +
+      "whitespace-normal leading-snug";
+
+    return (
+      <div
+        role="status"
+        aria-live="polite"
+        onClick={hideEgg}
+        className={[
+          base,
+          anim,
+          isDesktop ? desktopCls : mobileCls,
+          // ensure it disappears from a11y/interaction when hidden
+          eggVisible ? "" : "pointer-events-none",
+        ].join(" ")}
+      >
+        <span className={isDesktop ? "truncate" : ""}>{eggText}</span>
+      </div>
+    );
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100">
-      <style>{`
-        @media (prefers-reduced-motion: reduce) {
-          .swipe-anim { transition: none !important; }
-        }
-      `}</style>
-
       <a
         href="#content"
         className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[9999] bg-white dark:bg-slate-950 border dark:border-slate-800 rounded-lg px-3 py-2 shadow"
@@ -995,19 +1238,33 @@ export default function App() {
         <div className="w-full">
           <div className={`${CONTAINER} py-3 flex items-center justify-between gap-4 ${TOPBAR_H}`}>
             <div className="flex items-center gap-3 min-w-0">
-              <img
-                src="/logo.webp"
-                alt="Genndy Bogdanov"
-                className="w-9 h-9 rounded-xl object-cover transition-transform duration-200 ease-out hover:scale-[1.04] hover:rotate-1"
-                loading="eager"
-                decoding="async"
-                fetchPriority="high"
-                sizes="36px"
-              />
+              <button
+                type="button"
+                onClick={handleLogoClick}
+                className="inline-flex rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-blue-500/40 dark:focus-visible:ring-offset-slate-950"
+                aria-label="Logo easter egg"
+                title="🙂"
+              >
+                <img
+                  src="/logo.webp"
+                  alt="Genndy Bogdanov"
+                  className="w-9 h-9 rounded-xl object-cover transition-transform duration-200 ease-out hover:scale-[1.04] hover:rotate-1"
+                  loading="eager"
+                  decoding="async"
+                  fetchPriority="high"
+                  sizes="36px"
+                />
+              </button>
+
               <div className="min-w-0">
                 <p className="font-semibold leading-tight truncate">{t("name")}</p>
                 <p className="text-xs opacity-70 truncate">{t("tagline")}</p>
               </div>
+            </div>
+
+            {/* Desktop toast: BETWEEN name and language buttons */}
+            <div className="flex-1 hidden md:flex justify-center min-w-0">
+              {eggText ? <Toast variant="desktop" /> : null}
             </div>
 
             <div className="flex items-center gap-2 shrink-0">
@@ -1051,241 +1308,214 @@ export default function App() {
         </nav>
       </header>
 
+      {/* Mobile toast: overlays around “Contacts” area vibe */}
+      {eggText ? (
+        <div className="fixed md:hidden left-4 right-4 top-28 z-[60] pointer-events-none">
+          <div className="pointer-events-auto">
+            <Toast variant="mobile" />
+          </div>
+        </div>
+      ) : null}
+
       <main
         id="content"
-        className={`flex-1 ${CONTAINER} py-4 sm:py-8 relative`}
+        className={`flex-1 ${CONTAINER} py-4 sm:py-8`}
         onTouchStart={swipeHandlers.onTouchStart}
         onTouchMove={swipeHandlers.onTouchMove}
         onTouchEnd={swipeHandlers.onTouchEnd}
       >
-        {/* swipe edge hints */}
-        <div className="pointer-events-none absolute inset-y-0 left-0 w-10 flex items-center justify-start">
-          <div
-            className={[
-              "swipe-anim flex items-center gap-1 text-slate-400 dark:text-slate-500",
-              hintLeft ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-2",
-            ].join(" ")}
-            style={{ transition: "opacity 180ms ease, transform 180ms ease" }}
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </div>
-        </div>
-
-        <div className="pointer-events-none absolute inset-y-0 right-0 w-10 flex items-center justify-end">
-          <div
-            className={[
-              "swipe-anim flex items-center gap-1 text-slate-400 dark:text-slate-500",
-              hintRight ? "opacity-100 translate-x-0" : "opacity-0 translate-x-2",
-            ].join(" ")}
-            style={{ transition: "opacity 180ms ease, transform 180ms ease" }}
-          >
-            <ChevronRight className="w-5 h-5" />
-          </div>
-        </div>
-
-        {/* content with swipe-follow animation */}
-        <div
-          className="swipe-anim"
-          style={{
-            transform: `translateX(${swipeTranslate}px) rotate(${swipeRotate}deg)`,
-            opacity: swipeOpacity,
-            transition: swipeAnim.active ? "none" : "transform 240ms cubic-bezier(.2,.8,.2,1), opacity 240ms ease",
-            willChange: swipeAnim.active ? "transform" : "auto",
-          }}
-        >
-          {/* ABOUT */}
-          <section hidden={!showAbout} aria-hidden={!showAbout}>
-            <div className="grid md:grid-cols-3 gap-6 sm:gap-8 items-start">
-              <div className="md:col-span-2 space-y-4">
-                <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight break-words">{t("about_title")}</h1>
-                <p className="leading-relaxed text-slate-700 dark:text-slate-300">{t("about_p1")}</p>
-              </div>
-
-              <Card className="p-5 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl">
-                <CardTitle className="mb-2">{t("contacts")}</CardTitle>
-                <div className="text-sm space-y-1 text-slate-700 dark:text-slate-300">
-                  <p>E-mail: genndybogdanov@gmail.com</p>
-                  <p>
-                    <a className="underline hover:text-slate-900 dark:hover:text-white break-all" href="https://substack.com/@gbogdanov" target="_blank" rel="noopener noreferrer">
-                      Substack
-                    </a>
-                  </p>
-                </div>
-              </Card>
-
-              <Card className="md:col-span-3 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl">
-                <div className="p-5">
-                  <div className="flex items-start gap-5">
-                    <div className="flex-none w-28 sm:w-32 md:w-36 aspect-[3/4] rounded-2xl overflow-hidden bg-white dark:bg-slate-950 shadow">
-                      <img
-                        src="/Portrait_1.webp"
-                        alt="Portrait"
-                        className="w-full h-full object-contain"
-                        loading="eager"
-                        decoding="async"
-                        fetchPriority="high"
-                        sizes="(max-width: 640px) 112px, (max-width: 768px) 128px, 144px"
-                      />
-                    </div>
-
-                    <div className="min-w-0 flex-1 md:flex md:flex-col md:items-center md:text-center">
-                      <h3 className="text-lg sm:text-xl font-semibold leading-snug">{t("learn_with_me")}</h3>
-
-                      <div className="mt-3 flex flex-col gap-2 w-full max-w-[260px]">
-                        <ExternalLinkChip href="https://preply.com/en/?pref=ODkzOTkyOQ==&id=1759522486.457389&ep=w1">Preply</ExternalLinkChip>
-                        <ExternalLinkChip href="https://www.italki.com/affshare?ref=af11775706">italki</ExternalLinkChip>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </Card>
+        {/* ABOUT */}
+        <section hidden={!showAbout} aria-hidden={!showAbout}>
+          <div className="grid md:grid-cols-3 gap-6 sm:gap-8 items-start">
+            <div className="md:col-span-2 space-y-4">
+              <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight break-words">{t("about_title")}</h1>
+              <p className="leading-relaxed text-slate-700 dark:text-slate-300">{t("about_p1")}</p>
             </div>
-          </section>
 
-          {/* PRODUCTS */}
-          <section hidden={!showProducts} aria-hidden={!showProducts}>
-            <div className="space-y-4 sm:space-y-6">
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                <div className="relative">
-                  <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                  <Input
-                    aria-label={t("products_search")}
-                    placeholder={t("products_search")}
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    className="w-full pl-9 pr-10 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-100"
-                  />
-                  {!!query && (
-                    <button
-                      type="button"
-                      onClick={clearQuery}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 active:scale-[0.98] transition"
-                      aria-label={t("search_clear")}
-                      title={t("search_clear")}
-                      data-no-swipe="true"
-                    >
-                      <X className="w-4 h-4 text-slate-500 dark:text-slate-300" />
-                    </button>
-                  )}
-                </div>
+            <Card className="p-5 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl">
+              <CardTitle className="mb-2">{t("contacts")}</CardTitle>
+              <div className="text-sm space-y-1 text-slate-700 dark:text-slate-300">
+                <p>E-mail: genndybogdanov@gmail.com</p>
+                <p>
+                  <a className="underline hover:text-slate-900 dark:hover:text-white break-all" href="https://substack.com/@gbogdanov" target="_blank" rel="noopener noreferrer">
+                    Substack
+                  </a>
+                </p>
+              </div>
+            </Card>
 
-                <div className="hidden sm:block lg:col-span-2" />
-
-                {filteredProducts.length === 0 ? (
-                  <div>
-                    <EmptyState title={t("not_found")} subtitle={t("try_another")} className="max-w-[32rem]" />
+            <Card className="md:col-span-3 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl">
+              <div className="p-5">
+                <div className="flex items-start gap-5">
+                  <div className="flex-none w-28 sm:w-32 md:w-36 aspect-[3/4] rounded-2xl overflow-hidden bg-white dark:bg-slate-950 shadow">
+                    <img
+                      src="/Portrait_1.webp"
+                      alt="Portrait"
+                      className="w-full h-full object-contain"
+                      loading="eager"
+                      decoding="async"
+                      fetchPriority="high"
+                      sizes="(max-width: 640px) 112px, (max-width: 768px) 128px, 144px"
+                    />
                   </div>
-                ) : (
-                  filteredProducts.map((p) => <ProductCard key={p.id} item={p} t={t} lang={lang} />)
+
+                  <div className="min-w-0 flex-1 md:flex md:flex-col md:items-center md:text-center">
+                    <h3 className="text-lg sm:text-xl font-semibold leading-snug">{t("learn_with_me")}</h3>
+
+                    <div className="mt-3 flex flex-col gap-2 w-full max-w-[260px]">
+                      <ExternalLinkChip href="https://preply.com/en/?pref=ODkzOTkyOQ==&id=1759522486.457389&ep=w1">Preply</ExternalLinkChip>
+                      <ExternalLinkChip href="https://www.italki.com/affshare?ref=af11775706">italki</ExternalLinkChip>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Card>
+          </div>
+        </section>
+
+        {/* PRODUCTS */}
+        <section hidden={!showProducts} aria-hidden={!showProducts}>
+          <div className="space-y-4 sm:space-y-6">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              <div className="relative">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <Input
+                  aria-label={t("products_search")}
+                  placeholder={t("products_search")}
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  className="w-full pl-9 pr-10 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-100"
+                />
+                {!!query && (
+                  <button
+                    type="button"
+                    onClick={clearQuery}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
+                    aria-label={t("search_clear")}
+                    title={t("search_clear")}
+                    data-no-swipe="true"
+                  >
+                    <X className="w-4 h-4 text-slate-500 dark:text-slate-300" />
+                  </button>
                 )}
               </div>
-            </div>
-          </section>
 
-          {/* AUDIOBOOKS */}
-          <section hidden={!showAudio} aria-hidden={!showAudio}>
-            <div className="space-y-4 sm:space-y-6">
-              {!audioBookId && (
-                <>
-                  <p className="text-slate-700 dark:text-slate-300">{t("audio_choose")}</p>
+              <div className="hidden sm:block lg:col-span-2" />
 
-                  {AUDIO_BOOKS.length === 0 ? (
-                    <EmptyState title={t("audio_empty")} />
-                  ) : (
-                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {AUDIO_BOOKS.map((book) => (
-                        <AudioBookTile key={book.id} book={book} onOpen={setAudioBookId} comingSoonText={t("coming_soon")} />
-                      ))}
-                    </div>
-                  )}
-                </>
+              {filteredProducts.length === 0 ? (
+                <div>
+                  <EmptyState title={t("not_found")} subtitle={t("try_another")} className="max-w-[32rem]" />
+                </div>
+              ) : (
+                filteredProducts.map((p) => <ProductCard key={p.id} item={p} t={t} lang={lang} />)
               )}
+            </div>
+          </div>
+        </section>
 
-              {audioBookId && selectedBook && (
-                <>
-                  <div className="mb-4 sm:mb-6 flex flex-col gap-3 sm:gap-4 md:flex-row md:items-start md:justify-between">
-                    <div className="order-2 md:order-1 w-full">
-                      <div className="flex items-center gap-4 md:block">
-                        <img
-                          src={selectedBook.cover}
-                          alt={selectedBook.title}
-                          className="w-20 h-20 rounded-2xl object-cover shadow flex-none md:hidden"
-                          decoding="async"
-                          loading="eager"
-                          sizes="80px"
-                        />
+        {/* AUDIOBOOKS */}
+        <section hidden={!showAudio} aria-hidden={!showAudio}>
+          <div className="space-y-4 sm:space-y-6">
+            {!audioBookId && (
+              <>
+                <p className="text-slate-700 dark:text-slate-300">{t("audio_choose")}</p>
 
-                        <div className="min-w-0">
-                          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold leading-tight break-words">{selectedBook.title}</h1>
+                {AUDIO_BOOKS.length === 0 ? (
+                  <EmptyState title={t("audio_empty")} />
+                ) : (
+                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {AUDIO_BOOKS.map((book) => (
+                      <AudioBookTile key={book.id} book={book} onOpen={setAudioBookId} comingSoonText={t("coming_soon")} />
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
 
-                          <p className="text-slate-600 dark:text-slate-400 break-words">
-                            {selectedBook.author}
-                            {selectedBook.comingSoon ? <span className="font-semibold text-slate-700 dark:text-slate-200"> {" "}({t("coming_soon")})</span> : null}
-                          </p>
-                        </div>
+            {audioBookId && selectedBook && (
+              <>
+                <div className="mb-4 sm:mb-6 flex flex-col gap-3 sm:gap-4 md:flex-row md:items-start md:justify-between">
+                  <div className="order-2 md:order-1 w-full">
+                    <div className="flex items-center gap-4 md:block">
+                      <img
+                        src={selectedBook.cover}
+                        alt={selectedBook.title}
+                        className="w-20 h-20 rounded-2xl object-cover shadow flex-none md:hidden"
+                        decoding="async"
+                        loading="eager"
+                        sizes="80px"
+                      />
+
+                      <div className="min-w-0">
+                        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold leading-tight break-words">{selectedBook.title}</h1>
+
+                        <p className="text-slate-600 dark:text-slate-400 break-words">
+                          {selectedBook.author}
+                          {selectedBook.comingSoon ? <span className="font-semibold text-slate-700 dark:text-slate-200"> {" "}({t("coming_soon")})</span> : null}
+                        </p>
                       </div>
                     </div>
-
-                    <div className="order-1 md:order-2 flex gap-3 w-full md:w-auto">
-                      <Button
-                        variant="outline"
-                        onClick={() => setAudioBookId(null)}
-                        className="w-1/2 md:w-auto whitespace-nowrap dark:bg-slate-900 dark:border-slate-700 active:scale-[0.98] transition"
-                        type="button"
-                        data-no-swipe="true"
-                      >
-                        ← {t("back")}
-                      </Button>
-
-                      <Button
-                        onClick={downloadAllAudio}
-                        className="w-1/2 md:w-auto flex gap-2 justify-center whitespace-nowrap active:scale-[0.98] transition"
-                        type="button"
-                        data-no-swipe="true"
-                        disabled={!selectedBook.tracks?.length}
-                        title={!selectedBook.tracks?.length ? t("audio_empty") : t("download_all")}
-                      >
-                        <Download className="w-4 h-4" />
-                        {t("download_all")}
-                      </Button>
-                    </div>
                   </div>
 
-                  <div className="grid md:grid-cols-3 gap-5 sm:gap-6 items-start">
-                    <img
-                      src={selectedBook.cover}
-                      alt={selectedBook.title}
-                      className="hidden md:block w-full aspect-square object-cover rounded-2xl shadow md:col-span-1"
-                      decoding="async"
-                      loading="eager"
-                      sizes="(max-width: 1024px) 40vw, 360px"
-                    />
+                  <div className="order-1 md:order-2 flex gap-3 w-full md:w-auto">
+                    <Button
+                      variant="outline"
+                      onClick={() => setAudioBookId(null)}
+                      className="w-1/2 md:w-auto whitespace-nowrap dark:bg-slate-900 dark:border-slate-700"
+                      type="button"
+                      data-no-swipe="true"
+                    >
+                      ← {t("back")}
+                    </Button>
 
-                    <div className="md:col-span-2 space-y-2">
-                      {selectedBook.tracks?.length ? (
-                        selectedBook.tracks.map((tr) => (
-                          <TrackRow
-                            key={tr.id}
-                            track={tr}
-                            isActive={currentTrack?.id === tr.id}
-                            isPlaying={isPlaying}
-                            onToggle={toggleTrack}
-                            onSeek={seekTo}
-                            t={t}
-                            currentTime={currentTrack?.id === tr.id ? currentTime : 0}
-                            duration={currentTrack?.id === tr.id ? duration : 0}
-                          />
-                        ))
-                      ) : (
-                        <EmptyState title={t("not_found")} subtitle={t("audio_empty")} />
-                      )}
-                    </div>
+                    <Button
+                      onClick={downloadAllAudio}
+                      className="w-1/2 md:w-auto flex gap-2 justify-center whitespace-nowrap"
+                      type="button"
+                      data-no-swipe="true"
+                      disabled={!selectedBook.tracks?.length}
+                      title={!selectedBook.tracks?.length ? t("audio_empty") : t("download_all")}
+                    >
+                      <Download className="w-4 h-4" />
+                      {t("download_all")}
+                    </Button>
                   </div>
-                </>
-              )}
-            </div>
-          </section>
-        </div>
+                </div>
+
+                <div className="grid md:grid-cols-3 gap-5 sm:gap-6 items-start">
+                  <img
+                    src={selectedBook.cover}
+                    alt={selectedBook.title}
+                    className="hidden md:block w-full aspect-square object-cover rounded-2xl shadow md:col-span-1"
+                    decoding="async"
+                    loading="eager"
+                    sizes="(max-width: 1024px) 40vw, 360px"
+                  />
+
+                  <div className="md:col-span-2 space-y-1.5 sm:space-y-2">
+                    {selectedBook.tracks?.length ? (
+                      selectedBook.tracks.map((tr) => (
+                        <TrackRow
+                          key={tr.id}
+                          track={tr}
+                          isActive={currentTrack?.id === tr.id}
+                          isPlaying={isPlaying}
+                          onToggle={toggleTrack}
+                          onSeek={seekTo}
+                          t={t}
+                          currentTime={currentTrack?.id === tr.id ? currentTime : 0}
+                          duration={currentTrack?.id === tr.id ? duration : 0}
+                        />
+                      ))
+                    ) : (
+                      <EmptyState title={t("not_found")} subtitle={t("audio_empty")} />
+                    )}
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        </section>
       </main>
 
       <footer className="mt-auto border-t border-slate-200 dark:border-slate-800">
