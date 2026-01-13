@@ -10,16 +10,19 @@ const CONTAINER = "w-full max-w-6xl mx-auto px-8";
 const TOPBAR_H = "min-h-[64px]";
 
 // ================== SWIPE TABS HOOK ==================
-function useSwipeTabs({ enabled, onPrev, onNext, thresholdPx = 60, restraintPx = 40 }) {
+// Fixes:
+// - Allow swipe starting on buttons/links (previously ignored) to avoid "stuck" feeling on Audiobooks/Store.
+// - Add direction-lock, so "tap then drag without lifting" consistently switches on release.
+// - Avoid accidental cancellation from small vertical drift once horizontal intent is detected.
+function useSwipeTabs({ enabled, onPrev, onNext, thresholdPx = 60, lockPx = 10, restraintPx = 40 }) {
   const startX = useRef(0);
   const startY = useRef(0);
   const tracking = useRef(false);
+  const axisLock = useRef(null); // null | "x" | "y"
 
   const shouldIgnoreTarget = (target) => {
     try {
-      return !!target?.closest?.(
-        'input, textarea, select, button, a, [data-no-swipe="true"], [role="slider"]'
-      );
+      return !!target?.closest?.('input, textarea, select, [data-no-swipe="true"], [role="slider"]');
     } catch {
       return false;
     }
@@ -35,6 +38,7 @@ function useSwipeTabs({ enabled, onPrev, onNext, thresholdPx = 60, restraintPx =
       startX.current = t.clientX;
       startY.current = t.clientY;
       tracking.current = true;
+      axisLock.current = null;
     },
     [enabled]
   );
@@ -48,11 +52,28 @@ function useSwipeTabs({ enabled, onPrev, onNext, thresholdPx = 60, restraintPx =
       const dx = t.clientX - startX.current;
       const dy = t.clientY - startY.current;
 
-      if (Math.abs(dy) > restraintPx && Math.abs(dy) > Math.abs(dx)) {
+      // Lock axis after a small movement (prevents "animation but no switch" issue)
+      if (!axisLock.current) {
+        const adx = Math.abs(dx);
+        const ady = Math.abs(dy);
+        if (adx >= lockPx || ady >= lockPx) {
+          axisLock.current = adx > ady ? "x" : "y";
+        }
+      }
+
+      // If the user is clearly scrolling vertically, cancel swipe tracking
+      if (axisLock.current === "y") {
         tracking.current = false;
+        return;
+      }
+
+      // If locked to horizontal, ignore vertical drift up to restraint
+      if (axisLock.current === "x" && Math.abs(dy) > restraintPx) {
+        // still allow if it’s basically horizontal; only cancel if it becomes too vertical
+        if (Math.abs(dy) > Math.abs(dx)) tracking.current = false;
       }
     },
-    [enabled, restraintPx]
+    [enabled, lockPx, restraintPx]
   );
 
   const onTouchEnd = useCallback(
@@ -66,7 +87,8 @@ function useSwipeTabs({ enabled, onPrev, onNext, thresholdPx = 60, restraintPx =
       const dx = t.clientX - startX.current;
       const dy = t.clientY - startY.current;
 
-      if (Math.abs(dy) > restraintPx) return;
+      // If user performed a vertical scroll, do not switch tabs
+      if (Math.abs(dy) > restraintPx && axisLock.current === "y") return;
 
       if (dx > thresholdPx) onPrev?.();
       else if (dx < -thresholdPx) onNext?.();
@@ -91,11 +113,37 @@ const PRODUCTS = [
     description: "Word-by-word translation, stress marks, grammar explanations, exercises, audio included.",
     keywords: [
       // RU
-      "лев", "толстой", "лев толстой", "л.н. толстой", "толстого",
-      "рассказы", "короткие рассказы", "короткие", "книга", "бумажная книга", "печатная книга",
-      "аудио", "аудиокнига", "двуязычная", "ru-en", "перевод", "слово за словом", "билингвальный", "на русском", "русский",
+      "лев",
+      "толстой",
+      "лев толстой",
+      "л.н. толстой",
+      "толстого",
+      "рассказы",
+      "короткие рассказы",
+      "короткие",
+      "книга",
+      "бумажная книга",
+      "печатная книга",
+      "аудио",
+      "аудиокнига",
+      "двуязычная",
+      "ru-en",
+      "перевод",
+      "слово за словом",
+      "билингвальный",
+      "на русском",
+      "русский",
       // EN
-      "leo", "tolstoy", "short stories", "paper book", "paperback", "book", "audio", "bilingual", "ru-en", "russian"
+      "leo",
+      "tolstoy",
+      "short stories",
+      "paper book",
+      "paperback",
+      "book",
+      "audio",
+      "bilingual",
+      "ru-en",
+      "russian",
     ],
   },
 
@@ -112,11 +160,37 @@ const PRODUCTS = [
     disabled: true,
     keywords: [
       // RU
-      "антон", "чехов", "антон чехов", "а.п. чехов", "чехова",
-      "рассказы", "короткие рассказы", "короткие", "книга", "бумажная книга", "печатная книга",
-      "аудио", "аудиокнига", "двуязычная", "ru-en", "перевод", "слово за словом", "билингвальный", "на русском", "русский",
+      "антон",
+      "чехов",
+      "антон чехов",
+      "а.п. чехов",
+      "чехова",
+      "рассказы",
+      "короткие рассказы",
+      "короткие",
+      "книга",
+      "бумажная книга",
+      "печатная книга",
+      "аудио",
+      "аудиокнига",
+      "двуязычная",
+      "ru-en",
+      "перевод",
+      "слово за словом",
+      "билингвальный",
+      "на русском",
+      "русский",
       // EN
-      "anton", "chekhov", "short stories", "paper book", "paperback", "book", "audio", "bilingual", "ru-en", "russian"
+      "anton",
+      "chekhov",
+      "short stories",
+      "paper book",
+      "paperback",
+      "book",
+      "audio",
+      "bilingual",
+      "ru-en",
+      "russian",
     ],
   },
 ];
@@ -189,8 +263,7 @@ const I18N = {
     nav_audio: "Аудиокниги",
 
     about_title: "Всем привет, друзья! Меня зовут Геннадий. Я\u00A0преподаватель русского языка и автор книг",
-    about_p1:
-      "Я помогаю ученикам разных уровней быстрее осваивать русский язык. Более 1000 проведённых уроков и высокий рейтинг.",
+    about_p1: "Я помогаю ученикам разных уровней быстрее осваивать русский язык. Более 1000 проведённых уроков и высокий рейтинг.",
     contacts: "Контакты",
     learn_with_me: "Учи русский язык со мной на платформах:",
 
@@ -239,25 +312,57 @@ function NavPill({ active, onClick, children, size = "md", ...props }) {
   );
 }
 
+// Link that looks like a button (no <button> inside <a>)
+function LinkButton({ href, children, className = "", disabled = false, title, "aria-label": ariaLabel }) {
+  const base =
+    "inline-flex items-center justify-center gap-2 rounded-xl border px-4 py-2 text-sm font-medium " +
+    "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white " +
+    "[-webkit-tap-highlight-color:transparent]";
+
+  const enabledCls = "border-slate-200 bg-white text-slate-800 hover:bg-slate-50 active:scale-[0.98]";
+  const disabledCls = "border-slate-200 bg-white text-slate-400 opacity-70 cursor-not-allowed";
+
+  if (disabled || !href) {
+    return (
+      <span className={[base, disabledCls, className].join(" ")} title={title} aria-label={ariaLabel}>
+        {children}
+      </span>
+    );
+  }
+
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={[base, enabledCls, className].join(" ")}
+      title={title}
+      aria-label={ariaLabel}
+    >
+      {children}
+    </a>
+  );
+}
+
 function ExternalLinkChip({ href, children, className = "" }) {
   return (
-    <a href={href} target="_blank" rel="noopener noreferrer" className="block w-full">
-      <button
-        type="button"
-        className={[
-          "w-full",
-          "inline-flex items-center justify-between gap-3",
-          "rounded-xl border border-slate-200 bg-white",
-          "px-3 py-2 text-sm font-medium text-slate-800",
-          "hover:bg-slate-50 active:scale-[0.99]",
-          "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
-          "[-webkit-tap-highlight-color:transparent]",
-          className,
-        ].join(" ")}
-      >
-        <span className="truncate">{children}</span>
-        <ExternalLink className="w-4 h-4 opacity-80 flex-none" />
-      </button>
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={[
+        "block w-full",
+        "inline-flex items-center justify-between gap-3",
+        "rounded-xl border border-slate-200 bg-white",
+        "px-3 py-2 text-sm font-medium text-slate-800",
+        "hover:bg-slate-50 active:scale-[0.99]",
+        "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
+        "[-webkit-tap-highlight-color:transparent]",
+        className,
+      ].join(" ")}
+    >
+      <span className="truncate">{children}</span>
+      <ExternalLink className="w-4 h-4 opacity-80 flex-none" />
     </a>
   );
 }
@@ -293,9 +398,7 @@ function BookAuthorLine({ author, comingSoon, comingSoonText }) {
   return (
     <p className="text-sm text-slate-600 line-clamp-2">
       {author}
-      {comingSoon ? (
-        <span className="font-semibold text-slate-700"> {" "}({comingSoonText})</span>
-      ) : null}
+      {comingSoon ? <span className="font-semibold text-slate-700"> {" "}({comingSoonText})</span> : null}
     </p>
   );
 }
@@ -379,6 +482,7 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
               ].join(" ")}
               aria-label={activeAndPlaying ? t("pause") : t("listen")}
               title={activeAndPlaying ? t("pause") : t("listen")}
+              aria-pressed={activeAndPlaying}
               data-no-swipe="true"
             >
               {activeAndPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
@@ -386,8 +490,7 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
 
             {track.src && track.src !== "#" && (
               <a href={track.src} download className="inline-flex" aria-label={`${t("download")}: ${track.title}`}>
-                <button
-                  type="button"
+                <span
                   className={[
                     "h-10 w-10 inline-flex items-center justify-center rounded-xl border",
                     "border-slate-200 bg-white hover:bg-slate-50 active:scale-[0.98]",
@@ -398,7 +501,7 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
                   data-no-swipe="true"
                 >
                   <Download className="w-5 h-5" />
-                </button>
+                </span>
               </a>
             )}
           </div>
@@ -416,7 +519,7 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
               onChange={(e) => onSeek(Number(e.target.value))}
               disabled={!safeDuration}
               className="w-full accent-blue-600 disabled:opacity-40 disabled:cursor-not-allowed"
-              aria-label="Seek"
+              aria-label="Seek within track"
               data-no-swipe="true"
             />
           </div>
@@ -428,6 +531,7 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
 
 function ProductCard({ item, t, lang }) {
   const isDisabled = !!item.disabled;
+  const canBuy = !isDisabled && !!item.externalUrl;
 
   return (
     <Card className={["overflow-hidden border border-slate-200 flex flex-col bg-white", isDisabled ? "opacity-80" : ""].join(" ")}>
@@ -468,17 +572,17 @@ function ProductCard({ item, t, lang }) {
           </span>
 
           {isDisabled ? (
-            <Button variant="outline" type="button" disabled className="flex items-center gap-2 opacity-70 cursor-not-allowed">
-              <ExternalLink className="w-4 h-4" />
-              <span className="whitespace-nowrap">{lang === "ru" ? "Скоро в продаже" : "Coming soon"}</span>
-            </Button>
-          ) : (
-            <a href={item.externalUrl} target="_blank" rel="noopener noreferrer" className="inline-flex">
-              <Button variant="outline" className="flex items-center gap-2" type="button">
+            <span className="inline-flex">
+              <Button variant="outline" type="button" disabled className="flex items-center gap-2 opacity-70 cursor-not-allowed">
                 <ExternalLink className="w-4 h-4" />
-                <span className="whitespace-nowrap">{productBuyLabel(item, t)}</span>
+                <span className="whitespace-nowrap">{lang === "ru" ? "Скоро в продаже" : "Coming soon"}</span>
               </Button>
-            </a>
+            </span>
+          ) : (
+            <LinkButton href={item.externalUrl} disabled={!canBuy} aria-label={productBuyLabel(item, t)}>
+              <ExternalLink className="w-4 h-4" />
+              <span className="whitespace-nowrap">{productBuyLabel(item, t)}</span>
+            </LinkButton>
           )}
         </div>
       </CardContent>
@@ -514,12 +618,7 @@ export default function App() {
     }
   };
 
-  const PREFETCH_AFTER_ABOUT = [
-    "/Product_Leo.webp",
-    "/Product_Chekhov.webp",
-    "/Audio_External_Leo.webp",
-    "/Audio_External_Chekhov.webp",
-  ];
+  const PREFETCH_AFTER_ABOUT = ["/Product_Leo.webp", "/Product_Chekhov.webp", "/Audio_External_Leo.webp", "/Audio_External_Chekhov.webp"];
 
   const [lang, setLang] = useState(() => detectLanguage());
   const t = (key) => I18N[lang]?.[key] ?? I18N.en[key] ?? key;
@@ -548,14 +647,12 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [tab]);
 
-  // runtime title/description (приятно, но OG всё равно в index.html)
+  // runtime title/description (OG всё равно в index.html)
   useEffect(() => {
-    document.title = lang === "ru"
-      ? "Геннадий Богданов — русский язык"
-      : "Genndy Bogdanov — Learn Russian";
+    document.title = lang === "ru" ? "Геннадий Богданов — русский язык" : "Genndy Bogdanov — Learn Russian";
   }, [lang]);
 
-  // мягкий префетч один раз после первого рендера (как только About появился)
+  // мягкий префетч один раз после первого рендера
   useEffect(() => {
     if (typeof window === "undefined") return;
     const key = "prefetch_done_v2";
@@ -596,9 +693,7 @@ export default function App() {
     const tokens = q.split(" ").filter(Boolean);
 
     return PRODUCTS.filter((p) => {
-      const haystack = normalize(
-        [p.title, p.kind, p.description, ...(p.badges || []), ...(p.keywords || [])].join(" ")
-      );
+      const haystack = normalize([p.title, p.kind, p.description, ...(p.badges || []), ...(p.keywords || [])].join(" "));
       return tokens.every((tok) => haystack.includes(tok));
     });
   }, [query]);
@@ -627,7 +722,18 @@ export default function App() {
 
     const onPlay = () => setIsPlaying(true);
     const onPause = () => setIsPlaying(false);
-    const onEnded = () => setIsPlaying(false);
+
+    // ✅ ended: сбрасываем UI и позицию
+    const onEnded = () => {
+      setIsPlaying(false);
+      setCurrentTime(0);
+      // делаем реальный сброс позиции, чтобы scrubber не "залипал" в конце
+      try {
+        audio.currentTime = 0;
+      } catch {}
+      // по желанию можно снять активный трек полностью:
+      // setCurrentTrack(null);
+    };
 
     const onTime = () => setCurrentTime(audio.currentTime || 0);
     const onMeta = () => {
@@ -658,6 +764,7 @@ export default function App() {
     audio.pause();
     audio.currentTime = 0;
     setIsPlaying(false);
+    setCurrentTime(0);
   }, []);
 
   const toggleTrack = useCallback(
@@ -673,6 +780,9 @@ export default function App() {
       if (currentTrack?.id !== track.id) {
         audio.src = track.src;
         setCurrentTrack(track);
+        // сброс времени под новый трек
+        setCurrentTime(0);
+        setDuration(0);
       }
 
       try {
@@ -763,12 +873,15 @@ export default function App() {
   }, []);
 
   const swipeHandlers = useSwipeTabs({
-    enabled: isMobile && !isPlaying,
+    enabled: isMobile && !isPlaying, // когда играет — свайп блокируем, чтобы не бесить случайными переключениями
     onPrev: goPrevTab,
     onNext: goNextTab,
+    thresholdPx: 60,
+    lockPx: 10,
+    restraintPx: 40,
   });
 
-  // ✅ вкладки НЕ размонтируются — скрываем через hidden (картинки грузятся заранее)
+  // вкладки НЕ размонтируются — скрываем через hidden
   const showAbout = tab === "about";
   const showProducts = tab === "products";
   const showAudio = tab === "free-audio";
@@ -794,7 +907,7 @@ export default function App() {
                 className="w-9 h-9 rounded-xl object-cover transition-transform duration-200 ease-out hover:scale-[1.04] hover:rotate-1"
                 loading="eager"
                 decoding="async"
-                fetchpriority="high"
+                fetchPriority="high"   // ✅ React prop name
                 sizes="36px"
               />
               <div className="min-w-0">
@@ -885,7 +998,7 @@ export default function App() {
                       className="w-full h-full object-contain"
                       loading="eager"
                       decoding="async"
-                      fetchpriority="high"
+                      fetchPriority="high"  // ✅ React prop name
                       sizes="(max-width: 640px) 112px, (max-width: 768px) 128px, 144px"
                     />
                   </div>
@@ -929,6 +1042,7 @@ export default function App() {
                     className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-lg hover:bg-slate-100"
                     aria-label={t("search_clear")}
                     title={t("search_clear")}
+                    data-no-swipe="true"
                   >
                     <X className="w-4 h-4 text-slate-500" />
                   </button>
@@ -1062,9 +1176,7 @@ export default function App() {
         </section>
       </main>
 
-      <footer className="mt-auto py-6 text-center text-xs text-slate-500 border-t">
-        © {new Date().getFullYear()} Genndy Bogdanov
-      </footer>
+      <footer className="mt-auto py-6 text-center text-xs text-slate-500 border-t">© {new Date().getFullYear()} Genndy Bogdanov</footer>
     </div>
   );
 }
