@@ -8,7 +8,134 @@ import { ExternalLink, Download, Play, Pause, X, Search, Sun, Moon } from "lucid
 // ================== LAYOUT ==================
 const CONTAINER = "w-full max-w-6xl mx-auto px-4 sm:px-8";
 const TOPBAR_H = "min-h-[64px]";
-const MOBILE_MQ = "(max-width: 768px)";
+
+// ================== SWIPE TABS HOOK ==================
+// ✅ upgraded: returns dragX + isDragging for smooth swipe animations
+function useSwipeTabs({
+  enabled,
+  onPrev,
+  onNext,
+  thresholdPx = 60,
+  lockPx = 10,
+  restraintPx = 40,
+}) {
+  const startX = useRef(0);
+  const startY = useRef(0);
+  const tracking = useRef(false);
+  const axisLock = useRef(null); // null | "x" | "y"
+  const latestDx = useRef(0);
+
+  const [dragX, setDragX] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+
+  const shouldIgnoreTarget = (target) => {
+    try {
+      return !!target?.closest?.('input, textarea, select, [data-no-swipe="true"], [role="slider"]');
+    } catch {
+      return false;
+    }
+  };
+
+  const onTouchStart = useCallback(
+    (e) => {
+      if (!enabled) return;
+      const t = e.touches?.[0];
+      if (!t) return;
+      if (shouldIgnoreTarget(e.target)) return;
+
+      startX.current = t.clientX;
+      startY.current = t.clientY;
+      tracking.current = true;
+      axisLock.current = null;
+      latestDx.current = 0;
+      setDragX(0);
+      setIsDragging(true);
+    },
+    [enabled]
+  );
+
+  const onTouchMove = useCallback(
+    (e) => {
+      if (!enabled || !tracking.current) return;
+      const t = e.touches?.[0];
+      if (!t) return;
+
+      const dx = t.clientX - startX.current;
+      const dy = t.clientY - startY.current;
+
+      if (!axisLock.current) {
+        const adx = Math.abs(dx);
+        const ady = Math.abs(dy);
+        if (adx >= lockPx || ady >= lockPx) axisLock.current = adx > ady ? "x" : "y";
+      }
+
+      if (axisLock.current === "y") {
+        tracking.current = false;
+        setDragX(0);
+        setIsDragging(false);
+        return;
+      }
+
+      if (axisLock.current === "x" && Math.abs(dy) > restraintPx && Math.abs(dy) > Math.abs(dx)) {
+        tracking.current = false;
+        setDragX(0);
+        setIsDragging(false);
+        return;
+      }
+
+      // ✅ live drag for animation
+      latestDx.current = dx;
+
+      // little "rubber band" feel
+      const damp = 0.85;
+      setDragX(dx * damp);
+
+      // prevent page from scrolling horizontally while swiping
+      // (still allows vertical scrolling because we axis-lock)
+      if (axisLock.current === "x") {
+        e.preventDefault?.();
+      }
+    },
+    [enabled, lockPx, restraintPx]
+  );
+
+  const onTouchEnd = useCallback(
+    (e) => {
+      if (!enabled || !tracking.current) {
+        setDragX(0);
+        setIsDragging(false);
+        return;
+      }
+      tracking.current = false;
+
+      const t = e.changedTouches?.[0];
+      if (!t) {
+        setDragX(0);
+        setIsDragging(false);
+        return;
+      }
+
+      const dx = latestDx.current;
+      const dy = t.clientY - startY.current;
+
+      setIsDragging(false);
+
+      if (axisLock.current === "y" && Math.abs(dy) > restraintPx) {
+        setDragX(0);
+        return;
+      }
+
+      if (dx > thresholdPx) onPrev?.();
+      else if (dx < -thresholdPx) onNext?.();
+
+      // snap back (TabsSlider will animate)
+      setDragX(0);
+    },
+    [enabled, onPrev, onNext, thresholdPx, restraintPx]
+  );
+
+  return { onTouchStart, onTouchMove, onTouchEnd, dragX, isDragging };
+}
 
 // ================== DATA ==================
 const PRODUCTS = [
@@ -222,148 +349,7 @@ function applyThemeToHtml(theme) {
   root.style.colorScheme = theme;
 }
 
-// ================== HELPERS ==================
-function currencyUSD(n) {
-  try {
-    return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);
-  } catch {
-    return `$${n}`;
-  }
-}
-
-function productBuyLabel(item, t) {
-  if (item.marketplace === "amazon") return t("buy_amazon");
-  if (item.marketplace === "etsy") return t("buy_etsy");
-  return t("buy_generic");
-}
-
-function formatTime(sec) {
-  if (!Number.isFinite(sec) || sec < 0) return "0:00";
-  const m = Math.floor(sec / 60);
-  const s = Math.floor(sec % 60);
-  return `${m}:${String(s).padStart(2, "0")}`;
-}
-
-const preloadedSet = new Set();
-function preloadImages(urls = []) {
-  if (typeof window === "undefined") return;
-  urls.forEach((url) => {
-    if (!url || preloadedSet.has(url)) return;
-    preloadedSet.add(url);
-    const img = new Image();
-    img.decoding = "async";
-    img.src = url;
-  });
-}
-
-// ================== SWIPE TABS HOOK ==================
-// Улучшено: аккуратнее с axis lock, и нормальная “резина”
-function useSwipeTabs({ enabled, onPrev, onNext, thresholdPx = 60, lockPx = 10, restraintPx = 40 }) {
-  const startX = useRef(0);
-  const startY = useRef(0);
-  const tracking = useRef(false);
-  const axisLock = useRef(null); // null | "x" | "y"
-  const latestDx = useRef(0);
-
-  const [dragX, setDragX] = useState(0);
-  const [isDragging, setIsDragging] = useState(false);
-
-  const shouldIgnoreTarget = useCallback((target) => {
-    try {
-      return !!target?.closest?.('input, textarea, select, [data-no-swipe="true"], [role="slider"]');
-    } catch {
-      return false;
-    }
-  }, []);
-
-  const onTouchStart = useCallback(
-    (e) => {
-      if (!enabled) return;
-      const t = e.touches?.[0];
-      if (!t) return;
-      if (shouldIgnoreTarget(e.target)) return;
-
-      startX.current = t.clientX;
-      startY.current = t.clientY;
-      tracking.current = true;
-      axisLock.current = null;
-      latestDx.current = 0;
-      setDragX(0);
-      setIsDragging(true);
-    },
-    [enabled, shouldIgnoreTarget]
-  );
-
-  const onTouchMove = useCallback(
-    (e) => {
-      if (!enabled || !tracking.current) return;
-      const t = e.touches?.[0];
-      if (!t) return;
-
-      const dx = t.clientX - startX.current;
-      const dy = t.clientY - startY.current;
-
-      if (!axisLock.current) {
-        const adx = Math.abs(dx);
-        const ady = Math.abs(dy);
-        if (adx >= lockPx || ady >= lockPx) axisLock.current = adx > ady ? "x" : "y";
-      }
-
-      if (axisLock.current === "y") {
-        tracking.current = false;
-        setDragX(0);
-        setIsDragging(false);
-        return;
-      }
-
-      // если вертикаль сильно доминирует — отпускаем
-      if (Math.abs(dy) > restraintPx && Math.abs(dy) > Math.abs(dx)) {
-        tracking.current = false;
-        setDragX(0);
-        setIsDragging(false);
-        return;
-      }
-
-      latestDx.current = dx;
-
-      // “резина”: чем дальше — тем меньше прирост
-      const damp = 0.85;
-      const rubber = 1 / (1 + Math.abs(dx) / 380);
-      setDragX(dx * damp * rubber);
-
-      if (axisLock.current === "x") {
-        // React SyntheticEvent: preventDefault сработает, если touchAction позволяет
-        e.preventDefault?.();
-      }
-    },
-    [enabled, lockPx, restraintPx]
-  );
-
-  const onTouchEnd = useCallback(
-    (e) => {
-      if (!enabled) {
-        setDragX(0);
-        setIsDragging(false);
-        tracking.current = false;
-        return;
-      }
-
-      const dx = latestDx.current;
-      tracking.current = false;
-      setIsDragging(false);
-
-      if (dx > thresholdPx) onPrev?.();
-      else if (dx < -thresholdPx) onNext?.();
-
-      setDragX(0);
-    },
-    [enabled, onPrev, onNext, thresholdPx]
-  );
-
-  return { onTouchStart, onTouchMove, onTouchEnd, dragX, isDragging };
-}
-
-// ================== UI COMPONENTS ==================
+// ================== UI HELPERS ==================
 function NavPill({ active, onClick, children, size = "md", className = "", ...props }) {
   const padding = size === "sm" ? "px-3 py-1.5 text-xs" : "px-5 py-2.5 text-sm";
 
@@ -390,6 +376,7 @@ function NavPill({ active, onClick, children, size = "md", className = "", ...pr
   );
 }
 
+// Link that looks like a button (no <button> inside <a>)
 function LinkButton({ href, children, className = "", disabled = false, title, "aria-label": ariaLabel }) {
   const base =
     "inline-flex items-center justify-center gap-2 rounded-xl border px-4 py-2 text-sm font-medium " +
@@ -445,12 +432,26 @@ function ExternalLinkChip({ href, children, className = "" }) {
   );
 }
 
+function currencyUSD(n) {
+  try {
+    return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);
+  } catch {
+    return `$${n}`;
+  }
+}
+
+function productBuyLabel(item, t) {
+  if (item.marketplace === "amazon") return t("buy_amazon");
+  if (item.marketplace === "etsy") return t("buy_etsy");
+  return t("buy_generic");
+}
+
 function EmptyState({ title, subtitle, className = "" }) {
   return (
     <Card className={["border border-slate-200 dark:border-slate-800", "bg-white dark:bg-slate-950", "rounded-2xl", className].join(" ")}>
       <CardContent className="p-6">
         <p className="font-semibold text-slate-900 dark:text-slate-100">{title}</p>
-        {subtitle ? <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">{subtitle}</p> : null}
+        {subtitle && <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">{subtitle}</p>}
       </CardContent>
     </Card>
   );
@@ -458,6 +459,7 @@ function EmptyState({ title, subtitle, className = "" }) {
 
 function BookAuthorLine({ author, comingSoon, comingSoonText }) {
   if (!author && !comingSoon) return null;
+
   return (
     <p className="text-sm text-slate-600 dark:text-slate-400 line-clamp-2">
       {author}
@@ -468,6 +470,7 @@ function BookAuthorLine({ author, comingSoon, comingSoonText }) {
 
 function AudioBookTile({ book, onOpen, comingSoonText }) {
   const isDisabled = !!book.disabled;
+
   return (
     <button
       onClick={() => {
@@ -477,7 +480,6 @@ function AudioBookTile({ book, onOpen, comingSoonText }) {
       className="w-full max-w-sm text-left"
       type="button"
       disabled={isDisabled}
-      aria-disabled={isDisabled}
     >
       <Card
         className={[
@@ -488,14 +490,7 @@ function AudioBookTile({ book, onOpen, comingSoonText }) {
         ].join(" ")}
       >
         <div className="flex gap-4 items-center">
-          <img
-            src={book.cover}
-            alt={book.title}
-            className="w-16 h-16 rounded-xl object-cover flex-none"
-            decoding="async"
-            loading="lazy"
-            sizes="64px"
-          />
+          <img src={book.cover} alt={book.title} className="w-16 h-16 rounded-xl object-cover flex-none" decoding="async" loading="eager" sizes="64px" />
           <div className="min-w-0">
             <p className="font-semibold truncate text-slate-900 dark:text-slate-100">{book.title}</p>
             <BookAuthorLine author={book.author} comingSoon={!!book.comingSoon} comingSoonText={comingSoonText} />
@@ -506,6 +501,15 @@ function AudioBookTile({ book, onOpen, comingSoonText }) {
   );
 }
 
+function formatTime(sec) {
+  if (!Number.isFinite(sec) || sec < 0) return "0:00";
+  const m = Math.floor(sec / 60);
+  const s = Math.floor(sec % 60);
+  return `${m}:${String(s).padStart(2, "0")}`;
+}
+
+// ✅ (1) compact TrackRow + bigger title text WITHOUT changing block size
+// ✅ compactness restored (smaller paddings/buttons/icons) BUT your title size stays!
 function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime, duration }) {
   const activeAndPlaying = isActive && isPlaying;
   const showScrubber = isActive;
@@ -522,9 +526,11 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
         isActive ? "shadow-sm dark:shadow-none" : "",
       ].join(" ")}
     >
+      {/* was p-2 -> smaller again */}
       <CardContent className="p-1.5">
         <div className="flex items-center justify-between gap-1.5">
           <div className="min-w-0">
+            {/* ✅ requested title styling (kept) */}
             <p
               className="
                 font-medium truncate
@@ -536,11 +542,11 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
               {track.title}
             </p>
 
-            {showScrubber ? (
+            {showScrubber && (
               <p className="text-[10.5px] text-slate-500 dark:text-slate-400 mt-0.5 tabular-nums">
                 {formatTime(safeTime)} / {formatTime(safeDuration)}
               </p>
-            ) : null}
+            )}
           </div>
 
           <div className="flex items-center gap-1.5 flex-none">
@@ -548,6 +554,7 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
               type="button"
               onClick={() => onToggle(track)}
               className={[
+                // ✅ KEEP block size (h-8 w-8), but maximize icon inside WITHOUT changing block size
                 "h-8 w-8 inline-flex items-center justify-center rounded-xl border border-slate-200 transition",
                 "border-slate-200 bg-white hover:bg-slate-50 active:scale-[0.98]",
                 "dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800/70",
@@ -561,13 +568,19 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
               aria-pressed={activeAndPlaying}
               data-no-swipe="true"
             >
-              {activeAndPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+              {/* ✅ MAX icon size while still fitting into 32x32 */}
+              {activeAndPlaying ? (
+                 <Pause className="w-6 h-6" />
+              ) : (
+                  <Play className="w-6 h-6" />
+              )}
             </button>
 
-            {track.src && track.src !== "#" ? (
+            {track.src && track.src !== "#" && (
               <a href={track.src} download className="inline-flex" aria-label={`${t("download")}: ${track.title}`}>
                 <span
                   className={[
+                    // ✅ KEEP block size (h-8 w-8), but maximize icon inside WITHOUT changing block size
                     "h-8 w-8 inline-flex items-center justify-center rounded-xl border border-slate-200 transition",
                     "border-slate-200 bg-white hover:bg-slate-50 active:scale-[0.98]",
                     "dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800/70",
@@ -578,14 +591,15 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
                   title={t("download")}
                   data-no-swipe="true"
                 >
-                  <Download className="w-4 h-4" />
+                  {/* ✅ MAX icon size while still fitting into 32x32 */}
+                  <Download className="w-6 h-6" />
                 </span>
               </a>
-            ) : null}
+            )}
           </div>
         </div>
 
-        {showScrubber ? (
+        {showScrubber && (
           <div className="mt-1.5">
             <input
               type="range"
@@ -601,12 +615,13 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
               data-no-swipe="true"
             />
           </div>
-        ) : null}
+        )}
       </CardContent>
     </Card>
   );
 }
 
+// ================== ProductCard ==================
 function ProductCard({ item, t, lang }) {
   const isDisabled = !!item.disabled;
   const canBuy = !isDisabled && !!item.externalUrl;
@@ -623,23 +638,27 @@ function ProductCard({ item, t, lang }) {
       <CardHeader className="p-0">
         <div className="relative p-3">
           <div className="rounded-2xl overflow-hidden">
+            {/* ✅ remove underlay ONLY for light theme */}
             <div className="w-full aspect-[4/3] bg-transparent dark:bg-slate-200/35">
               <img
                 src={item.image}
                 alt={item.title}
                 className="w-full h-full object-contain block"
                 decoding="async"
-                loading="lazy"
+                loading="eager"
                 sizes="(max-width: 1024px) 90vw, 360px"
               />
             </div>
           </div>
 
-          <div className="absolute top-4 left-4 flex flex-wrap gap-1">
+          {/* ✅ badges moved left and compact */}
+          {/* ✅ CHANGE: move DOWN + LEFT (top-4/left-4 -> top-8/left-8) */}
+          <div className="absolute top-8 left-8 flex flex-wrap gap-1">
             {item.badges?.map((b) => (
               <Badge
                 key={b}
                 className={[
+                  // ✅ smaller text + smaller chip
                   "px-1.5 py-0.5 text-[10px] font-normal leading-none",
                   "bg-slate-100 text-slate-700 border border-slate-200",
                   "dark:bg-slate-100 dark:text-slate-700 dark:border-slate-200",
@@ -691,49 +710,30 @@ function ProductCard({ item, t, lang }) {
   );
 }
 
-// ================== TABS SLIDER ==================
-function TabsSlider({ isMobile, activeIndex, dragX, isDragging, children }) {
-  const count = React.Children.count(children);
-  const safeIndex = Math.min(Math.max(activeIndex, 0), Math.max(count - 1, 0));
-  const vw = typeof window !== "undefined" ? window.innerWidth || 1 : 1;
-  const dragPct = isMobile ? (dragX / vw) * 100 : 0;
-
-  const basePct = -safeIndex * 100;
-  const translatePct = basePct + (isMobile ? dragPct : 0);
-
-  return (
-    <div className="relative w-full overflow-hidden">
-      <div
-        className={["flex w-full", isMobile ? "" : "block"].join(" ")}
-        style={
-          isMobile
-            ? {
-                transform: `translate3d(${translatePct}%,0,0)`,
-                transition: isDragging ? "none" : "transform 260ms cubic-bezier(0.22, 0.61, 0.36, 1)",
-                willChange: "transform",
-              }
-            : undefined
-        }
-      >
-        {React.Children.map(children, (child, i) => (
-          <div className={isMobile ? "w-full flex-none" : i === safeIndex ? "block" : "hidden"} aria-hidden={isMobile ? false : i !== safeIndex}>
-            {child}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+// ================== prefetch helpers ==================
+const preloadedSet = new Set();
+function preloadImages(urls = []) {
+  if (typeof window === "undefined") return;
+  urls.forEach((url) => {
+    if (!url || preloadedSet.has(url)) return;
+    preloadedSet.add(url);
+    const img = new Image();
+    img.decoding = "async";
+    img.src = url;
+  });
 }
 
-// ================== EASTER EGG ==================
+// ================== EASTER EGG MESSAGES ==================
 const EASTER = {
   FIRST: "Привет! 👋",
+
+  // thresholds
   AFTER_5: "Не нажимай больше! 😑",
   AFTER_10: "Тебе что, нечего делать? 🗿",
   AFTER_12: "Зачем я всегда ставлю точки над «ё»? 😵‍💫",
   AFTER_15: "Сколько можно жать! 🤬",
 
-  SOBACHYE: "Прочитай «Собачье сердце» Булгакова.",
+  SOBACHYE: 'Прочитай «Собачье сердце» Булгакова.',
   SOBACHYE_FOLLOW: "Это крутая книга! 🙂",
 
   TOLSTOY: "Кстати, почитай Толстого.",
@@ -756,7 +756,7 @@ const EASTER = {
   CHEKHOV: "У Чехова лучшие рассказы в мире! 😄",
   DEAD_SOULS: "Где второй том «Мёртвых душ»? 🤔",
   GORKY: "Где Нобелевская премия Горького? 🥇",
-  LERMONTOV: "«…И ты, им преданный народ…» — Лермонтов",
+  LERMONTOV: '«…И ты, им преданный народ…» — Лермонтов',
   PISTOL: "Дайте Пушкину другой пистолет! 🔫",
   PHONE: "Лучше читать, чем залипать в телефоне. 📱",
   ENGLAND: "О, вы из Англии? 🎩",
@@ -770,41 +770,49 @@ const EASTER = {
 
 function pickRandom(arr) {
   if (!arr.length) return null;
-  return arr[Math.floor(Math.random() * arr.length)];
+  const i = Math.floor(Math.random() * arr.length);
+  return arr[i];
 }
 
-function EasterToast({ variant, visible, text, onClose }) {
-  const isDesktop = variant === "desktop";
-  const base =
-    "pointer-events-auto select-none " +
-    "rounded-2xl border shadow-lg " +
-    "bg-white/95 text-slate-900 border-slate-200 " +
-    "dark:bg-slate-900/95 dark:text-slate-100 dark:border-slate-700 " +
-    "backdrop-blur " +
-    "transition-all duration-200 ease-out";
+// ================== TABS SLIDER (ANIMATED) ==================
+// ✅ Makes the content "slide" on mobile with smooth transition.
+// Keeps desktop behavior unchanged.
+function TabsSlider({ isMobile, activeIndex, dragX, isDragging, children }) {
+  const count = React.Children.count(children);
+  const safeIndex = Math.min(Math.max(activeIndex, 0), Math.max(count - 1, 0));
 
-  const anim = visible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 -translate-y-2 scale-[0.98]";
+  // Convert px drag into percentage of viewport for consistent feel
+  const dragPct = isMobile ? (dragX / (typeof window !== "undefined" ? window.innerWidth || 1 : 1)) * 100 : 0;
 
-  const desktopCls =
-    "hidden md:inline-flex items-center " +
-    "whitespace-nowrap " +
-    "px-4 py-2 text-sm font-semibold " +
-    "max-w-[520px]";
-
-  const mobileCls =
-    "md:hidden " +
-    "px-4 py-3 text-sm font-semibold " +
-    "whitespace-normal leading-snug " +
-    "text-center w-fit max-w-[90vw]";
+  const basePct = -safeIndex * 100;
+  const translatePct = basePct + (isMobile ? dragPct : 0);
 
   return (
-    <div
-      role="status"
-      aria-live="polite"
-      onClick={onClose}
-      className={[base, anim, isDesktop ? desktopCls : mobileCls, visible ? "" : "pointer-events-none"].join(" ")}
-    >
-      <span className={isDesktop ? "truncate" : ""}>{text}</span>
+    <div className="relative w-full overflow-hidden">
+      <div
+        className={[
+          "flex w-full",
+          isMobile ? "" : "block",
+        ].join(" ")}
+        style={
+          isMobile
+            ? {
+                transform: `translate3d(${translatePct}%,0,0)`,
+                transition: isDragging ? "none" : "transform 260ms cubic-bezier(0.22, 0.61, 0.36, 1)",
+                willChange: "transform",
+              }
+            : undefined
+        }
+      >
+        {React.Children.map(children, (child, i) => (
+          <div
+            className={isMobile ? "w-full flex-none" : i === safeIndex ? "block" : "hidden"}
+            aria-hidden={isMobile ? false : i !== safeIndex}
+          >
+            {child}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -812,35 +820,40 @@ function EasterToast({ variant, visible, text, onClose }) {
 // ================== APP ==================
 export default function App() {
   // ---- language ----
-  const detectLanguage = useCallback(() => {
+  const detectLanguage = () => {
     try {
       const saved = localStorage.getItem("lang");
       if (saved === "ru" || saved === "en") return saved;
+
       const browser = (navigator.language || "en").toLowerCase();
-      return browser.startsWith("ru") ? "ru" : "en";
+      if (browser.startsWith("ru")) return "ru";
+      return "en";
     } catch {
       return "en";
     }
-  }, []);
+  };
 
   const [lang, setLang] = useState(() => detectLanguage());
-  const t = useCallback((key) => I18N[lang]?.[key] ?? I18N.en[key] ?? key, [lang]);
+  const t = (key) => I18N[lang]?.[key] ?? I18N.en[key] ?? key;
 
-  const switchLang = useCallback((next) => {
+  const switchLang = (next) => {
     setLang(next);
     try {
       localStorage.setItem("lang", next);
     } catch {}
-  }, []);
+  };
 
   // ---- theme ----
   const [theme, setTheme] = useState(() => detectTheme());
-  useEffect(() => applyThemeToHtml(theme), [theme]);
+
+  useEffect(() => {
+    applyThemeToHtml(theme);
+  }, [theme]);
 
   useEffect(() => {
     if (typeof window === "undefined" || !window.matchMedia) return;
-    const mq = window.matchMedia("(prefers-color-scheme: dark)");
 
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
     const handler = () => {
       try {
         const saved = localStorage.getItem("theme_user");
@@ -858,7 +871,7 @@ export default function App() {
     };
   }, []);
 
-  const toggleTheme = useCallback(() => {
+  const toggleTheme = () => {
     setTheme((prev) => {
       const next = prev === "dark" ? "light" : "dark";
       try {
@@ -866,17 +879,16 @@ export default function App() {
       } catch {}
       return next;
     });
-  }, []);
+  };
 
   // ---- tabs ----
-  const TABS_ORDER = useMemo(() => ["about", "products", "free-audio"], []);
-  const detectTab = useCallback(() => {
+  const detectTab = () => {
     try {
       const saved = localStorage.getItem("tab");
-      if (saved && TABS_ORDER.includes(saved)) return saved;
+      if (saved === "about" || saved === "products" || saved === "free-audio") return saved;
     } catch {}
     return "about";
-  }, [TABS_ORDER]);
+  };
 
   const [tab, setTab] = useState(() => detectTab());
 
@@ -884,7 +896,6 @@ export default function App() {
     try {
       localStorage.setItem("tab", tab);
     } catch {}
-    // приятно, но без истерики
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [tab]);
 
@@ -892,51 +903,41 @@ export default function App() {
     document.title = lang === "ru" ? "Геннадий Богданов — русский язык" : "Genndy Bogdanov — Learn Russian";
   }, [lang]);
 
-  const showAbout = tab === "about";
-  const showProducts = tab === "products";
-  const showAudio = tab === "free-audio";
-  const activeIndex = useMemo(() => TABS_ORDER.indexOf(tab), [tab, TABS_ORDER]);
-
   // ---- prefetch ----
-  const PREFETCH = useMemo(
-    () => ["/Product_Leo.webp", "/Product_Chekhov.webp", "/Audio_External_Leo.webp", "/Audio_External_Chekhov.webp"],
-    []
-  );
+  const PREFETCH_AFTER_ABOUT = ["/Product_Leo.webp", "/Product_Chekhov.webp", "/Audio_External_Leo.webp", "/Audio_External_Chekhov.webp"];
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const key = "prefetch_done_v3";
+    const key = "prefetch_done_v2";
     if (sessionStorage.getItem(key)) return;
 
     const run = () => {
-      preloadImages(PREFETCH);
+      preloadImages(PREFETCH_AFTER_ABOUT);
       sessionStorage.setItem(key, "1");
     };
 
     if ("requestIdleCallback" in window) window.requestIdleCallback(run, { timeout: 1500 });
     else setTimeout(run, 500);
-  }, [PREFETCH]);
+  }, []);
 
   const hasPrefetchedRef = useRef(false);
   const prefetchAudiobooksOnce = useCallback(() => {
     if (hasPrefetchedRef.current) return;
     hasPrefetchedRef.current = true;
-    preloadImages(PREFETCH);
-  }, [PREFETCH]);
+    preloadImages(PREFETCH_AFTER_ABOUT);
+  }, []);
 
   // ---- store search ----
   const [query, setQuery] = useState("");
-  const normalize = useCallback(
-    (s) =>
-      (s || "")
-        .toString()
-        .toLowerCase()
-        .replace(/ё/g, "е")
-        .replace(/[^\p{L}\p{N}\s]+/gu, " ")
-        .replace(/\s+/g, " ")
-        .trim(),
-    []
-  );
+
+  const normalize = (s) =>
+    (s || "")
+      .toString()
+      .toLowerCase()
+      .replace(/ё/g, "е")
+      .replace(/[^\p{L}\p{N}\s]+/gu, " ")
+      .replace(/\s+/g, " ")
+      .trim();
 
   const filteredProducts = useMemo(() => {
     const q = normalize(query);
@@ -947,9 +948,9 @@ export default function App() {
       const haystack = normalize([p.title, p.kind, p.description, ...(p.badges || []), ...(p.keywords || [])].join(" "));
       return tokens.every((tok) => haystack.includes(tok));
     });
-  }, [query, normalize]);
+  }, [query]);
 
-  const clearQuery = useCallback(() => setQuery(""), []);
+  const clearQuery = () => setQuery("");
 
   // ---- audiobooks ----
   const [audioBookId, setAudioBookId] = useState(null);
@@ -967,24 +968,13 @@ export default function App() {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
 
-  const stopAudio = useCallback(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    audio.pause();
-    try {
-      audio.currentTime = 0;
-    } catch {}
-    setIsPlaying(false);
-    setCurrentTime(0);
-  }, []);
-
-  // Главное исправление: надёжнее слушатели + правильно чистим
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
 
     const onPlay = () => setIsPlaying(true);
     const onPause = () => setIsPlaying(false);
+
     const onEnded = () => {
       setIsPlaying(false);
       setCurrentTime(0);
@@ -992,6 +982,7 @@ export default function App() {
         audio.currentTime = 0;
       } catch {}
     };
+
     const onTime = () => setCurrentTime(audio.currentTime || 0);
     const onMeta = () => {
       setDuration(Number.isFinite(audio.duration) ? audio.duration : 0);
@@ -1015,30 +1006,31 @@ export default function App() {
     };
   }, []);
 
+  const stopAudio = useCallback(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.pause();
+    audio.currentTime = 0;
+    setIsPlaying(false);
+    setCurrentTime(0);
+  }, []);
+
   const toggleTrack = useCallback(
     async (track) => {
       const audio = audioRef.current;
       if (!audio || !track?.src || track.src === "#") return;
 
-      // если это тот же трек — toggle play/pause
-      if (currentTrack?.id === track.id) {
-        if (!audio.paused) audio.pause();
-        else {
-          try {
-            await audio.play();
-          } catch (e) {
-            console.warn("Audio play failed:", e);
-          }
-        }
+      if (currentTrack?.id === track.id && !audio.paused) {
+        audio.pause();
         return;
       }
 
-      // новый трек
-      stopAudio();
-      audio.src = track.src;
-      setCurrentTrack(track);
-      setCurrentTime(0);
-      setDuration(0);
+      if (currentTrack?.id !== track.id) {
+        audio.src = track.src;
+        setCurrentTrack(track);
+        setCurrentTime(0);
+        setDuration(0);
+      }
 
       try {
         await audio.play();
@@ -1046,22 +1038,17 @@ export default function App() {
         console.warn("Audio play failed:", e);
       }
     },
-    [currentTrack, stopAudio]
+    [currentTrack]
   );
 
   const seekTo = useCallback((sec) => {
     const audio = audioRef.current;
     if (!audio) return;
-    const next = Math.max(0, sec || 0);
-    try {
-      audio.currentTime = next;
-    } catch {}
-    setCurrentTime(next);
+    audio.currentTime = Math.max(0, sec || 0);
+    setCurrentTime(audio.currentTime);
   }, []);
 
-  // Замечание: массовые автоскачивания часто блокируются браузерами.
-  // Но оставляем твою механику как есть.
-  const downloadAllAudio = useCallback(() => {
+  function downloadAllAudio() {
     if (!selectedBook?.tracks?.length) return;
     selectedBook.tracks.forEach((tr) => {
       if (!tr.src || tr.src === "#") return;
@@ -1072,9 +1059,8 @@ export default function App() {
       a.click();
       document.body.removeChild(a);
     });
-  }, [selectedBook]);
+  }
 
-  // При уходе с вкладки аудио — всегда стопаем
   useEffect(() => {
     if (tab !== "free-audio") {
       stopAudio();
@@ -1087,18 +1073,17 @@ export default function App() {
     if (!audioBookId) {
       stopAudio();
       setCurrentTrack(null);
-      setDuration(0);
     }
   }, [audioBookId, stopAudio]);
 
-  // ---- mobile detection ----
+  // ---- mobile detection (for swipe + easter placement) ----
   const [isMobile, setIsMobile] = useState(() => {
     if (typeof window === "undefined") return false;
-    return window.matchMedia(MOBILE_MQ).matches;
+    return window.matchMedia("(max-width: 768px)").matches;
   });
 
   useEffect(() => {
-    const mq = window.matchMedia(MOBILE_MQ);
+    const mq = window.matchMedia("(max-width: 768px)");
     const handler = (e) => setIsMobile(e.matches);
 
     if (mq.addEventListener) mq.addEventListener("change", handler);
@@ -1112,6 +1097,8 @@ export default function App() {
     };
   }, []);
 
+  const TABS_ORDER = ["about", "products", "free-audio"];
+
   const goPrevTab = useCallback(() => {
     setTab((prev) => {
       const i = TABS_ORDER.indexOf(prev);
@@ -1120,7 +1107,7 @@ export default function App() {
       if (nextTab !== "free-audio") setAudioBookId(null);
       return nextTab;
     });
-  }, [TABS_ORDER]);
+  }, []);
 
   const goNextTab = useCallback(() => {
     setTab((prev) => {
@@ -1130,10 +1117,10 @@ export default function App() {
       if (nextTab !== "free-audio") setAudioBookId(null);
       return nextTab;
     });
-  }, [TABS_ORDER]);
+  }, []);
 
   const swipeHandlers = useSwipeTabs({
-    enabled: isMobile && !isPlaying, // как у тебя
+    enabled: isMobile && !isPlaying,
     onPrev: goPrevTab,
     onNext: goNextTab,
     thresholdPx: 60,
@@ -1141,39 +1128,56 @@ export default function App() {
     restraintPx: 40,
   });
 
-  // ================== EASTER STATE ==================
+  const showAbout = tab === "about";
+  const showProducts = tab === "products";
+  const showAudio = tab === "free-audio";
+
+  // ✅ active index for animated slider
+  const activeIndex = useMemo(() => TABS_ORDER.indexOf(tab), [tab]);
+
+  // ================== EASTER EGG STATE ==================
   const [eggText, setEggText] = useState("");
   const [eggVisible, setEggVisible] = useState(false);
 
+  // what has been shown (each message once)
   const shownSetRef = useRef(new Set());
   const shownCountRef = useRef(0);
+
+  // sequence forcing: after some messages must come a specific next message
   const forcedNextRef = useRef(null);
-  const lastNeverGiveUpIndexRef = useRef(null);
-  const lastYouAreGreatIndexRef = useRef(null);
 
-  const hideEgg = useCallback(() => setEggVisible(false), []);
+  // constraints "after X other messages"
+  const lastNeverGiveUpIndexRef = useRef(null); // index when NEVER_GIVE_UP was shown
+  const lastYouAreGreatIndexRef = useRef(null); // index when YOU_ARE_GREAT was shown
 
-  // auto-hide timer (исправлено: гарантированно чистим таймер)
+  const hideEgg = useCallback(() => {
+    setEggVisible(false);
+  }, []);
+
+  // auto-hide timer
   const eggTimerRef = useRef(null);
   useEffect(() => {
     if (!eggVisible) return;
     if (eggTimerRef.current) clearTimeout(eggTimerRef.current);
 
-    eggTimerRef.current = setTimeout(() => setEggVisible(false), 8000);
+    eggTimerRef.current = setTimeout(() => {
+      setEggVisible(false);
+    }, 8000);
 
     return () => {
       if (eggTimerRef.current) clearTimeout(eggTimerRef.current);
     };
   }, [eggVisible, eggText]);
 
-  // hide on tab change
+  // hide on tab change (buttons or swipe)
   useEffect(() => {
     if (eggVisible) setEggVisible(false);
-  }, [tab, eggVisible]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tab]);
 
   const showEggMessage = useCallback(
     (text) => {
-      // “replace” анимация
+      // animate replace if already visible
       if (eggVisible) {
         setEggVisible(false);
         setTimeout(() => {
@@ -1192,84 +1196,143 @@ export default function App() {
     const shown = shownSetRef.current;
     const count = shownCountRef.current;
 
-    // forced next
+    // forced next always wins, but still "once"
     if (forcedNextRef.current) {
       const forced = forcedNextRef.current;
       forcedNextRef.current = null;
+
       if (!shown.has(forced)) return forced;
+      // if somehow already shown, fall through to normal picking
     }
 
+    // very first message is fixed
     if (count === 0 && !shown.has(EASTER.FIRST)) return EASTER.FIRST;
 
+    // build pool of eligible messages
     const pool = [];
-    const add = (msg, cond = true) => {
+
+    const addIfEligible = (msg, cond = true) => {
       if (!cond) return;
       if (!msg) return;
       if (shown.has(msg)) return;
       pool.push(msg);
     };
 
-    add(EASTER.AFTER_5, count >= 5);
-    add(EASTER.AFTER_10, count >= 10);
-    add(EASTER.AFTER_12, count >= 12);
-    add(EASTER.AFTER_15, count >= 15);
+    // thresholds
+    addIfEligible(EASTER.AFTER_5, count >= 5);
+    addIfEligible(EASTER.AFTER_10, count >= 10);
+    addIfEligible(EASTER.AFTER_12, count >= 12);
+    addIfEligible(EASTER.AFTER_15, count >= 15);
 
-    add(EASTER.SOBACHYE);
-    add(EASTER.TOLSTOY);
-    add(EASTER.HOW_LONG);
+    // sequenced starters
+    addIfEligible(EASTER.SOBACHYE);
+    addIfEligible(EASTER.TOLSTOY);
+    addIfEligible(EASTER.HOW_LONG);
 
-    add(EASTER.DOSTO);
-    add(EASTER.READ_BOOKS);
-    add(EASTER.CHEKHOV);
-    add(EASTER.DEAD_SOULS);
-    add(EASTER.GORKY);
-    add(EASTER.LERMONTOV, count >= 10);
-    add(EASTER.PISTOL, count >= 8);
-    add(EASTER.PHONE, count >= 5);
-    add(EASTER.ENGLAND, count >= 5);
-    add(EASTER.AMAZING, count >= 8);
-    add(EASTER.KAZBEK, count >= 10);
-    add(EASTER.OIL, count >= 14);
+    // other messages + conditions
+    addIfEligible(EASTER.DOSTO);
+    addIfEligible(EASTER.READ_BOOKS);
+    addIfEligible(EASTER.CHEKHOV);
+    addIfEligible(EASTER.DEAD_SOULS);
+    addIfEligible(EASTER.GORKY);
+    addIfEligible(EASTER.LERMONTOV, count >= 10);
+    addIfEligible(EASTER.PISTOL, count >= 8);
+    addIfEligible(EASTER.PHONE, count >= 5);
+    addIfEligible(EASTER.ENGLAND, count >= 5);
+    addIfEligible(EASTER.AMAZING, count >= 8);
+    addIfEligible(EASTER.KAZBEK, count >= 10);
+    addIfEligible(EASTER.OIL, count >= 14);
 
-    add(EASTER.ARBAT, count >= 12);
-    add(EASTER.WALK, count >= 14);
+    addIfEligible(EASTER.ARBAT, count >= 12);
+    addIfEligible(EASTER.WALK, count >= 14);
 
-    add(EASTER.YOU_LEARN);
-    add(EASTER.NEVER_GIVE_UP);
+    addIfEligible(EASTER.YOU_LEARN);
+    addIfEligible(EASTER.NEVER_GIVE_UP);
 
+    // "Ты молодец!" — only if NEVER_GIVE_UP was shown and at least 3 other messages passed
     const neverIdx = lastNeverGiveUpIndexRef.current;
-    add(EASTER.YOU_ARE_GREAT, neverIdx != null && count - neverIdx >= 4);
+    addIfEligible(EASTER.YOU_ARE_GREAT, neverIdx != null && count - neverIdx >= 4);
 
+    // "Всё! Я больше не отвечаю." — only if YOU_ARE_GREAT was shown and at least 3 other messages passed
     const greatIdx = lastYouAreGreatIndexRef.current;
-    add(EASTER.IM_DONE, greatIdx != null && count - greatIdx >= 4);
+    addIfEligible(EASTER.IM_DONE, greatIdx != null && count - greatIdx >= 4);
 
-    add(EASTER.HARD_TO_PRESS, count >= 15);
-    add(EASTER.AI_SITE, count >= 10);
-    add(EASTER.AI_WORLD, count >= 14);
+    addIfEligible(EASTER.HARD_TO_PRESS, count >= 15);
 
-    return pickRandom(pool);
+    addIfEligible(EASTER.AI_SITE, count >= 10);
+    addIfEligible(EASTER.AI_WORLD, count >= 14);
+
+    const picked = pickRandom(pool);
+    return picked || null;
   }, []);
 
   const handleLogoClick = useCallback(() => {
     const next = pickNextEasterMessage();
     if (!next) return;
 
-    // mark shown
+    // mark shown + bump count
     shownSetRef.current.add(next);
 
+    // update indices for "after 3 other" rules
     const nextIndex = shownCountRef.current;
     if (next === EASTER.NEVER_GIVE_UP) lastNeverGiveUpIndexRef.current = nextIndex;
     if (next === EASTER.YOU_ARE_GREAT) lastYouAreGreatIndexRef.current = nextIndex;
 
+    // set forced follow-ups
     if (next === EASTER.SOBACHYE) forcedNextRef.current = EASTER.SOBACHYE_FOLLOW;
     if (next === EASTER.TOLSTOY) forcedNextRef.current = EASTER.TOLSTOY_FOLLOW;
     if (next === EASTER.HOW_LONG) forcedNextRef.current = EASTER.HOW_LONG_FOLLOW;
 
     shownCountRef.current = nextIndex + 1;
+
     showEggMessage(next);
   }, [pickNextEasterMessage, showEggMessage]);
 
-  // ---- theme button content ----
+  // ================== EASTER TOAST UI ==================
+  const Toast = ({ variant }) => {
+    const isDesktop = variant === "desktop";
+
+    const base =
+      "pointer-events-auto select-none " +
+      "rounded-2xl border shadow-lg " +
+      "bg-white/95 text-slate-900 border-slate-200 " +
+      "dark:bg-slate-900/95 dark:text-slate-100 dark:border-slate-700 " +
+      "backdrop-blur " +
+      "transition-all duration-200 ease-out";
+
+    const anim = eggVisible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 -translate-y-2 scale-[0.98]";
+
+    const desktopCls =
+      "hidden md:inline-flex items-center " +
+      "whitespace-nowrap " +
+      "px-4 py-2 text-sm font-semibold " +
+      "max-w-[520px]";
+
+    // ✅ CHANGE: mobile toast is auto-sized by content (w-fit) + centered text
+    const mobileCls =
+      "md:hidden " +
+      "px-4 py-3 text-sm font-semibold " +
+      "whitespace-normal leading-snug " +
+      "text-center w-fit max-w-[90vw]";
+
+    return (
+      <div
+        role="status"
+        aria-live="polite"
+        onClick={hideEgg}
+        className={[
+          base,
+          anim,
+          isDesktop ? desktopCls : mobileCls,
+          eggVisible ? "" : "pointer-events-none",
+        ].join(" ")}
+      >
+        <span className={isDesktop ? "truncate" : ""}>{eggText}</span>
+      </div>
+    );
+  };
+
+  // ✅ label/icon should show the TARGET theme (opposite of current)
   const nextTheme = theme === "dark" ? "light" : "dark";
 
   return (
@@ -1311,9 +1374,9 @@ export default function App() {
               </div>
             </div>
 
-            {/* Desktop toast */}
+            {/* Desktop toast: BETWEEN name and language buttons */}
             <div className="flex-1 hidden md:flex justify-center min-w-0">
-              {eggText ? <EasterToast variant="desktop" visible={eggVisible} text={eggText} onClose={hideEgg} /> : null}
+              {eggText ? <Toast variant="desktop" /> : null}
             </div>
 
             <div className="flex items-center gap-2 shrink-0">
@@ -1357,11 +1420,11 @@ export default function App() {
         </nav>
       </header>
 
-      {/* Mobile toast: центр экрана + вниз */}
+      {/* ✅ Mobile toast: moved DOWN to center of screen, auto-sized, centered text */}
       {eggText ? (
         <div className="fixed md:hidden inset-0 z-[60] pointer-events-none flex items-center justify-center">
           <div className="pointer-events-auto translate-y-16">
-            <EasterToast variant="mobile" visible={eggVisible} text={eggText} onClose={hideEgg} />
+            <Toast variant="mobile" />
           </div>
         </div>
       ) : null}
@@ -1372,9 +1435,16 @@ export default function App() {
         onTouchStart={swipeHandlers.onTouchStart}
         onTouchMove={swipeHandlers.onTouchMove}
         onTouchEnd={swipeHandlers.onTouchEnd}
+        // important for iOS Safari to allow preventDefault in touchmove
         style={{ touchAction: isMobile ? "pan-y" : "auto" }}
       >
-        <TabsSlider isMobile={isMobile} activeIndex={activeIndex} dragX={swipeHandlers.dragX} isDragging={swipeHandlers.isDragging}>
+        {/* ✅ Animated tab content slider (mobile) */}
+        <TabsSlider
+          isMobile={isMobile}
+          activeIndex={activeIndex}
+          dragX={swipeHandlers.dragX}
+          isDragging={swipeHandlers.isDragging}
+        >
           {/* ABOUT */}
           <section hidden={!showAbout} aria-hidden={!showAbout}>
             <div className="grid md:grid-cols-3 gap-6 sm:gap-8 items-start">
@@ -1403,7 +1473,7 @@ export default function App() {
                         src="/Portrait_1.webp"
                         alt="Portrait"
                         className="w-full h-full object-contain"
-                        loading="lazy"
+                        loading="eager"
                         decoding="async"
                         fetchPriority="high"
                         sizes="(max-width: 640px) 112px, (max-width: 768px) 128px, 144px"
@@ -1437,12 +1507,18 @@ export default function App() {
                     onChange={(e) => setQuery(e.target.value)}
                     className={[
                       "w-full pl-9 pr-10 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-100",
-                      // Оставляем без жирных колец, но фокус всё же должен быть видимым:
-                      "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 dark:focus-visible:ring-blue-500/40",
+                      // ✅ remove ALL focus outline/ring (light + dark)
+                      "outline-none focus:outline-none focus-visible:outline-none",
+                      "ring-0 focus:ring-0 focus-visible:ring-0",
+                      "ring-offset-0 focus:ring-offset-0 focus-visible:ring-offset-0",
+                      "!outline-none !ring-0 !ring-offset-0",
+                      "focus:!outline-none focus-visible:!outline-none",
+                      "focus:!ring-0 focus-visible:!ring-0",
+                      "focus:!ring-offset-0 focus-visible:!ring-offset-0",
+                      "focus:shadow-none focus-visible:shadow-none !shadow-none",
                     ].join(" ")}
                   />
-
-                  {!!query ? (
+                  {!!query && (
                     <button
                       type="button"
                       onClick={clearQuery}
@@ -1453,7 +1529,7 @@ export default function App() {
                     >
                       <X className="w-4 h-4 text-slate-500 dark:text-slate-300" />
                     </button>
-                  ) : null}
+                  )}
                 </div>
 
                 <div className="hidden sm:block lg:col-span-2" />
@@ -1472,7 +1548,7 @@ export default function App() {
           {/* AUDIOBOOKS */}
           <section hidden={!showAudio} aria-hidden={!showAudio}>
             <div className="space-y-4 sm:space-y-6">
-              {!audioBookId ? (
+              {!audioBookId && (
                 <>
                   <p className="text-slate-700 dark:text-slate-300">{t("audio_choose")}</p>
 
@@ -1486,7 +1562,9 @@ export default function App() {
                     </div>
                   )}
                 </>
-              ) : selectedBook ? (
+              )}
+
+              {audioBookId && selectedBook && (
                 <>
                   <div className="mb-4 sm:mb-6 flex flex-col gap-3 sm:gap-4 md:flex-row md:items-start md:justify-between">
                     <div className="order-2 md:order-1 w-full">
@@ -1496,7 +1574,7 @@ export default function App() {
                           alt={selectedBook.title}
                           className="w-20 h-20 rounded-2xl object-cover shadow flex-none md:hidden"
                           decoding="async"
-                          loading="lazy"
+                          loading="eager"
                           sizes="80px"
                         />
 
@@ -1542,7 +1620,7 @@ export default function App() {
                       alt={selectedBook.title}
                       className="hidden md:block w-full aspect-square object-cover rounded-2xl shadow md:col-span-1"
                       decoding="async"
-                      loading="lazy"
+                      loading="eager"
                       sizes="(max-width: 1024px) 40vw, 360px"
                     />
 
@@ -1567,8 +1645,6 @@ export default function App() {
                     </div>
                   </div>
                 </>
-              ) : (
-                <EmptyState title={t("not_found")} subtitle={t("audio_empty")} />
               )}
             </div>
           </section>
@@ -1595,6 +1671,7 @@ export default function App() {
                 aria-label={nextTheme === "dark" ? t("theme_dark") : t("theme_light")}
                 title={nextTheme === "dark" ? t("theme_dark") : t("theme_light")}
               >
+                {/* ✅ show the icon of the TARGET theme (opposite of current) */}
                 {nextTheme === "dark" ? <Moon className="w-3.5 h-3.5" /> : <Sun className="w-3.5 h-3.5" />}
                 <span>{nextTheme === "dark" ? t("theme_dark") : t("theme_light")}</span>
               </button>
