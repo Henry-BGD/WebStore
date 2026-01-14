@@ -628,50 +628,45 @@ function ProductCard({ item, t, lang }) {
 
   return (
     <Card
-      className={[
-        // ✅ visual like your "СТАЛО": tighter image margins + more “panel” feel
-        "overflow-hidden border flex flex-col rounded-2xl",
-        "bg-white border-slate-200",
-        "dark:bg-slate-950 dark:border-slate-800",
-        "shadow-sm dark:shadow-none",
-        isDisabled ? "opacity-80" : "",
-      ].join(" ")}
-    >
-     <CardHeader className="p-0 bg-transparent">
-  {/* КАРТИНКА — ВЕРХНЯЯ ПАНЕЛЬ КАРТОЧКИ */}
-  <div className="relative overflow-hidden rounded-t-2xl">
-    {/* строго 4:3, без внутренних отступов */}
-    <div className="w-full aspect-[4/3]">
-      <img
-        src={item.image}
-        alt={item.title}
-        className="w-full h-full object-cover"
-        decoding="async"
-        loading="eager"
-        sizes="(max-width: 1024px) 90vw, 360px"
-      />
-    </div>
+  className={[
+    "overflow-hidden border flex flex-col rounded-2xl",
+    "bg-white border-slate-200",
+    "dark:bg-slate-950 dark:border-slate-800",
+    isDisabled ? "opacity-80" : "",
+  ].join(" ")}
+>
+  {/* ✅ IMAGE PANEL (без CardHeader, чтобы убрать скрытые padding’и) */}
+  <div className="relative p-[1px]">
+    <div className="relative rounded-2xl overflow-hidden">
+      {/* ✅ 4:3, занимает почти всю область */}
+      <div className="w-full aspect-[4/3] bg-transparent dark:bg-slate-200/35">
+        <img
+          src={item.image}
+          alt={item.title}
+          className="w-full h-full object-cover block"
+          decoding="async"
+          loading="eager"
+          sizes="(max-width: 1024px) 90vw, 360px"
+        />
+      </div>
 
-    {/* БЕЙДЖИ — ПРИКЛЕЕНЫ К УГЛУ КАРТИНКИ */}
-    <div className="absolute top-2 left-2 flex flex-wrap gap-1.5">
-      {item.badges?.map((b) => (
-        <Badge
-          key={b}
-          className="
-            px-2.5 py-1
-            text-[11px] font-medium leading-none
-            rounded-full
-            bg-slate-100/95 text-slate-700
-            border border-slate-200
-            dark:bg-slate-100/95 dark:text-slate-700 dark:border-slate-200
-          "
-        >
-          {b}
-        </Badge>
-      ))}
+      {/* ✅ бейджи в углу КАРТИНКИ */}
+      <div className="absolute top-[6px] left-[6px] flex flex-wrap gap-1.5">
+        {item.badges?.map((b) => (
+          <Badge
+            key={b}
+            className={[
+              "px-2.5 py-1 text-[11px] font-medium leading-none rounded-full",
+              "bg-slate-100/95 text-slate-700 border border-slate-200",
+              "dark:bg-slate-100/95 dark:text-slate-700 dark:border-slate-200",
+            ].join(" ")}
+          >
+            {b}
+          </Badge>
+        ))}
+      </div>
     </div>
   </div>
-</CardHeader>
 
       <CardContent className="p-4 pt-3 flex flex-col flex-grow dark:bg-slate-200/10">
         <div className="space-y-1">
