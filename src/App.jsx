@@ -557,7 +557,7 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
                 // ✅ KEEP block size (h-8 w-8), but maximize icon inside WITHOUT changing block size
                 "h-8 w-8 inline-flex items-center justify-center rounded-xl border border-slate-200 transition",
                 "border-slate-200 bg-white hover:bg-slate-50 active:scale-[0.98]",
-                "dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800/70",
+                "dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800/70",
                 "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
                 "dark:focus-visible:ring-blue-500/40 dark:focus-visible:ring-offset-slate-950",
                 "[-webkit-tap-highlight-color:transparent]",
@@ -583,7 +583,7 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
                     // ✅ KEEP block size (h-8 w-8), but maximize icon inside WITHOUT changing block size
                     "h-8 w-8 inline-flex items-center justify-center rounded-xl border border-slate-200 transition",
                     "border-slate-200 bg-white hover:bg-slate-50 active:scale-[0.98]",
-                    "dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800/70",
+                    "dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800/70",
                     "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
                     "dark:focus-visible:ring-blue-500/40 dark:focus-visible:ring-offset-slate-950",
                     "[-webkit-tap-highlight-color:transparent]",
@@ -629,21 +629,25 @@ function ProductCard({ item, t, lang }) {
   return (
     <Card
       className={[
+        // ✅ visual like your "СТАЛО": tighter image margins + more “panel” feel
         "overflow-hidden border flex flex-col rounded-2xl",
         "bg-white border-slate-200",
         "dark:bg-slate-950 dark:border-slate-800",
+        "shadow-sm dark:shadow-none",
         isDisabled ? "opacity-80" : "",
       ].join(" ")}
     >
       <CardHeader className="p-0">
-        <div className="relative p-3">
+        {/* ✅ less padding so the cover sits “bigger” like in the reference */}
+        <div className="relative p-2 sm:p-3">
           <div className="rounded-2xl overflow-hidden">
-            {/* ✅ remove underlay ONLY for light theme */}
-            <div className="w-full aspect-[4/3] bg-transparent dark:bg-slate-200/35">
+            {/* ✅ slightly wider aspect and tighter framing */}
+            <div className="w-full aspect-[16/10] bg-transparent dark:bg-slate-200/35">
               <img
                 src={item.image}
                 alt={item.title}
-                className="w-full h-full object-contain block"
+                // ✅ cover fills more (like your mock): use object-cover + keep right side visible
+                className="w-full h-full object-cover object-right block"
                 decoding="async"
                 loading="eager"
                 sizes="(max-width: 1024px) 90vw, 360px"
@@ -651,15 +655,14 @@ function ProductCard({ item, t, lang }) {
             </div>
           </div>
 
-          {/* ✅ badges moved left and compact */}
-          {/* ✅ CHANGE: move a bit to the right (left-3 -> left-4) */}
-          <div className="absolute top-4 left-4 flex flex-wrap gap-1">
+          {/* ✅ badges positioned closer to the image edge and ровно */}
+          <div className="absolute top-3 left-3 flex flex-wrap gap-1">
             {item.badges?.map((b) => (
               <Badge
                 key={b}
                 className={[
-                  // ✅ smaller text + smaller chip
-                  "px-1.5 py-0.5 text-[10px] font-normal leading-none",
+                  // ✅ chips closer to your screenshot feel (still compact)
+                  "px-2.5 py-1 text-[11px] font-medium leading-none rounded-full",
                   "bg-slate-100 text-slate-700 border border-slate-200",
                   "dark:bg-slate-100 dark:text-slate-700 dark:border-slate-200",
                 ].join(" ")}
@@ -692,14 +695,19 @@ function ProductCard({ item, t, lang }) {
                 variant="outline"
                 type="button"
                 disabled
-                className="flex items-center gap-2 opacity-70 cursor-not-allowed dark:bg-slate-900 dark:border-slate-700"
+                className="flex items-center gap-2 opacity-70 cursor-not-allowed dark:bg-slate-900 dark:border-slate-700 rounded-full px-5 py-2.5"
               >
                 <ExternalLink className="w-4 h-4" />
                 <span className="whitespace-nowrap">{lang === "ru" ? "Скоро в продаже" : "Coming soon"}</span>
               </Button>
             </span>
           ) : (
-            <LinkButton href={item.externalUrl} disabled={!canBuy} aria-label={productBuyLabel(item, t)}>
+            <LinkButton
+              href={item.externalUrl}
+              disabled={!canBuy}
+              aria-label={productBuyLabel(item, t)}
+              className="rounded-full px-5 py-2.5"
+            >
               <ExternalLink className="w-4 h-4" />
               <span className="whitespace-nowrap">{productBuyLabel(item, t)}</span>
             </LinkButton>
