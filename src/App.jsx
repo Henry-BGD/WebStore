@@ -554,8 +554,8 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
               type="button"
               onClick={() => onToggle(track)}
               className={[
-                // was h-9 w-9 -> smaller again
-                "h-8 w-8 inline-flex items-center justify-center rounded-xl border transition",
+                // ✅ KEEP block size (h-8 w-8), but make button feel bigger via icon + border + shadow
+                "h-8 w-8 inline-flex items-center justify-center rounded-xl border border-slate-300 transition shadow-sm",
                 "border-slate-200 bg-white hover:bg-slate-50 active:scale-[0.98]",
                 "dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800/70",
                 "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
@@ -568,14 +568,20 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
               aria-pressed={activeAndPlaying}
               data-no-swipe="true"
             >
-              {activeAndPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
+              {/* ✅ bigger icons WITHOUT changing button block size */}
+              {activeAndPlaying ? (
+                <Pause className="w-[18px] h-[18px]" />
+              ) : (
+                <Play className="w-[18px] h-[18px]" />
+              )}
             </button>
 
             {track.src && track.src !== "#" && (
               <a href={track.src} download className="inline-flex" aria-label={`${t("download")}: ${track.title}`}>
                 <span
                   className={[
-                    "h-8 w-8 inline-flex items-center justify-center rounded-xl border transition",
+                    // ✅ KEEP block size (h-8 w-8), but make it feel bigger
+                    "h-8 w-8 inline-flex items-center justify-center rounded-xl border border-slate-300 transition shadow-sm",
                     "border-slate-200 bg-white hover:bg-slate-50 active:scale-[0.98]",
                     "dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800/70",
                     "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
@@ -585,7 +591,8 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
                   title={t("download")}
                   data-no-swipe="true"
                 >
-                  <Download className="w-3.5 h-3.5" />
+                  {/* ✅ bigger icon */}
+                  <Download className="w-[18px] h-[18px]" />
                 </span>
               </a>
             )}
@@ -631,7 +638,8 @@ function ProductCard({ item, t, lang }) {
       <CardHeader className="p-0">
         <div className="relative p-3">
           <div className="rounded-2xl overflow-hidden">
-            <div className="w-full aspect-[4/3] bg-white dark:bg-slate-200/20">
+            {/* ✅ brighter underlay */}
+            <div className="w-full aspect-[4/3] bg-slate-50 dark:bg-slate-200/35">
               <img
                 src={item.image}
                 alt={item.title}
@@ -643,12 +651,14 @@ function ProductCard({ item, t, lang }) {
             </div>
           </div>
 
-          <div className="absolute top-5 left-5 flex flex-wrap gap-1.5">
+          {/* ✅ badges moved left and compact */}
+          <div className="absolute top-4 left-3 flex flex-wrap gap-1">
             {item.badges?.map((b) => (
               <Badge
                 key={b}
                 className={[
-                  "px-2 py-0.5 text-[11px] font-normal leading-none",
+                  // ✅ smaller text + smaller chip
+                  "px-1.5 py-0.5 text-[10px] font-normal leading-none",
                   "bg-slate-100 text-slate-700 border border-slate-200",
                   "dark:bg-slate-100 dark:text-slate-700 dark:border-slate-200",
                 ].join(" ")}
