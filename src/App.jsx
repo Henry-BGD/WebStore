@@ -555,7 +555,7 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
               onClick={() => onToggle(track)}
               className={[
                 // ✅ KEEP block size (h-8 w-8), but maximize icon inside WITHOUT changing block size
-                "h-8 w-8 inline-flex items-center justify-center rounded-xl border border-slate-300 transition shadow-sm overflow-hidden",
+                "h-8 w-8 inline-flex items-center justify-center rounded-xl border border-slate-200 transition",
                 "border-slate-200 bg-white hover:bg-slate-50 active:scale-[0.98]",
                 "dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800/70",
                 "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
@@ -570,9 +570,9 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
             >
               {/* ✅ MAX icon size while still fitting into 32x32 */}
               {activeAndPlaying ? (
-                <Pause className="w-[26px] h-[26px]" />
+                 <Pause className="w-4 h-4" />
               ) : (
-                <Play className="w-[26px] h-[26px]" />
+                  <Play className="w-4 h-4" />
               )}
             </button>
 
@@ -581,7 +581,7 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
                 <span
                   className={[
                     // ✅ KEEP block size (h-8 w-8), but maximize icon inside WITHOUT changing block size
-                    "h-8 w-8 inline-flex items-center justify-center rounded-xl border border-slate-300 transition shadow-sm overflow-hidden",
+                    "h-8 w-8 inline-flex items-center justify-center rounded-xl border border-slate-200 transition",
                     "border-slate-200 bg-white hover:bg-slate-50 active:scale-[0.98]",
                     "dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800/70",
                     "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
@@ -592,7 +592,7 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
                   data-no-swipe="true"
                 >
                   {/* ✅ MAX icon size while still fitting into 32x32 */}
-                  <Download className="w-[26px] h-[26px]" />
+                  <Download className="w-4 h-4" />
                 </span>
               </a>
             )}
