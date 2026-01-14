@@ -550,50 +550,53 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
           </div>
 
           <div className="flex items-center gap-1.5 flex-none">
-            <button
-              type="button"
-              onClick={() => onToggle(track)}
-              className={[
-                // ✅ KEEP block size (h-8 w-8), but maximize icon inside WITHOUT changing block size
-                "h-8 w-8 inline-flex items-center justify-center rounded-xl border border-slate-200 transition",
-                "border-slate-200 bg-white hover:bg-slate-50 active:scale-[0.98]",
-                "dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800/70",
-                "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
-                "dark:focus-visible:ring-blue-500/40 dark:focus-visible:ring-offset-slate-950",
-                "[-webkit-tap-highlight-color:transparent]",
-                isActive ? "shadow-sm dark:shadow-none" : "",
-              ].join(" ")}
-              aria-label={activeAndPlaying ? t("pause") : t("listen")}
-              title={activeAndPlaying ? t("pause") : t("listen")}
-              aria-pressed={activeAndPlaying}
-              data-no-swipe="true"
-            >
-              {/* ✅ MAX icon size while still fitting into 32x32 */}
-              {activeAndPlaying ? (
-                 <Pause className="w-4 h-4" />
-              ) : (
-                  <Play className="w-4 h-4" />
-              )}
-            </button>
+        <button
+  type="button"
+  onClick={() => onToggle(track)}
+  className={[
+    // ✅ УВЕЛИЧЕННАЯ КНОПКА
+    "h-12 w-12 inline-flex items-center justify-center",
+    "rounded-2xl border transition",
+    "border-slate-200 bg-white/80 hover:bg-white active:scale-[0.97]",
+    "dark:border-slate-700 dark:bg-slate-900/80 dark:hover:bg-slate-900",
+    "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
+    "dark:focus-visible:ring-blue-500/40 dark:focus-visible:ring-offset-slate-950",
+    "[-webkit-tap-highlight-color:transparent]",
+    isActive ? "shadow-md dark:shadow-none" : "",
+  ].join(" ")}
+  aria-label={activeAndPlaying ? t("pause") : t("listen")}
+  title={activeAndPlaying ? t("pause") : t("listen")}
+  aria-pressed={activeAndPlaying}
+  data-no-swipe="true"
+>
+  {/* ✅ БОЛЬШАЯ ИКОНКА */}
+  {activeAndPlaying ? (
+    <Pause className="w-6 h-6" />
+  ) : (
+    <Play className="w-6 h-6 translate-x-[1px]" />
+  )}
+</button>
 
             {track.src && track.src !== "#" && (
               <a href={track.src} download className="inline-flex" aria-label={`${t("download")}: ${track.title}`}>
                 <span
-                  className={[
-                    // ✅ KEEP block size (h-8 w-8), but maximize icon inside WITHOUT changing block size
-                    "h-8 w-8 inline-flex items-center justify-center rounded-xl border border-slate-200 transition",
-                    "border-slate-200 bg-white hover:bg-slate-50 active:scale-[0.98]",
-                    "dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800/70",
-                    "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
-                    "dark:focus-visible:ring-blue-500/40 dark:focus-visible:ring-offset-slate-950",
-                    "[-webkit-tap-highlight-color:transparent]",
-                  ].join(" ")}
-                  title={t("download")}
-                  data-no-swipe="true"
-                >
-                  {/* ✅ MAX icon size while still fitting into 32x32 */}
-                  <Download className="w-4 h-4" />
-                </span>
+  className={[
+    // ✅ УВЕЛИЧЕННАЯ КНОПКА
+    "h-12 w-12 inline-flex items-center justify-center",
+    "rounded-2xl border transition",
+    "border-slate-200 bg-white/80 hover:bg-white active:scale-[0.97]",
+    "dark:border-slate-700 dark:bg-slate-900/80 dark:hover:bg-slate-900",
+    "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
+    "dark:focus-visible:ring-blue-500/40 dark:focus-visible:ring-offset-slate-950",
+    "[-webkit-tap-highlight-color:transparent]",
+  ].join(" ")}
+  title={t("download")}
+  data-no-swipe="true"
+>
+  {/* ✅ БОЛЬШАЯ ИКОНКА */}
+  <Download className="w-6 h-6" />
+</span>
+
               </a>
             )}
           </div>
@@ -636,7 +639,7 @@ function ProductCard({ item, t, lang }) {
   ].join(" ")}
 >
   {/* ✅ IMAGE PANEL (без CardHeader, чтобы убрать скрытые padding’и) */}
-  <div className="relative p-[1px]">
+  <div className="relative p-[2px]">
     <div className="relative rounded-2xl overflow-hidden">
       {/* ✅ 4:3, занимает почти всю область */}
       <div className="w-full aspect-[4/3] bg-transparent dark:bg-slate-200/35">
