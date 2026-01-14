@@ -652,7 +652,8 @@ function ProductCard({ item, t, lang }) {
           </div>
 
           {/* ✅ badges moved left and compact */}
-          <div className="absolute top-4 left-3 flex flex-wrap gap-1">
+          {/* ✅ CHANGE: move a bit to the right (left-3 -> left-4) */}
+          <div className="absolute top-4 left-4 flex flex-wrap gap-1">
             {item.badges?.map((b) => (
               <Badge
                 key={b}
@@ -1307,10 +1308,12 @@ export default function App() {
       "px-4 py-2 text-sm font-semibold " +
       "max-w-[520px]";
 
+    // ✅ CHANGE: mobile toast is auto-sized by content (w-fit) + centered text
     const mobileCls =
       "md:hidden " +
       "px-4 py-3 text-sm font-semibold " +
-      "whitespace-normal leading-snug";
+      "whitespace-normal leading-snug " +
+      "text-center w-fit max-w-[90vw]";
 
     return (
       <div
@@ -1417,10 +1420,10 @@ export default function App() {
         </nav>
       </header>
 
-      {/* Mobile toast: overlays around “Contacts” area vibe */}
+      {/* ✅ Mobile toast: moved DOWN to center of screen, auto-sized, centered text */}
       {eggText ? (
-        <div className="fixed md:hidden left-4 right-4 top-28 z-[60] pointer-events-none">
-          <div className="pointer-events-auto">
+        <div className="fixed md:hidden inset-0 z-[60] pointer-events-none flex items-center justify-center">
+          <div className="pointer-events-auto translate-y-16">
             <Toast variant="mobile" />
           </div>
         </div>
