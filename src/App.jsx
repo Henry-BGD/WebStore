@@ -554,8 +554,8 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
               type="button"
               onClick={() => onToggle(track)}
               className={[
-                // ✅ KEEP block size (h-8 w-8), but make button feel bigger via icon + border + shadow
-                "h-8 w-8 inline-flex items-center justify-center rounded-xl border border-slate-300 transition shadow-sm",
+                // ✅ KEEP block size (h-8 w-8), but maximize icon inside WITHOUT changing block size
+                "h-8 w-8 inline-flex items-center justify-center rounded-xl border border-slate-300 transition shadow-sm overflow-hidden",
                 "border-slate-200 bg-white hover:bg-slate-50 active:scale-[0.98]",
                 "dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800/70",
                 "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
@@ -568,11 +568,11 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
               aria-pressed={activeAndPlaying}
               data-no-swipe="true"
             >
-              {/* ✅ bigger icons WITHOUT changing button block size */}
+              {/* ✅ MAX icon size while still fitting into 32x32 */}
               {activeAndPlaying ? (
-                <Pause className="w-[18px] h-[18px]" />
+                <Pause className="w-[26px] h-[26px]" />
               ) : (
-                <Play className="w-[18px] h-[18px]" />
+                <Play className="w-[26px] h-[26px]" />
               )}
             </button>
 
@@ -580,8 +580,8 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
               <a href={track.src} download className="inline-flex" aria-label={`${t("download")}: ${track.title}`}>
                 <span
                   className={[
-                    // ✅ KEEP block size (h-8 w-8), but make it feel bigger
-                    "h-8 w-8 inline-flex items-center justify-center rounded-xl border border-slate-300 transition shadow-sm",
+                    // ✅ KEEP block size (h-8 w-8), but maximize icon inside WITHOUT changing block size
+                    "h-8 w-8 inline-flex items-center justify-center rounded-xl border border-slate-300 transition shadow-sm overflow-hidden",
                     "border-slate-200 bg-white hover:bg-slate-50 active:scale-[0.98]",
                     "dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800/70",
                     "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
@@ -591,8 +591,8 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
                   title={t("download")}
                   data-no-swipe="true"
                 >
-                  {/* ✅ bigger icon */}
-                  <Download className="w-[18px] h-[18px]" />
+                  {/* ✅ MAX icon size while still fitting into 32x32 */}
+                  <Download className="w-[26px] h-[26px]" />
                 </span>
               </a>
             )}
@@ -638,8 +638,8 @@ function ProductCard({ item, t, lang }) {
       <CardHeader className="p-0">
         <div className="relative p-3">
           <div className="rounded-2xl overflow-hidden">
-            {/* ✅ brighter underlay */}
-            <div className="w-full aspect-[4/3] bg-slate-50 dark:bg-slate-200/35">
+            {/* ✅ remove underlay ONLY for light theme */}
+            <div className="w-full aspect-[4/3] bg-transparent dark:bg-slate-200/35">
               <img
                 src={item.image}
                 alt={item.title}
@@ -1329,6 +1329,9 @@ export default function App() {
     );
   };
 
+  // ✅ label/icon should show the TARGET theme (opposite of current)
+  const nextTheme = theme === "dark" ? "light" : "dark";
+
   return (
     <div className="min-h-screen flex flex-col bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100">
       <a
@@ -1499,7 +1502,18 @@ export default function App() {
                     placeholder={t("products_search")}
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
-                    className="w-full pl-9 pr-10 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-100"
+                    className={[
+                      "w-full pl-9 pr-10 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-100",
+                      // ✅ remove ALL focus outline/ring (light + dark)
+                      "outline-none focus:outline-none focus-visible:outline-none",
+                      "ring-0 focus:ring-0 focus-visible:ring-0",
+                      "ring-offset-0 focus:ring-offset-0 focus-visible:ring-offset-0",
+                      "!outline-none !ring-0 !ring-offset-0",
+                      "focus:!outline-none focus-visible:!outline-none",
+                      "focus:!ring-0 focus-visible:!ring-0",
+                      "focus:!ring-offset-0 focus-visible:!ring-offset-0",
+                      "focus:shadow-none focus-visible:shadow-none !shadow-none",
+                    ].join(" ")}
                   />
                   {!!query && (
                     <button
@@ -1651,11 +1665,12 @@ export default function App() {
                   "dark:focus-visible:ring-blue-500/40 dark:focus-visible:ring-offset-slate-950",
                   "[-webkit-tap-highlight-color:transparent]",
                 ].join(" ")}
-                aria-label={theme === "dark" ? t("theme_dark") : t("theme_light")}
-                title={theme === "dark" ? t("theme_dark") : t("theme_light")}
+                aria-label={nextTheme === "dark" ? t("theme_dark") : t("theme_light")}
+                title={nextTheme === "dark" ? t("theme_dark") : t("theme_light")}
               >
-                {theme === "dark" ? <Moon className="w-3.5 h-3.5" /> : <Sun className="w-3.5 h-3.5" />}
-                <span>{theme === "dark" ? t("theme_dark") : t("theme_light")}</span>
+                {/* ✅ show the icon of the TARGET theme (opposite of current) */}
+                {nextTheme === "dark" ? <Moon className="w-3.5 h-3.5" /> : <Sun className="w-3.5 h-3.5" />}
+                <span>{nextTheme === "dark" ? t("theme_dark") : t("theme_light")}</span>
               </button>
             </div>
           </div>
