@@ -570,9 +570,9 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
             >
               {/* ✅ MAX icon size while still fitting into 32x32 */}
               {activeAndPlaying ? (
-                 <Pause className="w-6 h-6" />
+                 <Pause className="w-4 h-4" />
               ) : (
-                  <Play className="w-6 h-6" />
+                  <Play className="w-4 h-4" />
               )}
             </button>
 
@@ -592,7 +592,7 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
                   data-no-swipe="true"
                 >
                   {/* ✅ MAX icon size while still fitting into 32x32 */}
-                  <Download className="w-6 h-6" />
+                  <Download className="w-4 h-4" />
                 </span>
               </a>
             )}
@@ -652,8 +652,8 @@ function ProductCard({ item, t, lang }) {
           </div>
 
           {/* ✅ badges moved left and compact */}
-          {/* ✅ CHANGE: move DOWN + LEFT (top-4/left-4 -> top-8/left-8) */}
-          <div className="absolute top-8 left-8 flex flex-wrap gap-1">
+          {/* ✅ CHANGE: move a bit to the right (left-3 -> left-4) */}
+          <div className="absolute top-4 left-4 flex flex-wrap gap-1">
             {item.badges?.map((b) => (
               <Badge
                 key={b}
