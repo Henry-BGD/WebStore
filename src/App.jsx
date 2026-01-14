@@ -519,100 +519,99 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
 
   return (
     <Card
-      className={[
-        "border transition rounded-2xl",
-        "bg-white border-slate-200",
-        "dark:bg-slate-950 dark:border-slate-800",
-        isActive ? "shadow-sm dark:shadow-none" : "",
-      ].join(" ")}
-    >
-      {/* was p-2 -> smaller again */}
-      <CardContent className="p-0">
-  <div className="flex items-start justify-between gap-2">
-    {/* LEFT: title */}
-    <div className="min-w-0 py-1">
-      <p
-        className="
-          font-medium truncate
-          text-[15px] sm:text-[15.5px]
-          leading-[1.05]
-          text-slate-900 dark:text-slate-100
-        "
-      >
-        {track.title}
-      </p>
-
-      {showScrubber && (
-        <p className="text-[10.5px] text-slate-500 dark:text-slate-400 mt-0.5 tabular-nums">
-          {formatTime(safeTime)} / {formatTime(safeDuration)}
+  className={[
+    "border transition rounded-2xl",
+    "bg-white border-slate-200",
+    "dark:bg-slate-950 dark:border-slate-800",
+    isActive ? "shadow-sm dark:shadow-none" : "",
+  ].join(" ")}
+>
+  <CardContent className="p-0">
+    {/* ✅ ROW: высота почти как кнопки + минимальные поля */}
+    <div className="flex items-center justify-between gap-3 px-3 py-2">
+      {/* LEFT: text (центр по вертикали) */}
+      <div className="min-w-0 flex-1">
+        <p className="font-semibold truncate text-[15px] sm:text-[15.5px] leading-none text-slate-900 dark:text-slate-100">
+          {track.title}
         </p>
-      )}
+
+        {/* если активный — показываем тайминг (не раздувает высоту сильно) */}
+        {showScrubber && (
+          <p className="mt-1 text-[10.5px] leading-none text-slate-500 dark:text-slate-400 tabular-nums">
+            {formatTime(safeTime)} / {formatTime(safeDuration)}
+          </p>
+        )}
+      </div>
+
+      {/* RIGHT: buttons — большие и почти занимают высоту ряда */}
+      <div className="flex items-center gap-4 flex-none">
+        <button
+          type="button"
+          onClick={() => onToggle(track)}
+          className={[
+            "h-12 w-12 inline-flex items-center justify-center flex-none",
+            "rounded-2xl border transition",
+            "border-slate-200 bg-white hover:bg-slate-50 active:scale-[0.97]",
+            "dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800/70",
+            "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
+            "dark:focus-visible:ring-blue-500/40 dark:focus-visible:ring-offset-slate-950",
+            "[-webkit-tap-highlight-color:transparent]",
+          ].join(" ")}
+          aria-label={activeAndPlaying ? t("pause") : t("listen")}
+          title={activeAndPlaying ? t("pause") : t("listen")}
+          aria-pressed={activeAndPlaying}
+          data-no-swipe="true"
+        >
+          {activeAndPlaying ? (
+            <Pause className="w-7 h-7" />
+          ) : (
+            <Play className="w-7 h-7 translate-x-[1px]" />
+          )}
+        </button>
+
+        {track.src && track.src !== "#" && (
+          <a href={track.src} download className="inline-flex" aria-label={`${t("download")}: ${track.title}`}>
+            <span
+              className={[
+                "h-12 w-12 inline-flex items-center justify-center flex-none",
+                "rounded-2xl border transition",
+                "border-slate-200 bg-white hover:bg-slate-50 active:scale-[0.97]",
+                "dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800/70",
+                "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
+                "dark:focus-visible:ring-blue-500/40 dark:focus-visible:ring-offset-slate-950",
+                "[-webkit-tap-highlight-color:transparent]",
+              ].join(" ")}
+              title={t("download")}
+              data-no-swipe="true"
+            >
+              <Download className="w-7 h-7" />
+            </span>
+          </a>
+        )}
+      </div>
     </div>
 
-    {/* RIGHT: buttons (big) — минимальные отступы сверху/снизу */}
-    <div className="flex items-start gap-3 flex-none p-1">
-      <button
-        type="button"
-        onClick={() => onToggle(track)}
-        className={[
-          "h-11 w-11 inline-flex items-center justify-center flex-none",
-          "rounded-2xl border transition",
-          "border-slate-200 bg-white/80 hover:bg-white active:scale-[0.97]",
-          "dark:border-slate-700 dark:bg-slate-900/80 dark:hover:bg-slate-900",
-          "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
-          "dark:focus-visible:ring-blue-500/40 dark:focus-visible:ring-offset-slate-950",
-          "[-webkit-tap-highlight-color:transparent]",
-          isActive ? "shadow-sm dark:shadow-none" : "",
-        ].join(" ")}
-        aria-label={activeAndPlaying ? t("pause") : t("listen")}
-        title={activeAndPlaying ? t("pause") : t("listen")}
-        aria-pressed={activeAndPlaying}
-        data-no-swipe="true"
-      >
-        {activeAndPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6 translate-x-[1px]" />}
-      </button>
+    {/* ✅ SCRUBBER: отдельной строкой снизу (чтобы верхний ряд всегда был компактным) */}
+    {showScrubber && (
+      <div className="px-3 pb-2">
+        <input
+          type="range"
+          role="slider"
+          min={0}
+          max={safeDuration || 0}
+          step={0.25}
+          value={Math.min(safeTime, safeDuration || safeTime)}
+          onChange={(e) => onSeek(Number(e.target.value))}
+          disabled={!safeDuration}
+          className="w-full accent-blue-600 disabled:opacity-40 disabled:cursor-not-allowed"
+          aria-label="Seek within track"
+          data-no-swipe="true"
+        />
+      </div>
+    )}
+  </CardContent>
+</Card>
 
-      {track.src && track.src !== "#" && (
-        <a href={track.src} download className="inline-flex" aria-label={`${t("download")}: ${track.title}`}>
-          <span
-            className={[
-              "h-11 w-11 inline-flex items-center justify-center flex-none",
-              "rounded-2xl border transition",
-              "border-slate-200 bg-white/80 hover:bg-white active:scale-[0.97]",
-              "dark:border-slate-700 dark:bg-slate-900/80 dark:hover:bg-slate-900",
-              "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
-              "dark:focus-visible:ring-blue-500/40 dark:focus-visible:ring-offset-slate-950",
-              "[-webkit-tap-highlight-color:transparent]",
-            ].join(" ")}
-            title={t("download")}
-            data-no-swipe="true"
-          >
-            <Download className="w-6 h-6" />
-          </span>
-        </a>
-      )}
-    </div>
-  </div>
-
-  {showScrubber && (
-    <div className="px-1 pb-1">
-      <input
-        type="range"
-        role="slider"
-        min={0}
-        max={safeDuration || 0}
-        step={0.25}
-        value={Math.min(safeTime, safeDuration || safeTime)}
-        onChange={(e) => onSeek(Number(e.target.value))}
-        disabled={!safeDuration}
-        className="w-full accent-blue-600 disabled:opacity-40 disabled:cursor-not-allowed"
-        aria-label="Seek within track"
-        data-no-swipe="true"
-      />
-    </div>
-  )}
-</CardContent>
-    </Card>
   );
 }
 
