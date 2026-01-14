@@ -528,58 +528,32 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
     >
       {/* was p-2 -> smaller again */}
       <CardContent className="p-0">
-        <div className="flex items-center justify-between gap-1.5">
-          <div className="min-w-0">
-            {/* ✅ requested title styling (kept) */}
-            <p
-              className="
-                font-medium truncate
-                text-[15px] sm:text-[15.5px]
-                leading-[1.1]
-                text-slate-900 dark:text-slate-100
-              "
-            >
-              {track.title}
-            </p>
+  <div className="flex items-start justify-between gap-2">
+    {/* LEFT: title */}
+    <div className="min-w-0 py-1">
+      <p
+        className="
+          font-medium truncate
+          text-[15px] sm:text-[15.5px]
+          leading-[1.05]
+          text-slate-900 dark:text-slate-100
+        "
+      >
+        {track.title}
+      </p>
 
-            {showScrubber && (
-              <p className="text-[10.5px] text-slate-500 dark:text-slate-400 mt-0.5 tabular-nums">
-                {formatTime(safeTime)} / {formatTime(safeDuration)}
-              </p>
-            )}
-          </div>
+      {showScrubber && (
+        <p className="text-[10.5px] text-slate-500 dark:text-slate-400 mt-0.5 tabular-nums">
+          {formatTime(safeTime)} / {formatTime(safeDuration)}
+        </p>
+      )}
+    </div>
 
-          <div className="flex items-center gap-3 flex-none">
-  {/* ✅ PLAY / PAUSE — большая, но не раздувает строку */}
-  <button
-    type="button"
-    onClick={() => onToggle(track)}
-    className={[
-      "h-11 w-11 inline-flex items-center justify-center flex-none",
-      "rounded-2xl border transition",
-      "border-slate-200 bg-white/80 hover:bg-white active:scale-[0.97]",
-      "dark:border-slate-700 dark:bg-slate-900/80 dark:hover:bg-slate-900",
-      "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
-      "dark:focus-visible:ring-blue-500/40 dark:focus-visible:ring-offset-slate-950",
-      "[-webkit-tap-highlight-color:transparent]",
-      isActive ? "shadow-sm dark:shadow-none" : "",
-    ].join(" ")}
-    aria-label={activeAndPlaying ? t("pause") : t("listen")}
-    title={activeAndPlaying ? t("pause") : t("listen")}
-    aria-pressed={activeAndPlaying}
-    data-no-swipe="true"
-  >
-    {activeAndPlaying ? (
-      <Pause className="w-6 h-6" />
-    ) : (
-      <Play className="w-6 h-6 translate-x-[1px]" />
-    )}
-  </button>
-
-  {/* ✅ DOWNLOAD */}
-  {track.src && track.src !== "#" && (
-    <a href={track.src} download className="inline-flex" aria-label={`${t("download")}: ${track.title}`}>
-      <span
+    {/* RIGHT: buttons (big) — минимальные отступы сверху/снизу */}
+    <div className="flex items-start gap-3 flex-none p-1">
+      <button
+        type="button"
+        onClick={() => onToggle(track)}
         className={[
           "h-11 w-11 inline-flex items-center justify-center flex-none",
           "rounded-2xl border transition",
@@ -588,36 +562,56 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
           "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
           "dark:focus-visible:ring-blue-500/40 dark:focus-visible:ring-offset-slate-950",
           "[-webkit-tap-highlight-color:transparent]",
+          isActive ? "shadow-sm dark:shadow-none" : "",
         ].join(" ")}
-        title={t("download")}
+        aria-label={activeAndPlaying ? t("pause") : t("listen")}
+        title={activeAndPlaying ? t("pause") : t("listen")}
+        aria-pressed={activeAndPlaying}
         data-no-swipe="true"
       >
-        <Download className="w-6 h-6" />
-      </span>
-    </a>
+        {activeAndPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6 translate-x-[1px]" />}
+      </button>
+
+      {track.src && track.src !== "#" && (
+        <a href={track.src} download className="inline-flex" aria-label={`${t("download")}: ${track.title}`}>
+          <span
+            className={[
+              "h-11 w-11 inline-flex items-center justify-center flex-none",
+              "rounded-2xl border transition",
+              "border-slate-200 bg-white/80 hover:bg-white active:scale-[0.97]",
+              "dark:border-slate-700 dark:bg-slate-900/80 dark:hover:bg-slate-900",
+              "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
+              "dark:focus-visible:ring-blue-500/40 dark:focus-visible:ring-offset-slate-950",
+              "[-webkit-tap-highlight-color:transparent]",
+            ].join(" ")}
+            title={t("download")}
+            data-no-swipe="true"
+          >
+            <Download className="w-6 h-6" />
+          </span>
+        </a>
+      )}
+    </div>
+  </div>
+
+  {showScrubber && (
+    <div className="px-1 pb-1">
+      <input
+        type="range"
+        role="slider"
+        min={0}
+        max={safeDuration || 0}
+        step={0.25}
+        value={Math.min(safeTime, safeDuration || safeTime)}
+        onChange={(e) => onSeek(Number(e.target.value))}
+        disabled={!safeDuration}
+        className="w-full accent-blue-600 disabled:opacity-40 disabled:cursor-not-allowed"
+        aria-label="Seek within track"
+        data-no-swipe="true"
+      />
+    </div>
   )}
-</div>
-
-        </div>
-
-        {showScrubber && (
-          <div className="mt-1.5">
-            <input
-              type="range"
-              role="slider"
-              min={0}
-              max={safeDuration || 0}
-              step={0.25}
-              value={Math.min(safeTime, safeDuration || safeTime)}
-              onChange={(e) => onSeek(Number(e.target.value))}
-              disabled={!safeDuration}
-              className="w-full accent-blue-600 disabled:opacity-40 disabled:cursor-not-allowed"
-              aria-label="Seek within track"
-              data-no-swipe="true"
-            />
-          </div>
-        )}
-      </CardContent>
+</CardContent>
     </Card>
   );
 }
