@@ -4,6 +4,7 @@ import { Button } from "./components/ui/Button.jsx";
 import { Input } from "./components/ui/Input.jsx";
 import { Badge } from "./components/ui/Badge.jsx";
 import { ExternalLink, Download, Play, Pause, X, Search, Sun, Moon } from "lucide-react";
+import { Analytics } from "@vercel/analytics/react";
 
 // ================== LAYOUT ==================
 const CONTAINER = "w-full max-w-6xl mx-auto px-4 sm:px-8";
@@ -1670,6 +1671,7 @@ export default function App() {
           </div>
         </div>
       </footer>
+      <Analytics />
     </div>
   );
 }
