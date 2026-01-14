@@ -638,41 +638,41 @@ function ProductCard({ item, t, lang }) {
       ].join(" ")}
     >
       <CardHeader className="p-0">
-        {/* ✅ less padding so the cover sits “bigger” like in the reference */}
-        <div className="relative p-2 sm:p-3">
-          <div className="rounded-2xl overflow-hidden">
-            {/* ✅ slightly wider aspect and tighter framing */}
-            <div className="w-full aspect-[16/10] bg-transparent dark:bg-slate-200/35">
-              <img
-                src={item.image}
-                alt={item.title}
-                // ✅ cover fills more (like your mock): use object-cover + keep right side visible
-                className="w-full h-full object-cover object-right block"
-                decoding="async"
-                loading="eager"
-                sizes="(max-width: 1024px) 90vw, 360px"
-              />
-            </div>
-          </div>
+  {/* тонкая "рамка" вокруг картинки */}
+  <div className="relative p-1">
+    {/* контейнер изображения */}
+    <div className="relative rounded-2xl overflow-hidden">
+      {/* строго 4:3, почти на всю область */}
+      <div className="w-full aspect-[4/3] bg-transparent dark:bg-slate-200/35">
+        <img
+          src={item.image}
+          alt={item.title}
+          className="w-full h-full object-cover block"
+          decoding="async"
+          loading="eager"
+          sizes="(max-width: 1024px) 90vw, 360px"
+        />
+      </div>
 
-          {/* ✅ badges positioned closer to the image edge and ровно */}
-          <div className="absolute top-3 left-3 flex flex-wrap gap-1">
-            {item.badges?.map((b) => (
-              <Badge
-                key={b}
-                className={[
-                  // ✅ chips closer to your screenshot feel (still compact)
-                  "px-2.5 py-1 text-[11px] font-medium leading-none rounded-full",
-                  "bg-slate-100 text-slate-700 border border-slate-200",
-                  "dark:bg-slate-100 dark:text-slate-700 dark:border-slate-200",
-                ].join(" ")}
-              >
-                {b}
-              </Badge>
-            ))}
-          </div>
-        </div>
-      </CardHeader>
+      {/* ✅ БЕЙДЖИ ПРИВЯЗАНЫ К УГЛУ ИМЕННО КАРТИНКИ */}
+      <div className="absolute top-2 left-2 flex flex-wrap gap-1.5">
+        {item.badges?.map((b) => (
+          <Badge
+            key={b}
+            className={[
+              // компактные чипы, как на рефе
+              "px-2.5 py-1 text-[11px] font-medium leading-none rounded-full",
+              "bg-slate-100/95 text-slate-700 border border-slate-200",
+              "dark:bg-slate-100/95 dark:text-slate-700 dark:border-slate-200",
+            ].join(" ")}
+          >
+            {b}
+          </Badge>
+        ))}
+      </div>
+    </div>
+  </div>
+</CardHeader>
 
       <CardContent className="p-4 pt-3 flex flex-col flex-grow dark:bg-slate-200/10">
         <div className="space-y-1">
