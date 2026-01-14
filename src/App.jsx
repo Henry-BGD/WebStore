@@ -561,7 +561,7 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
               aria-pressed={activeAndPlaying}
               data-no-swipe="true"
             >
-              {activeAndPlaying ? <Pause className="w-5 h-5" strokeWidth={1.25} /> : <Play className="w-5 h-5 translate-x-[1px]" strokeWidth={1.25} />}
+              {activeAndPlaying ? <Pause className="w-5 h-5" strokeWidth={1.6} /> : <Play className="w-5 h-5 translate-x-[1px]" strokeWidth={1.6} />}
             </button>
 
             {track.src && track.src !== "#" && (
@@ -579,7 +579,7 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
                   title={t("download")}
                   data-no-swipe="true"
                 >
-                  <Download className="w-5 h-5" strokeWidth={1.25} />
+                  <Download className="w-5 h-5" strokeWidth={1.6} />
                 </span>
               </a>
             )}
