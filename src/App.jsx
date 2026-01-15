@@ -1207,8 +1207,8 @@ export default function App() {
     enabled: isMobile && !isPlaying,
     onPrev: goPrevTab,
     onNext: goNextTab,
-    thresholdPx: 60,
-    lockPx: 10,
+    thresholdPx: 45,
+    lockPx: 12,
     restraintPx: 40,
   });
 
