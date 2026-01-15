@@ -136,46 +136,46 @@ function useSwipeTabs({
   );
 
   const onPointerUp = useCallback(
-  (e) => {
-    if (!enabled) {
-      stopTracking();
-      return;
-    }
-    if (e.pointerType !== "touch") return;
+    (e) => {
+      if (!enabled) {
+        stopTracking();
+        return;
+      }
+      if (e.pointerType !== "touch") return;
 
-    // ✅ CANCEL pending RAF so it can't apply stale drag after release
-    if (rafRef.current) {
-      cancelAnimationFrame(rafRef.current);
-      rafRef.current = 0;
-    }
+      // ✅ CANCEL pending RAF so it can't apply stale drag after release
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = 0;
+      }
 
-    if (!tracking.current) {
+      if (!tracking.current) {
+        setIsDragging(false);
+        setDragX(0);
+        return;
+      }
+
+      tracking.current = false;
       setIsDragging(false);
-      setDragX(0);
-      return;
-    }
 
-    tracking.current = false;
-    setIsDragging(false);
+      const dx = latestDx.current;
+      const dy = e.clientY - startY.current;
 
-    const dx = latestDx.current;
-    const dy = e.clientY - startY.current;
+      if (axisLock.current === "y" && Math.abs(dy) > restraintPx) {
+        setDragX(0);
+        axisLock.current = null;
+        return;
+      }
 
-    if (axisLock.current === "y" && Math.abs(dy) > restraintPx) {
+      if (dx > thresholdPx) onPrev?.();
+      else if (dx < -thresholdPx) onNext?.();
+
+      // ✅ snap back, guaranteed final state
       setDragX(0);
       axisLock.current = null;
-      return;
-    }
-
-    if (dx > thresholdPx) onPrev?.();
-    else if (dx < -thresholdPx) onNext?.();
-
-    // ✅ snap back, guaranteed final state
-    setDragX(0);
-    axisLock.current = null;
-  },
-  [enabled, onPrev, onNext, thresholdPx, restraintPx, stopTracking]
-);
+    },
+    [enabled, onPrev, onNext, thresholdPx, restraintPx, stopTracking]
+  );
 
   const onPointerCancel = useCallback(() => {
     stopTracking();
@@ -309,6 +309,7 @@ const AUDIO_ROUTE_MAP = {
 const AUDIO_BOOKS = [
   {
     id: "tolstoy-short-stories",
+    slug: "tolstoy",
     title: "Russian Short Stories",
     cover: "/Audio_External_Leo.webp",
     author: "by Leo Tolstoy",
@@ -324,6 +325,7 @@ const AUDIO_BOOKS = [
   },
   {
     id: "chekhov-short-stories",
+    slug: "chekhov",
     title: "Russian Short Stories",
     cover: "/Audio_External_Chekhov.webp",
     author: "by Anton Chekhov",
@@ -555,7 +557,7 @@ function AudioBookTile({ book, onOpen, comingSoonText }) {
     <button
       onClick={() => {
         if (isDisabled) return;
-        onOpen(book.id);
+        onOpen();
       }}
       className="w-full max-w-sm text-left"
       type="button"
@@ -689,7 +691,6 @@ function TrackRow({ track, isActive, isPlaying, onToggle, onSeek, t, currentTime
   );
 }
 
-
 // ================== ProductCard ==================
 function ProductCard({ item, t, lang }) {
   const isDisabled = !!item.disabled;
@@ -697,45 +698,45 @@ function ProductCard({ item, t, lang }) {
 
   return (
     <Card
-  className={[
-    "overflow-hidden border flex flex-col rounded-2xl",
-    "bg-white border-slate-200",
-    "dark:bg-slate-950 dark:border-slate-800",
-    isDisabled ? "opacity-80" : "",
-  ].join(" ")}
->
-  {/* ✅ IMAGE PANEL (без CardHeader, чтобы убрать скрытые padding’и) */}
-  <div className="relative p-[1px]">
-    <div className="relative rounded-2xl overflow-hidden">
-      {/* ✅ 4:3, занимает почти всю область */}
-      <div className="w-full aspect-[4/3] bg-transparent dark:bg-slate-200/35">
-        <img
-          src={item.image}
-          alt={item.title}
-          className="w-full h-full object-cover block"
-          decoding="async"
-          loading="eager"
-          sizes="(max-width: 1024px) 90vw, 360px"
-        />
-      </div>
+      className={[
+        "overflow-hidden border flex flex-col rounded-2xl",
+        "bg-white border-slate-200",
+        "dark:bg-slate-950 dark:border-slate-800",
+        isDisabled ? "opacity-80" : "",
+      ].join(" ")}
+    >
+      {/* ✅ IMAGE PANEL (без CardHeader, чтобы убрать скрытые padding’и) */}
+      <div className="relative p-[1px]">
+        <div className="relative rounded-2xl overflow-hidden">
+          {/* ✅ 4:3, занимает почти всю область */}
+          <div className="w-full aspect-[4/3] bg-transparent dark:bg-slate-200/35">
+            <img
+              src={item.image}
+              alt={item.title}
+              className="w-full h-full object-cover block"
+              decoding="async"
+              loading="eager"
+              sizes="(max-width: 1024px) 90vw, 360px"
+            />
+          </div>
 
-      {/* ✅ бейджи в углу КАРТИНКИ */}
-      <div className="absolute top-[6px] left-[6px] flex flex-wrap gap-1.5">
-        {item.badges?.map((b) => (
-          <Badge
-            key={b}
-            className={[
-              "px-2.5 py-1 text-[11px] font-medium leading-none rounded-full",
-              "bg-slate-100/95 text-slate-700 border border-slate-200",
-              "dark:bg-slate-100/95 dark:text-slate-700 dark:border-slate-200",
-            ].join(" ")}
-          >
-            {b}
-          </Badge>
-        ))}
+          {/* ✅ бейджи в углу КАРТИНКИ */}
+          <div className="absolute top-[6px] left-[6px] flex flex-wrap gap-1.5">
+            {item.badges?.map((b) => (
+              <Badge
+                key={b}
+                className={[
+                  "px-2.5 py-1 text-[11px] font-medium leading-none rounded-full",
+                  "bg-slate-100/95 text-slate-700 border border-slate-200",
+                  "dark:bg-slate-100/95 dark:text-slate-700 dark:border-slate-200",
+                ].join(" ")}
+              >
+                {b}
+              </Badge>
+            ))}
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
 
       <CardContent className="p-4 pt-3 flex flex-col flex-grow dark:bg-slate-200/10">
         <div className="space-y-1">
@@ -885,9 +886,7 @@ function TabsSlider({ isMobile, activeIndex, dragX, isDragging, children }) {
           isMobile
             ? {
                 transform: `translate3d(${translatePct}%, 0, 0)`,
-                transition: isDragging
-                  ? "none"
-                  : "transform 260ms cubic-bezier(0.22, 0.61, 0.36, 1)",
+                transition: isDragging ? "none" : "transform 260ms cubic-bezier(0.22, 0.61, 0.36, 1)",
                 willChange: "transform",
               }
             : undefined
@@ -970,7 +969,7 @@ export default function App() {
       return next;
     });
   };
-  
+
   // ---- tabs ----
   const detectTab = () => {
     try {
@@ -992,30 +991,6 @@ export default function App() {
   useEffect(() => {
     document.title = lang === "ru" ? "Геннадий Богданов — русский язык" : "Genndy Bogdanov — Learn Russian";
   }, [lang]);
-
-  useEffect(() => {
-  if (typeof window === "undefined") return;
-
-  const applyAudioRoute = () => {
-    const path = window.location.pathname || "/";
-    // /audio
-    // /audio/tolstoy
-    const m = path.match(/^\/audio(?:\/([^\/?#]+))?\/?$/i);
-    if (!m) return;
-
-    const slug = (m[1] || "").toLowerCase();
-    const mappedId = AUDIO_ROUTE_MAP[slug] || null;
-
-    setTab("free-audio");
-
-    if (mappedId) setAudioBookId(mappedId);
-    else setAudioBookId(null); // /audio -> список книг
-  };
-
-  applyAudioRoute();
-  window.addEventListener("popstate", applyAudioRoute);
-  return () => window.removeEventListener("popstate", applyAudioRoute);
-}, []);
 
   // ---- prefetch ----
   const PREFETCH_AFTER_ABOUT = ["/Product_Leo.webp", "/Product_Chekhov.webp", "/Audio_External_Leo.webp", "/Audio_External_Chekhov.webp"];
@@ -1213,25 +1188,47 @@ export default function App() {
 
   const TABS_ORDER = ["about", "products", "free-audio"];
 
-  const goPrevTab = useCallback(() => {
-    setTab((prev) => {
-      const i = TABS_ORDER.indexOf(prev);
-      if (i <= 0) return prev;
-      const nextTab = TABS_ORDER[i - 1];
-      if (nextTab !== "free-audio") setAudioBookId(null);
-      return nextTab;
-    });
+  const TAB_TO_PATH = {
+    about: "/about",
+    products: "/store",
+    "free-audio": "/audio",
+  };
+
+  function pathToTab(pathname) {
+    if (/^\/(about)?\/?$/i.test(pathname)) return "about";
+    if (/^\/(store|products)\/?$/i.test(pathname)) return "products";
+    if (/^\/audio(\/.*)?$/i.test(pathname)) return "free-audio";
+    return "about";
+  }
+
+  function parseAudioSlug(pathname) {
+    const m = pathname.match(/^\/audio(?:\/([^\/?#]+))?\/?$/i);
+    return m ? (m[1] || "").toLowerCase() : null; // null => не audio
+  }
+
+  const findBookIdBySlug = useCallback((slug) => {
+    if (!slug) return null;
+    const found = AUDIO_BOOKS.find((b) => (b.slug || "").toLowerCase() === slug.toLowerCase() && !b.disabled);
+    return found ? found.id : null;
   }, []);
 
-  const goNextTab = useCallback(() => {
-    setTab((prev) => {
-      const i = TABS_ORDER.indexOf(prev);
-      if (i === -1 || i >= TABS_ORDER.length - 1) return prev;
-      const nextTab = TABS_ORDER[i + 1];
-      if (nextTab !== "free-audio") setAudioBookId(null);
-      return nextTab;
-    });
+  // ✅ MOVED UP: navigate must be defined BEFORE goPrevTab/goNextTab use it
+  const navigate = useCallback((to) => {
+    if (typeof window === "undefined") return;
+    if (window.location.pathname === to) return;
+    window.history.pushState({}, "", to);
+    window.dispatchEvent(new PopStateEvent("popstate"));
   }, []);
+
+  const goPrevTab = useCallback(() => {
+    const i = TABS_ORDER.indexOf(tab);
+    if (i > 0) navigate(TAB_TO_PATH[TABS_ORDER[i - 1]]);
+  }, [tab, navigate]);
+
+  const goNextTab = useCallback(() => {
+    const i = TABS_ORDER.indexOf(tab);
+    if (i >= 0 && i < TABS_ORDER.length - 1) navigate(TAB_TO_PATH[TABS_ORDER[i + 1]]);
+  }, [tab, navigate]);
 
   const swipeHandlers = useSwipeTabs({
     enabled: isMobile && !isPlaying,
@@ -1288,6 +1285,42 @@ export default function App() {
     if (eggVisible) setEggVisible(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tab]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const TAB_FROM_PATH = (p) => {
+      if (/^\/(about)?\/?$/i.test(p)) return "about";
+      if (/^\/(store|products)\/?$/i.test(p)) return "products";
+      if (/^\/audio(\/.*)?$/i.test(p)) return "free-audio";
+      return "about";
+    };
+
+    const AUDIO_SLUG_FROM_PATH = (p) => {
+      const m = p.match(/^\/audio(?:\/([^\/?#]+))?\/?$/i);
+      return m ? (m[1] || "").toLowerCase() : null;
+    };
+
+    const applyRouteFromUrl = () => {
+      const path = window.location.pathname || "/";
+
+      const nextTab = TAB_FROM_PATH(path);
+      const slug = AUDIO_SLUG_FROM_PATH(path);
+      const bookId = slug ? findBookIdBySlug(slug) : null;
+
+      setTab(nextTab);
+
+      if (nextTab === "free-audio") {
+        // /audio -> список книг (null)
+        // /audio/tolstoy -> конкретная книга
+        setAudioBookId(bookId);
+      }
+    };
+
+    applyRouteFromUrl();
+    window.addEventListener("popstate", applyRouteFromUrl);
+    return () => window.removeEventListener("popstate", applyRouteFromUrl);
+  }, [findBookIdBySlug]);
 
   const showEggMessage = useCallback(
     (text) => {
@@ -1508,11 +1541,11 @@ export default function App() {
           <div className="w-full">
             <div className={`${CONTAINER} py-3`}>
               <div className="flex w-full items-center gap-2 sm:gap-3 overflow-x-hidden sm:overflow-x-auto no-scrollbar">
-                <NavPill active={showAbout} onClick={() => setTab("about")} className="flex-1 text-center sm:flex-none">
+                <NavPill active={showAbout} onClick={() => navigate("/about")} className="flex-1 text-center sm:flex-none">
                   {t("nav_about")}
                 </NavPill>
 
-                <NavPill active={showProducts} onClick={() => setTab("products")} className="flex-1 text-center sm:flex-none">
+                <NavPill active={showProducts} onClick={() => navigate("/store")} className="flex-1 text-center sm:flex-none">
                   {t("nav_products")}
                 </NavPill>
 
@@ -1520,10 +1553,7 @@ export default function App() {
                   active={showAudio}
                   onMouseEnter={prefetchAudiobooksOnce}
                   onFocus={prefetchAudiobooksOnce}
-                  onClick={() => {
-                    setTab("free-audio");
-                    setAudioBookId(null);
-                  }}
+                  onClick={() => navigate("/audio")}
                   className="flex-1 text-center sm:flex-none"
                 >
                   {t("nav_audio")}
@@ -1543,17 +1573,17 @@ export default function App() {
         </div>
       ) : null}
 
-<main
-  id="content"
-  className={`flex-1 ${CONTAINER} py-4 sm:py-8`}
-  onPointerDown={swipeHandlers.onPointerDown}
-  onPointerMove={swipeHandlers.onPointerMove}
-  onPointerUp={swipeHandlers.onPointerUp}
-  onPointerCancel={swipeHandlers.onPointerCancel}
-  onClickCapture={swipeHandlers.onClickCapture}
-  // Важно: разрешаем вертикальный скролл, но НЕ даём браузеру "жрать" горизонтальные жесты
-  style={{ touchAction: isMobile ? "pan-y" : "auto" }}
->
+      <main
+        id="content"
+        className={`flex-1 ${CONTAINER} py-4 sm:py-8`}
+        onPointerDown={swipeHandlers.onPointerDown}
+        onPointerMove={swipeHandlers.onPointerMove}
+        onPointerUp={swipeHandlers.onPointerUp}
+        onPointerCancel={swipeHandlers.onPointerCancel}
+        onClickCapture={swipeHandlers.onClickCapture}
+        // Важно: разрешаем вертикальный скролл, но НЕ даём браузеру "жрать" горизонтальные жесты
+        style={{ touchAction: isMobile ? "pan-y" : "auto" }}
+      >
         {/* ✅ Animated tab content slider (mobile) */}
         <TabsSlider
           isMobile={isMobile}
@@ -1574,7 +1604,12 @@ export default function App() {
                 <div className="text-sm space-y-1 text-slate-700 dark:text-slate-300">
                   <p>E-mail: genndybogdanov@gmail.com</p>
                   <p>
-                    <a className="underline hover:text-slate-900 dark:hover:text-white break-all" href="https://substack.com/@gbogdanov" target="_blank" rel="noopener noreferrer">
+                    <a
+                      className="underline hover:text-slate-900 dark:hover:text-white break-all"
+                      href="https://substack.com/@gbogdanov"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
                       Substack
                     </a>
                   </p>
@@ -1600,7 +1635,9 @@ export default function App() {
                       <h3 className="text-lg sm:text-xl font-semibold leading-snug">{t("learn_with_me")}</h3>
 
                       <div className="mt-3 flex flex-col gap-2 w-full max-w-[260px]">
-                        <ExternalLinkChip href="https://preply.com/en/?pref=ODkzOTkyOQ==&id=1759522486.457389&ep=w1">Preply</ExternalLinkChip>
+                        <ExternalLinkChip href="https://preply.com/en/?pref=ODkzOTkyOQ==&id=1759522486.457389&ep=w1">
+                          Preply
+                        </ExternalLinkChip>
                         <ExternalLinkChip href="https://www.italki.com/affshare?ref=af11775706">italki</ExternalLinkChip>
                       </div>
                     </div>
@@ -1673,7 +1710,12 @@ export default function App() {
                   ) : (
                     <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                       {AUDIO_BOOKS.map((book) => (
-                        <AudioBookTile key={book.id} book={book} onOpen={setAudioBookId} comingSoonText={t("coming_soon")} />
+                        <AudioBookTile
+                          key={book.id}
+                          book={book}
+                          onOpen={() => navigate(`/audio/${book.slug}`)}
+                          comingSoonText={t("coming_soon")}
+                        />
                       ))}
                     </div>
                   )}
@@ -1699,7 +1741,9 @@ export default function App() {
 
                           <p className="text-slate-600 dark:text-slate-400 break-words">
                             {selectedBook.author}
-                            {selectedBook.comingSoon ? <span className="font-semibold text-slate-700 dark:text-slate-200"> {" "}({t("coming_soon")})</span> : null}
+                            {selectedBook.comingSoon ? (
+                              <span className="font-semibold text-slate-700 dark:text-slate-200"> {" "}({t("coming_soon")})</span>
+                            ) : null}
                           </p>
                         </div>
                       </div>
@@ -1708,7 +1752,7 @@ export default function App() {
                     <div className="order-1 md:order-2 flex gap-3 w-full md:w-auto">
                       <Button
                         variant="outline"
-                        onClick={() => setAudioBookId(null)}
+                        onClick={() => navigate("/audio")}
                         className="w-1/2 md:w-auto whitespace-nowrap dark:bg-slate-900 dark:border-slate-700"
                         type="button"
                         data-no-swipe="true"
@@ -1795,6 +1839,7 @@ export default function App() {
           </div>
         </div>
       </footer>
+
       <Analytics />
     </div>
   );
