@@ -300,6 +300,12 @@ const PRODUCTS = [
   },
 ];
 
+const AUDIO_ROUTE_MAP = {
+  tolstoy: "tolstoy-short-stories",
+  // chekhov: "chekhov-short-stories",
+  // добавить новое
+};
+
 const AUDIO_BOOKS = [
   {
     id: "tolstoy-short-stories",
@@ -964,7 +970,7 @@ export default function App() {
       return next;
     });
   };
-
+  
   // ---- tabs ----
   const detectTab = () => {
     try {
@@ -986,6 +992,30 @@ export default function App() {
   useEffect(() => {
     document.title = lang === "ru" ? "Геннадий Богданов — русский язык" : "Genndy Bogdanov — Learn Russian";
   }, [lang]);
+
+  useEffect(() => {
+  if (typeof window === "undefined") return;
+
+  const applyAudioRoute = () => {
+    const path = window.location.pathname || "/";
+    // /audio
+    // /audio/tolstoy
+    const m = path.match(/^\/audio(?:\/([^\/?#]+))?\/?$/i);
+    if (!m) return;
+
+    const slug = (m[1] || "").toLowerCase();
+    const mappedId = AUDIO_ROUTE_MAP[slug] || null;
+
+    setTab("free-audio");
+
+    if (mappedId) setAudioBookId(mappedId);
+    else setAudioBookId(null); // /audio -> список книг
+  };
+
+  applyAudioRoute();
+  window.addEventListener("popstate", applyAudioRoute);
+  return () => window.removeEventListener("popstate", applyAudioRoute);
+}, []);
 
   // ---- prefetch ----
   const PREFETCH_AFTER_ABOUT = ["/Product_Leo.webp", "/Product_Chekhov.webp", "/Audio_External_Leo.webp", "/Audio_External_Chekhov.webp"];
