@@ -19,6 +19,8 @@ function useSwipeTabs({
   thresholdPx = 60,
   lockPx = 10,
   restraintPx = 40,
+  tapSlopPx = 8,         // движение, которое всё ещё считается "тапом"
+  cancelClickDxPx = 14,  // если сдвиг больше — клики гасим
 }) {
   const startX = useRef(0);
   const startY = useRef(0);
@@ -26,43 +28,72 @@ function useSwipeTabs({
   const axisLock = useRef(null); // null | "x" | "y"
   const latestDx = useRef(0);
 
+  const didSwipeRef = useRef(false);
+  const rafRef = useRef(0);
+
   const [dragX, setDragX] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
 
   const shouldIgnoreTarget = (target) => {
+    // ВАЖНО: НЕ игнорим [data-no-swipe] — иначе кнопки снова станут "не-свайпабельны"
     try {
-      return !!target?.closest?.('input, textarea, select, [data-no-swipe="true"], [role="slider"]');
+      return !!target?.closest?.('input, textarea, select, [role="slider"], input[type="range"]');
     } catch {
       return false;
     }
   };
 
-  const onTouchStart = useCallback(
+  const stopTracking = useCallback(() => {
+    tracking.current = false;
+    axisLock.current = null;
+    latestDx.current = 0;
+    didSwipeRef.current = false;
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    rafRef.current = 0;
+    setDragX(0);
+    setIsDragging(false);
+  }, []);
+
+  const setDragXRaf = useCallback((x) => {
+    if (rafRef.current) return;
+    rafRef.current = requestAnimationFrame(() => {
+      rafRef.current = 0;
+      setDragX(x);
+    });
+  }, []);
+
+  const onPointerDown = useCallback(
     (e) => {
       if (!enabled) return;
-      const t = e.touches?.[0];
-      if (!t) return;
+      if (e.pointerType !== "touch") return;
       if (shouldIgnoreTarget(e.target)) return;
 
-      startX.current = t.clientX;
-      startY.current = t.clientY;
+      // захватываем pointer, чтобы не "залипало", если палец уехал за пределы <main>
+      try {
+        e.currentTarget?.setPointerCapture?.(e.pointerId);
+      } catch {}
+
+      startX.current = e.clientX;
+      startY.current = e.clientY;
+      latestDx.current = 0;
+
       tracking.current = true;
       axisLock.current = null;
-      latestDx.current = 0;
+      didSwipeRef.current = false;
+
       setDragX(0);
       setIsDragging(true);
     },
     [enabled]
   );
 
-  const onTouchMove = useCallback(
+  const onPointerMove = useCallback(
     (e) => {
       if (!enabled || !tracking.current) return;
-      const t = e.touches?.[0];
-      if (!t) return;
+      if (e.pointerType !== "touch") return;
 
-      const dx = t.clientX - startX.current;
-      const dy = t.clientY - startY.current;
+      const dx = e.clientX - startX.current;
+      const dy = e.clientY - startY.current;
 
       if (!axisLock.current) {
         const adx = Math.abs(dx);
@@ -71,71 +102,110 @@ function useSwipeTabs({
       }
 
       if (axisLock.current === "y") {
-        tracking.current = false;
-        setDragX(0);
+        // вертикальный скролл — отпускаем свайп
         setIsDragging(false);
+        setDragXRaf(0);
+        tracking.current = false;
         return;
       }
 
       if (axisLock.current === "x" && Math.abs(dy) > restraintPx && Math.abs(dy) > Math.abs(dx)) {
-        tracking.current = false;
-        setDragX(0);
+        // похоже на вертикаль — отпускаем
         setIsDragging(false);
+        setDragXRaf(0);
+        tracking.current = false;
         return;
       }
 
-      // ✅ live drag for animation
+      // горизонтальный свайп
       latestDx.current = dx;
 
-      // little "rubber band" feel
-      const damp = 0.85;
-      setDragX(dx * damp);
+      // если сдвиг заметный — считаем это свайпом и будем гасить клики
+      if (Math.abs(dx) > cancelClickDxPx) didSwipeRef.current = true;
 
-      // prevent page from scrolling horizontally while swiping
-      // (still allows vertical scrolling because we axis-lock)
+      // “резинка”
+      const damp = 0.85;
+      setDragXRaf(dx * damp);
+
+      // не даём браузеру устраивать свои жесты (особенно на iOS)
       if (axisLock.current === "x") {
         e.preventDefault?.();
       }
     },
-    [enabled, lockPx, restraintPx]
+    [enabled, lockPx, restraintPx, cancelClickDxPx, setDragXRaf]
   );
 
-  const onTouchEnd = useCallback(
+  const onPointerUp = useCallback(
     (e) => {
-      if (!enabled || !tracking.current) {
-        setDragX(0);
-        setIsDragging(false);
+      if (!enabled) {
+        stopTracking();
         return;
       }
+      if (e.pointerType !== "touch") return;
+
+      if (!tracking.current) {
+        // уже отпущено логикой выше
+        setIsDragging(false);
+        setDragX(0);
+        return;
+      }
+
       tracking.current = false;
-
-      const t = e.changedTouches?.[0];
-      if (!t) {
-        setDragX(0);
-        setIsDragging(false);
-        return;
-      }
-
-      const dx = latestDx.current;
-      const dy = t.clientY - startY.current;
-
       setIsDragging(false);
 
+      const dx = latestDx.current;
+      const dy = e.clientY - startY.current;
+
+      // если это явно вертикаль — просто вернём всё назад
       if (axisLock.current === "y" && Math.abs(dy) > restraintPx) {
         setDragX(0);
+        axisLock.current = null;
         return;
       }
 
+      // свайп-решение
       if (dx > thresholdPx) onPrev?.();
       else if (dx < -thresholdPx) onNext?.();
 
-      // snap back (TabsSlider will animate)
+      // snap back
       setDragX(0);
+      axisLock.current = null;
     },
-    [enabled, onPrev, onNext, thresholdPx, restraintPx]
+    [enabled, onPrev, onNext, thresholdPx, restraintPx, stopTracking]
   );
 
-  return { onTouchStart, onTouchMove, onTouchEnd, dragX, isDragging };
+  const onPointerCancel = useCallback(() => {
+    stopTracking();
+  }, [stopTracking]);
+
+  // 🔥 КЛЮЧЕВОЕ: гасим клики по кнопкам/ссылкам, если человек реально свайпнул
+  const onClickCapture = useCallback((e) => {
+    if (!didSwipeRef.current) return;
+
+    // если это был свайп — запрещаем "нажатие" на play/download и т.п.
+    e.preventDefault?.();
+    e.stopPropagation?.();
+
+    // сбросим флаг чуть позже, чтобы не поймать следующий клик
+    setTimeout(() => {
+      didSwipeRef.current = false;
+    }, 0);
+  }, []);
+
+  return {
+    // pointer handlers
+    onPointerDown,
+    onPointerMove,
+    onPointerUp,
+    onPointerCancel,
+
+    // click-cancel
+    onClickCapture,
+
+    // ui state
+    dragX,
+    isDragging,
+  };
 }
 
 // ================== DATA ==================
@@ -1421,15 +1491,17 @@ export default function App() {
         </div>
       ) : null}
 
-      <main
-        id="content"
-        className={`flex-1 ${CONTAINER} py-4 sm:py-8`}
-        onTouchStart={swipeHandlers.onTouchStart}
-        onTouchMove={swipeHandlers.onTouchMove}
-        onTouchEnd={swipeHandlers.onTouchEnd}
-        // important for iOS Safari to allow preventDefault in touchmove
-        style={{ touchAction: isMobile ? "pan-y" : "auto" }}
-      >
+<main
+  id="content"
+  className={`flex-1 ${CONTAINER} py-4 sm:py-8`}
+  onPointerDown={swipeHandlers.onPointerDown}
+  onPointerMove={swipeHandlers.onPointerMove}
+  onPointerUp={swipeHandlers.onPointerUp}
+  onPointerCancel={swipeHandlers.onPointerCancel}
+  onClickCapture={swipeHandlers.onClickCapture}
+  // Важно: разрешаем вертикальный скролл, но НЕ даём браузеру "жрать" горизонтальные жесты
+  style={{ touchAction: isMobile ? "pan-y" : "auto" }}
+>
         {/* ✅ Animated tab content slider (mobile) */}
         <TabsSlider
           isMobile={isMobile}
