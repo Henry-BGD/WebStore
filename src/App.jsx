@@ -136,43 +136,46 @@ function useSwipeTabs({
   );
 
   const onPointerUp = useCallback(
-    (e) => {
-      if (!enabled) {
-        stopTracking();
-        return;
-      }
-      if (e.pointerType !== "touch") return;
+  (e) => {
+    if (!enabled) {
+      stopTracking();
+      return;
+    }
+    if (e.pointerType !== "touch") return;
 
-      if (!tracking.current) {
-        // уже отпущено логикой выше
-        setIsDragging(false);
-        setDragX(0);
-        return;
-      }
+    // ✅ CANCEL pending RAF so it can't apply stale drag after release
+    if (rafRef.current) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = 0;
+    }
 
-      tracking.current = false;
+    if (!tracking.current) {
       setIsDragging(false);
+      setDragX(0);
+      return;
+    }
 
-      const dx = latestDx.current;
-      const dy = e.clientY - startY.current;
+    tracking.current = false;
+    setIsDragging(false);
 
-      // если это явно вертикаль — просто вернём всё назад
-      if (axisLock.current === "y" && Math.abs(dy) > restraintPx) {
-        setDragX(0);
-        axisLock.current = null;
-        return;
-      }
+    const dx = latestDx.current;
+    const dy = e.clientY - startY.current;
 
-      // свайп-решение
-      if (dx > thresholdPx) onPrev?.();
-      else if (dx < -thresholdPx) onNext?.();
-
-      // snap back
+    if (axisLock.current === "y" && Math.abs(dy) > restraintPx) {
       setDragX(0);
       axisLock.current = null;
-    },
-    [enabled, onPrev, onNext, thresholdPx, restraintPx, stopTracking]
-  );
+      return;
+    }
+
+    if (dx > thresholdPx) onPrev?.();
+    else if (dx < -thresholdPx) onNext?.();
+
+    // ✅ snap back, guaranteed final state
+    setDragX(0);
+    axisLock.current = null;
+  },
+  [enabled, onPrev, onNext, thresholdPx, restraintPx, stopTracking]
+);
 
   const onPointerCancel = useCallback(() => {
     stopTracking();
@@ -843,24 +846,42 @@ function TabsSlider({ isMobile, activeIndex, dragX, isDragging, children }) {
   const count = React.Children.count(children);
   const safeIndex = Math.min(Math.max(activeIndex, 0), Math.max(count - 1, 0));
 
-  // Convert px drag into percentage of viewport for consistent feel
-  const dragPct = isMobile ? (dragX / (typeof window !== "undefined" ? window.innerWidth || 1 : 1)) * 100 : 0;
+  // ✅ 1. ref на контейнер
+  const hostRef = React.useRef(null);
+  const [hostW, setHostW] = React.useState(1);
+
+  // ✅ 2. измеряем РЕАЛЬНУЮ ширину слайдера
+  React.useEffect(() => {
+    if (!isMobile) return;
+    const el = hostRef.current;
+    if (!el) return;
+
+    const update = () => setHostW(el.clientWidth || 1);
+    update();
+
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+
+    return () => ro.disconnect();
+  }, [isMobile]);
+
+  // ❗ ВАЖНО: проценты считаем от hostW, а не от window
+  const dragPct = isMobile ? (dragX / hostW) * 100 : 0;
 
   const basePct = -safeIndex * 100;
   const translatePct = basePct + (isMobile ? dragPct : 0);
 
   return (
-    <div className="relative w-full overflow-hidden">
+    <div ref={hostRef} className="relative w-full overflow-hidden">
       <div
-        className={[
-          "flex w-full",
-          isMobile ? "" : "block",
-        ].join(" ")}
+        className={["flex w-full", isMobile ? "" : "block"].join(" ")}
         style={
           isMobile
             ? {
-                transform: `translate3d(${translatePct}%,0,0)`,
-                transition: isDragging ? "none" : "transform 260ms cubic-bezier(0.22, 0.61, 0.36, 1)",
+                transform: `translate3d(${translatePct}%, 0, 0)`,
+                transition: isDragging
+                  ? "none"
+                  : "transform 260ms cubic-bezier(0.22, 0.61, 0.36, 1)",
                 willChange: "transform",
               }
             : undefined
@@ -868,6 +889,7 @@ function TabsSlider({ isMobile, activeIndex, dragX, isDragging, children }) {
       >
         {React.Children.map(children, (child, i) => (
           <div
+            key={i}
             className={isMobile ? "w-full flex-none" : i === safeIndex ? "block" : "hidden"}
             aria-hidden={isMobile ? false : i !== safeIndex}
           >
