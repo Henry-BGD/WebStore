@@ -883,7 +883,7 @@ function TabsSlider({ isMobile, activeIndex, dragX, isDragging, children }) {
   const translatePct = basePct + (isMobile ? dragPct : 0);
 
   return (
-    <div ref={hostRef} className="relative w-full overflow-hidden">
+    <div ref={hostRef} className="relative w-full overflow-hidden p-2">
       <div
         className={["flex w-full", isMobile ? "" : "block"].join(" ")}
         style={
@@ -1757,28 +1757,27 @@ function downloadAllAudio() {
                     </div>
 
                     <div className="order-1 md:order-2 flex gap-3 w-full md:w-auto">
-                     <Button
-  variant="outline"
-  onClick={() => navigate("/audio")}
-  className="w-1/2 md:w-auto whitespace-nowrap dark:bg-slate-900 dark:border-slate-700
-             focus-visible:ring-inset
-            focus-visible:!ring-2 focus-visible:!ring-inset focus-visible:!ring-offset-0 focus-visible:!outline-none"
-  type="button"
->
-  ← {t("back")}
-</Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => navigate("/audio")}
+                        className="w-1/2 md:w-auto whitespace-nowrap dark:bg-slate-900 dark:border-slate-700"
+                        type="button"
+                        data-no-swipe="true"
+                      >
+                        ← {t("back")}
+                      </Button>
 
-<Button
-  onClick={downloadAllAudio}
-  className="relative z-10 w-1/2 md:w-auto flex gap-2 justify-center whitespace-nowrap
-             focus-visible:ring-inset 
-  focus-visible:!ring-2 focus-visible:!ring-inset focus-visible:!ring-offset-0 focus-visible:!outline-none"
-  type="button"
-  disabled={!selectedBook.tracks?.length}
->
-  <Download className="w-4 h-4" />
-  {t("download_all")}
-</Button>
+                      <Button
+                        onClick={downloadAllAudio}
+                        className="relative z-10 w-1/2 md:w-auto flex gap-2 justify-center whitespace-nowrap"
+                        type="button"
+                        data-no-swipe="true"
+                        disabled={!selectedBook.tracks?.length}
+                        title={!selectedBook.tracks?.length ? t("audio_empty") : t("download_all")}
+                      >
+                        <Download className="w-4 h-4" />
+                        {t("download_all")}
+                      </Button>
                     </div>
                   </div>
 
