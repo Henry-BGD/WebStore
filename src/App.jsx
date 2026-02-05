@@ -883,7 +883,8 @@ function TabsSlider({ isMobile, activeIndex, dragX, isDragging, children }) {
   const translatePct = basePct + (isMobile ? dragPct : 0);
 
   return (
-    <div ref={hostRef} className="relative w-full overflow-hidden">
+    // БЫЛО: <div ref={hostRef} className="relative w-full overflow-hidden">
+      <div ref={hostRef} className="relative w-full overflow-x-hidden overflow-y-visible">
       <div
         className={["flex w-full", isMobile ? "" : "block"].join(" ")}
         style={
@@ -1769,7 +1770,7 @@ function downloadAllAudio() {
 
                       <Button
                         onClick={downloadAllAudio}
-                        className="relative z-10 w-1/2 md:w-auto flex gap-2 justify-center whitespace-nowrap"
+                        className="w-1/2 md:w-auto flex gap-2 justify-center whitespace-nowrap"
                         type="button"
                         data-no-swipe="true"
                         disabled={!selectedBook.tracks?.length}
