@@ -308,10 +308,6 @@ const AUDIO_ROUTE_MAP = {
 
 const AUDIO_BOOKS = [
   {
-    // ✅ GitHub Release assets base URL
-  const GH_RELEASE_BASE =
-  "https://github.com/Henry-BGD/WebStore/releases/download/v1/Russian_Short_Stories_by_Leo_Tolstoy.zip";
-    
     id: "tolstoy-short-stories",
     slug: "tolstoy",
     title: "Russian Short Stories",
@@ -319,9 +315,8 @@ const AUDIO_BOOKS = [
     author: "by Leo Tolstoy",
     comingSoon: false,
 
-    // ✅ ZIP archive for "Download all"
-    zipSrc: `${GH_RELEASE_BASE}/Russian_Short_Stories_by_Leo_Tolstoy.zip`,
-    
+    zipSrc: "https://github.com/Henry-BGD/WebStore/releases/download/v1/Russian_Short_Stories_by_Leo_Tolstoy.zip",
+
     tracks: [
       { id: "kostochka", title: "Косточка (The Pit)", src: "/audio/1_The_Pit.mp3" },
       { id: "kotenok", title: "Котёнок (The Kitten)", src: "/audio/2_The_Kitten.mp3" },
@@ -331,7 +326,8 @@ const AUDIO_BOOKS = [
       { id: "jump", title: "Прыжок (The Jump)", src: "/audio/6_The_Jump.mp3" },
     ],
   },
-  {
+
+    {
     id: "chekhov-short-stories",
     slug: "chekhov",
     title: "Russian Short Stories",
