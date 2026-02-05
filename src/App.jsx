@@ -308,6 +308,10 @@ const AUDIO_ROUTE_MAP = {
 
 const AUDIO_BOOKS = [
   {
+    // ✅ GitHub Release assets base URL
+  const GH_RELEASE_BASE =
+  "https://github.com/Henry-BGD/WebStore/releases/download/v1/Russian_Short_Stories_by_Leo_Tolstoy.zip";
+    
     id: "tolstoy-short-stories",
     slug: "tolstoy",
     title: "Russian Short Stories",
@@ -316,7 +320,7 @@ const AUDIO_BOOKS = [
     comingSoon: false,
 
     // ✅ ZIP archive for "Download all"
-    zipSrc: "/audio/Russian_Short_Stories_by_Leo_Tolstoy.zip",
+    zipSrc: `${GH_RELEASE_BASE}/Russian_Short_Stories_by_Leo_Tolstoy.zip`,
     
     tracks: [
       { id: "kostochka", title: "Косточка (The Pit)", src: "/audio/1_The_Pit.mp3" },
@@ -1142,19 +1146,9 @@ export default function App() {
   }, []);
 
 function downloadAllAudio() {
-  // ✅ Always download a single ZIP instead of multiple mp3 clicks
-  const zip = selectedBook?.zipSrc || "/audio/Russian_Short_Stories_by_Leo_Tolstoy.zip";
-
-  const a = document.createElement("a");
-  a.href = zip;
-
-  // set filename for nicer download (works on most browsers)
-  const name = zip.split("/").pop() || "audiobook.zip";
-  a.setAttribute("download", name);
-
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
+  const zip = selectedBook?.zipSrc;
+  if (!zip) return;
+  window.location.href = zip;
 }
 
   useEffect(() => {
