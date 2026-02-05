@@ -1769,7 +1769,7 @@ function downloadAllAudio() {
 
                       <Button
                         onClick={downloadAllAudio}
-                        className="w-1/2 md:w-auto flex gap-2 justify-center whitespace-nowrap"
+                        className="relative z-10 w-1/2 md:w-auto flex gap-2 justify-center whitespace-nowrap"
                         type="button"
                         data-no-swipe="true"
                         disabled={!selectedBook.tracks?.length}
