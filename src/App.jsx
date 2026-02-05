@@ -1757,31 +1757,71 @@ function downloadAllAudio() {
                     </div>
 
                     <div className="order-1 md:order-2 flex gap-3 w-full md:w-auto">
-                      <Button
-                        variant="outline"
-                        onClick={() => navigate("/audio")}
-                        className="w-1/2 md:w-auto whitespace-nowrap dark:bg-slate-900 dark:border-slate-700
-                        transition active:scale-[0.97] active:shadow-[0_0_0_4px_rgba(59,130,246,0.35)]"
-                        type="button"
-                        data-no-swipe="true"
-                      >
-                        ← {t("back")}
-                      </Button>
+  {/* BACK */}
+  <Button
+    onClick={() => navigate("/audio")}
+    type="button"
+    data-no-swipe="true"
+    className={[
+      "w-1/2 md:w-auto whitespace-nowrap rounded-full",
+      "border border-slate-200 bg-white text-slate-800",
+      "hover:bg-slate-50 active:bg-slate-100",
+      "dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100",
+      "dark:hover:bg-slate-800/70 dark:active:bg-slate-800",
 
-                      <Button
-                        onClick={downloadAllAudio}
-                        className="relative z-10 w-1/2 md:w-auto flex gap-2 justify-center whitespace-nowrap
-                        transition active:scale-[0.97] active:shadow-[0_0_0_4px_rgba(59,130,246,0.35)]"
-                        type="button"
-                        data-no-swipe="true"
-                        disabled={!selectedBook.tracks?.length}
-                        title={!selectedBook.tracks?.length ? t("audio_empty") : t("download_all")}
-                      >
-                        <Download className="w-4 h-4" />
-                        {t("download_all")}
-                      </Button>
-                    </div>
-                  </div>
+      // одинаковая анимация
+      "transition-all duration-150 ease-out",
+      "active:scale-[0.97] active:shadow-[0_0_0_4px_rgba(59,130,246,0.25)]",
+
+      // полностью убираем ring / outline / focus-обводки
+      "outline-none focus:outline-none focus-visible:outline-none",
+      "ring-0 focus:ring-0 focus-visible:ring-0",
+      "ring-offset-0 focus:ring-offset-0 focus-visible:ring-offset-0",
+      "shadow-none focus:shadow-none focus-visible:shadow-none",
+
+      // iOS tap highlight
+      "[-webkit-tap-highlight-color:transparent]",
+    ].join(" ")}
+  >
+    ← {t("back")}
+  </Button>
+
+  {/* DOWNLOAD ALL */}
+  <Button
+    onClick={downloadAllAudio}
+    type="button"
+    data-no-swipe="true"
+    disabled={!selectedBook.tracks?.length}
+    title={!selectedBook.tracks?.length ? t("audio_empty") : t("download_all")}
+    className={[
+      "w-1/2 md:w-auto whitespace-nowrap rounded-full",
+      "border border-slate-200 bg-white text-slate-800",
+      "hover:bg-slate-50 active:bg-slate-100",
+      "dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100",
+      "dark:hover:bg-slate-800/70 dark:active:bg-slate-800",
+
+      // одинаковая анимация
+      "transition-all duration-150 ease-out",
+      "active:scale-[0.97] active:shadow-[0_0_0_4px_rgba(59,130,246,0.25)]",
+
+      // полностью убираем ring / outline / focus-обводки
+      "outline-none focus:outline-none focus-visible:outline-none",
+      "ring-0 focus:ring-0 focus-visible:ring-0",
+      "ring-offset-0 focus:ring-offset-0 focus-visible:ring-offset-0",
+      "shadow-none focus:shadow-none focus-visible:shadow-none",
+
+      // iOS tap highlight
+      "[-webkit-tap-highlight-color:transparent]",
+
+      // чтобы disabled выглядел аккуратно и одинаково везде
+      "disabled:opacity-60 disabled:cursor-not-allowed disabled:active:scale-100 disabled:active:shadow-none",
+      "flex items-center justify-center gap-2",
+    ].join(" ")}
+  >
+    <Download className="w-4 h-4" />
+    {t("download_all")}
+  </Button>
+</div>
 
                   <div className="grid md:grid-cols-3 gap-5 sm:gap-6 items-start">
                     <img
