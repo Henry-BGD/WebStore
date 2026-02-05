@@ -1822,6 +1822,7 @@ function downloadAllAudio() {
     {t("download_all")}
   </Button>
 </div>
+</div>
 
                   <div className="grid md:grid-cols-3 gap-5 sm:gap-6 items-start">
                     <img
