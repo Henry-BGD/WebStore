@@ -1761,8 +1761,8 @@ function downloadAllAudio() {
   variant="outline"
   onClick={() => navigate("/audio")}
   className="w-1/2 md:w-auto whitespace-nowrap dark:bg-slate-900 dark:border-slate-700
-             focus-visible:ring-inset focus-visible:ring-2 focus-visible:ring-blue-300
-             focus-visible:ring-offset-0"
+             focus-visible:ring-inset
+            focus-visible:!ring-2 focus-visible:!ring-inset focus-visible:!ring-offset-0 focus-visible:!outline-none"
   type="button"
 >
   ← {t("back")}
@@ -1771,8 +1771,8 @@ function downloadAllAudio() {
 <Button
   onClick={downloadAllAudio}
   className="relative z-10 w-1/2 md:w-auto flex gap-2 justify-center whitespace-nowrap
-             focus-visible:ring-inset focus-visible:ring-2 focus-visible:ring-blue-300
-             focus-visible:ring-offset-0"
+             focus-visible:ring-inset 
+  focus-visible:!ring-2 focus-visible:!ring-inset focus-visible:!ring-offset-0 focus-visible:!outline-none"
   type="button"
   disabled={!selectedBook.tracks?.length}
 >
