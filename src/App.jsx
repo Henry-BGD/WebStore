@@ -314,6 +314,10 @@ const AUDIO_BOOKS = [
     cover: "/Audio_External_Leo.webp",
     author: "by Leo Tolstoy",
     comingSoon: false,
+
+    // ✅ ZIP archive for "Download all"
+    zipSrc: "/audio/Russian_Short_Stories_by_Leo_Tolstoy.zip",
+    
     tracks: [
       { id: "kostochka", title: "Косточка (The Pit)", src: "/audio/1_The_Pit.mp3" },
       { id: "kotenok", title: "Котёнок (The Kitten)", src: "/audio/2_The_Kitten.mp3" },
@@ -1137,18 +1141,21 @@ export default function App() {
     setCurrentTime(audio.currentTime);
   }, []);
 
-  function downloadAllAudio() {
-    if (!selectedBook?.tracks?.length) return;
-    selectedBook.tracks.forEach((tr) => {
-      if (!tr.src || tr.src === "#") return;
-      const a = document.createElement("a");
-      a.href = tr.src;
-      a.download = "";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    });
-  }
+function downloadAllAudio() {
+  // ✅ Always download a single ZIP instead of multiple mp3 clicks
+  const zip = selectedBook?.zipSrc || "/audio/Russian_Short_Stories_by_Leo_Tolstoy.zip";
+
+  const a = document.createElement("a");
+  a.href = zip;
+
+  // set filename for nicer download (works on most browsers)
+  const name = zip.split("/").pop() || "audiobook.zip";
+  a.setAttribute("download", name);
+
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
 
   useEffect(() => {
     if (tab !== "free-audio") {
@@ -1749,7 +1756,7 @@ export default function App() {
                       </div>
                     </div>
 
-                    <div className="order-1 md:order-2 flex gap-3 w-full md:w-auto p-2 -m-2">
+                    <div className="order-1 md:order-2 flex gap-3 w-full md:w-auto">
                       <Button
                         variant="outline"
                         onClick={() => navigate("/audio")}
@@ -1762,7 +1769,7 @@ export default function App() {
 
                       <Button
                         onClick={downloadAllAudio}
-                        className="w-1/2 md:w-auto flex gap-2 justify-center whitespace-nowrap"
+                        className="relative z-10 w-1/2 md:w-auto flex gap-2 justify-center whitespace-nowrap"
                         type="button"
                         data-no-swipe="true"
                         disabled={!selectedBook.tracks?.length}
