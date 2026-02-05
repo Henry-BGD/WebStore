@@ -314,13 +314,17 @@ const AUDIO_BOOKS = [
     cover: "/Audio_External_Leo.webp",
     author: "by Leo Tolstoy",
     comingSoon: false,
+
+    // ✅ ZIP archive for "Download all"
+    zipSrc: "/audio/Russian_Short_Stories_by_Leo_Tolstoy.zip",
+    
     tracks: [
-      { id: "kostochka", title: "Косточка (The Pit)", src: "/audio/kostochka.mp3" },
-      { id: "kotenok", title: "Котёнок (The Kitten)", src: "/audio/kotenok.mp3" },
-      { id: "lebedy", title: "Лебеди (The Swans)", src: "/audio/lebedy.mp3" },
-      { id: "bears", title: "Три медведя (The Three Bears)", src: "/audio/bears.mp3" },
-      { id: "shark", title: "Акула (The Shark)", src: "/audio/shark.mp3" },
-      { id: "jump", title: "Прыжок (The Jump)", src: "/audio/jump.mp3" },
+      { id: "kostochka", title: "Косточка (The Pit)", src: "/audio/1_The_Pit.mp3" },
+      { id: "kotenok", title: "Котёнок (The Kitten)", src: "/audio/2_The_Kitten.mp3" },
+      { id: "lebedy", title: "Лебеди (The Swans)", src: "/audio/3_The_Swans.mp3" },
+      { id: "bears", title: "Три медведя (The Three Bears)", src: "/audio/4_The_Three_Bears.mp3" },
+      { id: "shark", title: "Акула (The Shark)", src: "/audio/5_The_Shark.mp3" },
+      { id: "jump", title: "Прыжок (The Jump)", src: "/audio/6_The_Jump.mp3" },
     ],
   },
   {
@@ -1137,18 +1141,21 @@ export default function App() {
     setCurrentTime(audio.currentTime);
   }, []);
 
-  function downloadAllAudio() {
-    if (!selectedBook?.tracks?.length) return;
-    selectedBook.tracks.forEach((tr) => {
-      if (!tr.src || tr.src === "#") return;
-      const a = document.createElement("a");
-      a.href = tr.src;
-      a.download = "";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    });
-  }
+function downloadAllAudio() {
+  // ✅ Always download a single ZIP instead of multiple mp3 clicks
+  const zip = selectedBook?.zipSrc || "/audio/Russian_Short_Stories_by_Leo_Tolstoy.zip";
+
+  const a = document.createElement("a");
+  a.href = zip;
+
+  // set filename for nicer download (works on most browsers)
+  const name = zip.split("/").pop() || "audiobook.zip";
+  a.setAttribute("download", name);
+
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
 
   useEffect(() => {
     if (tab !== "free-audio") {
