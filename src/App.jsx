@@ -1760,7 +1760,8 @@ function downloadAllAudio() {
                       <Button
                         variant="outline"
                         onClick={() => navigate("/audio")}
-                        className="w-1/2 md:w-auto whitespace-nowrap dark:bg-slate-900 dark:border-slate-700"
+                        className="w-1/2 md:w-auto whitespace-nowrap dark:bg-slate-900 dark:border-slate-700
+                        transition active:scale-[0.97] active:shadow-[0_0_0_4px_rgba(59,130,246,0.35)]"
                         type="button"
                         data-no-swipe="true"
                       >
@@ -1769,7 +1770,8 @@ function downloadAllAudio() {
 
                       <Button
                         onClick={downloadAllAudio}
-                        className="relative z-10 w-1/2 md:w-auto flex gap-2 justify-center whitespace-nowrap"
+                        className="relative z-10 w-1/2 md:w-auto flex gap-2 justify-center whitespace-nowrap
+                        transition active:scale-[0.97] active:shadow-[0_0_0_4px_rgba(59,130,246,0.35)]"
                         type="button"
                         data-no-swipe="true"
                         disabled={!selectedBook.tracks?.length}
