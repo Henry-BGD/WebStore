@@ -1757,7 +1757,7 @@ function downloadAllAudio() {
                       </div>
                     </div>
 
-                    <div className="order-1 md:order-2 flex gap-3 w-full md:w-auto">
+                    <div className="order-1 md:order-2 flex gap-3 w-full md:w-auto overflow-visible">
                       <Button
                         variant="outline"
                         onClick={() => navigate("/audio")}
