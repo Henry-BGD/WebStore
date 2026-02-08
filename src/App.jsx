@@ -219,7 +219,7 @@ const PRODUCTS = [
     kind: "A1-B1 Level",
     price: 11.99,
     image: "/Product_Leo.webp",
-    externalUrl: "https://amazon.example/your-book",
+    externalUrl: "https://www.amazon.com/dp/B0GMCCFMQQ",
     marketplace: "amazon",
     badges: ["RU-EN", "Paper Book", "Audio"],
     description: "Word-by-word translation, stress marks, grammar explanations, exercises, audio included.",
