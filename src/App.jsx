@@ -259,7 +259,7 @@ const PRODUCTS = [
     id: "prod-ru-book-2",
     title: "Russian Short Stories by Anton Chekhov",
     kind: "A2-B2 Level",
-    price: 12.99,
+    price: 6.99,
     image: "/Product_Chekhov.webp",
     externalUrl: "",
     marketplace: "amazon",
