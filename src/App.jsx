@@ -1632,10 +1632,10 @@ function downloadAllAudio() {
                       <h3 className="text-lg sm:text-xl font-semibold leading-snug">{t("learn_with_me")}</h3>
 
                       <div className="mt-3 flex flex-col gap-2 w-full max-w-[260px]">
-                        <ExternalLinkChip href="https://preply.com/en/?pref=ODkzOTkyOQ==&id=1759522486.457389&ep=w1">
+                        <ExternalLinkChip href="https://preply.in/GENNADII6EN1261045210?ts=17728229">
                           Preply
                         </ExternalLinkChip>
-                        <ExternalLinkChip href="https://www.italki.com/affshare?ref=af11775706">italki</ExternalLinkChip>
+                        <ExternalLinkChip href="https://www.italki.com/en/teacher/11775706?lv=1">italki</ExternalLinkChip>
                       </div>
                     </div>
                   </div>
