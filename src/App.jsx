@@ -345,6 +345,7 @@ const I18N = {
     name: "Genndy Bogdanov",
     tagline: "",
     nav_about: "About",
+    nav_lit_club: "Russian Literature Club",
     nav_products: "Store",
     nav_audio: "Audiobooks",
 
@@ -379,6 +380,7 @@ const I18N = {
     name: "Genndy Bogdanov",
     tagline: "",
     nav_about: "Обо мне",
+    nav_lit_club: "Русский литературный клуб",
     nav_products: "Магазин",
     nav_audio: "Аудиокниги",
 
@@ -975,13 +977,20 @@ export default function App() {
   };
 
   // ---- tabs ----
-  const detectTab = () => {
-    try {
-      const saved = localStorage.getItem("tab");
-      if (saved === "about" || saved === "products" || saved === "free-audio") return saved;
-    } catch {}
-    return "about";
-  };
+ const detectTab = () => {
+  try {
+    const saved = localStorage.getItem("tab");
+    if (
+      saved === "about" ||
+      saved === "lit-club" ||
+      saved === "products" ||
+      saved === "free-audio"
+    ) {
+      return saved;
+    }
+  } catch {}
+  return "about";
+};
 
   const [tab, setTab] = useState(() => detectTab());
 
@@ -1183,20 +1192,22 @@ function downloadAllAudio() {
     };
   }, []);
 
-  const TABS_ORDER = ["about", "products", "free-audio"];
+  const TABS_ORDER = ["about", "lit-club", "products", "free-audio"];
 
-  const TAB_TO_PATH = {
-    about: "/about",
-    products: "/store",
-    "free-audio": "/audio",
-  };
+const TAB_TO_PATH = {
+  about: "/about",
+  "lit-club": "/literature-club",
+  products: "/store",
+  "free-audio": "/audio",
+};
 
-  function pathToTab(pathname) {
-    if (/^\/(about)?\/?$/i.test(pathname)) return "about";
-    if (/^\/(store|products)\/?$/i.test(pathname)) return "products";
-    if (/^\/audio(\/.*)?$/i.test(pathname)) return "free-audio";
-    return "about";
-  }
+function pathToTab(pathname) {
+  if (/^\/(about)?\/?$/i.test(pathname)) return "about";
+  if (/^\/(literature-club|lit-club)\/?$/i.test(pathname)) return "lit-club";
+  if (/^\/(store|products)\/?$/i.test(pathname)) return "products";
+  if (/^\/audio(\/.*)?$/i.test(pathname)) return "free-audio";
+  return "about";
+}
 
   function parseAudioSlug(pathname) {
     const m = pathname.match(/^\/audio(?:\/([^\/?#]+))?\/?$/i);
@@ -1236,9 +1247,10 @@ function downloadAllAudio() {
     restraintPx: 40,
   });
 
-  const showAbout = tab === "about";
-  const showProducts = tab === "products";
-  const showAudio = tab === "free-audio";
+const showAbout = tab === "about";
+const showLitClub = tab === "lit-club";
+const showProducts = tab === "products";
+const showAudio = tab === "free-audio";
 
   // ✅ active index for animated slider
   const activeIndex = useMemo(() => TABS_ORDER.indexOf(tab), [tab]);
@@ -1286,12 +1298,13 @@ function downloadAllAudio() {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const TAB_FROM_PATH = (p) => {
-      if (/^\/(about)?\/?$/i.test(p)) return "about";
-      if (/^\/(store|products)\/?$/i.test(p)) return "products";
-      if (/^\/audio(\/.*)?$/i.test(p)) return "free-audio";
-      return "about";
-    };
+const TAB_FROM_PATH = (p) => {
+  if (/^\/(about)?\/?$/i.test(p)) return "about";
+  if (/^\/(literature-club|lit-club)\/?$/i.test(p)) return "lit-club";
+  if (/^\/(store|products)\/?$/i.test(p)) return "products";
+  if (/^\/audio(\/.*)?$/i.test(p)) return "free-audio";
+  return "about";
+};
 
     const AUDIO_SLUG_FROM_PATH = (p) => {
       const m = p.match(/^\/audio(?:\/([^\/?#]+))?\/?$/i);
@@ -1542,6 +1555,10 @@ function downloadAllAudio() {
                   {t("nav_about")}
                 </NavPill>
 
+                <NavPill active={showLitClub} onClick={() => navigate("/literature-club")} className="flex-1 text-center sm:flex-none">
+                {t("nav_lit_club")}
+                </NavPill>
+
                 <NavPill active={showProducts} onClick={() => navigate("/store")} className="flex-1 text-center sm:flex-none">
                   {t("nav_products")}
                 </NavPill>
@@ -1643,6 +1660,67 @@ function downloadAllAudio() {
               </Card>
             </div>
           </section>
+
+          {/* RUSSIAN LITERATURE CLUB */}
+<section hidden={!showLitClub} aria-hidden={!showLitClub}>
+  <div className="grid md:grid-cols-3 gap-6 sm:gap-8 items-start">
+    <div className="md:col-span-2 space-y-4">
+      <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight break-words">
+        Russian Literature Club
+      </h1>
+      <p className="leading-relaxed text-slate-700 dark:text-slate-300">
+        Description will go here.
+      </p>
+    </div>
+
+    <Card className="p-5 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl">
+      <CardTitle className="mb-2">{t("contacts")}</CardTitle>
+      <div className="text-sm space-y-1 text-slate-700 dark:text-slate-300">
+        <p>E-mail: genndybogdanov@gmail.com</p>
+        <p>
+          <a
+            className="underline hover:text-slate-900 dark:hover:text-white break-all"
+            href="https://substack.com/@gbogdanov"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Substack
+          </a>
+        </p>
+      </div>
+    </Card>
+
+    <Card className="md:col-span-3 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl">
+      <div className="p-5">
+        <div className="flex items-start gap-5">
+          <div className="flex-none w-28 sm:w-32 md:w-36 aspect-[3/4] rounded-2xl overflow-hidden bg-white dark:bg-slate-950 shadow">
+            <img
+              src="/Portrait_1.webp"
+              alt="Portrait"
+              className="w-full h-full object-contain"
+              loading="eager"
+              decoding="async"
+              fetchPriority="high"
+              sizes="(max-width: 640px) 112px, (max-width: 768px) 128px, 144px"
+            />
+          </div>
+
+          <div className="min-w-0 flex-1 md:flex md:flex-col md:items-center md:text-center">
+            <h3 className="text-lg sm:text-xl font-semibold leading-snug">
+              Russian Literature Club
+            </h3>
+
+            <div className="mt-3 flex flex-col gap-2 w-full max-w-[260px]">
+              <ExternalLinkChip href="#">
+                Coming soon
+              </ExternalLinkChip>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Card>
+  </div>
+</section>
 
           {/* PRODUCTS */}
           <section hidden={!showProducts} aria-hidden={!showProducts}>
