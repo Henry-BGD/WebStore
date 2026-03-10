@@ -1669,7 +1669,7 @@ const TAB_FROM_PATH = (p) => {
         Russian Literature Club
       </h1>
       <p className="leading-relaxed text-slate-700 dark:text-slate-300">
-        Description will go here.
+        Description will go here. This is description. This is description. This is description. This is description. This is description. This is description. This is description. This is description. This is description.
       </p>
     </div>
 
