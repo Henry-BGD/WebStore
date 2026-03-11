@@ -1691,15 +1691,15 @@ const TAB_FROM_PATH = (p) => {
             </div>
           </section>
 
-          {/* RUSSIAN LITERATURE CLUB */}
+        {/* RUSSIAN LITERATURE CLUB */}
 <section hidden={!showLitClub} aria-hidden={!showLitClub}>
   <div className="grid md:grid-cols-3 gap-6 sm:gap-8 items-start">
     <div className="md:col-span-2 space-y-4">
       <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight break-words">
-        Russian Literature Club
+        {t("lit_club_title")}
       </h1>
       <p className="leading-relaxed text-slate-700 dark:text-slate-300">
-        Description will go here. This is description. This is description. This is description. This is description. This is description. This is description. This is description. This is description. This is description.
+        {t("lit_club_desc")}
       </p>
     </div>
 
@@ -1720,91 +1720,85 @@ const TAB_FROM_PATH = (p) => {
       </div>
     </Card>
 
-  <div className="md:col-span-3 grid md:grid-cols-2 gap-5 sm:gap-6">
-  {/* A2-B1 */}
-  <div>
-    <h3 className="text-2xl sm:text-3xl font-semibold text-center mb-4">
-      Level A2 - B1 (1,5 hours)
-    </h3>
+    <div className="md:col-span-3 grid md:grid-cols-2 gap-5 sm:gap-6">
+      {/* A2-B1 */}
+      <div>
+        <h3 className="text-2xl sm:text-3xl font-semibold text-center mb-4">
+          {t("lit_club_a2b1")}
+        </h3>
 
-<div className="md:col-span-3 grid md:grid-cols-2 gap-5 sm:gap-6">
-  <div>
-    <h3 className="text-2xl sm:text-3xl font-semibold text-center mb-4">
-      {t("lit_club_a2b1")}
-    </h3>
+        <Card className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl h-full">
+          <div className="p-5 flex flex-col h-full">
+            <p className="text-2xl sm:text-3xl text-blue-600 text-center font-medium mb-6">
+              {t("lit_club_next")}
+            </p>
 
-    <Card className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl h-full">
-      <div className="p-5 flex flex-col h-full">
-        <p className="text-2xl sm:text-3xl text-blue-600 text-center font-medium mb-6">
-          {t("lit_club_next")}
-        </p>
+            <div className="text-base sm:text-lg text-slate-800 dark:text-slate-200 space-y-2">
+              <p>— {t("lit_club_point_1")}</p>
+              <p>— {t("lit_club_point_2")}</p>
+              <p>— {t("lit_club_point_3")}</p>
+              <p>— {t("lit_club_point_4")}</p>
+              <p>— {t("lit_club_point_5")}</p>
+              <p>— {t("lit_club_point_6")}</p>
+            </div>
 
-        <div className="text-base sm:text-lg text-slate-800 dark:text-slate-200 space-y-2">
-          <p>— {t("lit_club_point_1")}</p>
-          <p>— {t("lit_club_point_2")}</p>
-          <p>— {t("lit_club_point_3")}</p>
-          <p>— {t("lit_club_point_4")}</p>
-          <p>— {t("lit_club_point_5")}</p>
-          <p>— {t("lit_club_point_6")}</p>
-        </div>
+            <div className="mt-8 flex flex-col sm:flex-row items-center justify-end gap-3">
+              <span className="text-2xl sm:text-3xl font-medium text-slate-800 dark:text-slate-100">
+                {t("lit_club_join")}
+              </span>
 
-        <div className="mt-8 flex flex-col sm:flex-row items-center justify-end gap-3">
-          <span className="text-2xl sm:text-3xl font-medium text-slate-800 dark:text-slate-100">
-            {t("lit_club_join")}
-          </span>
-
-          <LinkButton
-            href="#"
-            className="rounded-2xl px-6 py-3 text-xl"
-            aria-label="PayPal $10"
-          >
-            <ExternalLink className="w-5 h-5" />
-            <span>$10 PayPal</span>
-          </LinkButton>
-        </div>
+              <LinkButton
+                href="#"
+                className="rounded-2xl px-6 py-3 text-xl"
+                aria-label="PayPal $10"
+              >
+                <ExternalLink className="w-5 h-5" />
+                <span>$10 PayPal</span>
+              </LinkButton>
+            </div>
+          </div>
+        </Card>
       </div>
-    </Card>
-  </div>
 
-  <div>
-    <h3 className="text-2xl sm:text-3xl font-semibold text-center mb-4">
-      {t("lit_club_b1b2")}
-    </h3>
+      {/* B1-B2 */}
+      <div>
+        <h3 className="text-2xl sm:text-3xl font-semibold text-center mb-4">
+          {t("lit_club_b1b2")}
+        </h3>
 
-    <Card className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl h-full">
-      <div className="p-5 flex flex-col h-full">
-        <p className="text-2xl sm:text-3xl text-blue-600 text-center font-medium mb-6">
-          {t("lit_club_next")}
-        </p>
+        <Card className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl h-full">
+          <div className="p-5 flex flex-col h-full">
+            <p className="text-2xl sm:text-3xl text-blue-600 text-center font-medium mb-6">
+              {t("lit_club_next")}
+            </p>
 
-        <div className="text-base sm:text-lg text-slate-800 dark:text-slate-200 space-y-2">
-          <p>— {t("lit_club_point_1")}</p>
-          <p>— {t("lit_club_point_2")}</p>
-          <p>— {t("lit_club_point_3")}</p>
-          <p>— {t("lit_club_point_4")}</p>
-          <p>— {t("lit_club_point_5")}</p>
-          <p>— {t("lit_club_point_6")}</p>
-        </div>
+            <div className="text-base sm:text-lg text-slate-800 dark:text-slate-200 space-y-2">
+              <p>— {t("lit_club_point_1")}</p>
+              <p>— {t("lit_club_point_2")}</p>
+              <p>— {t("lit_club_point_3")}</p>
+              <p>— {t("lit_club_point_4")}</p>
+              <p>— {t("lit_club_point_5")}</p>
+              <p>— {t("lit_club_point_6")}</p>
+            </div>
 
-        <div className="mt-8 flex flex-col sm:flex-row items-center justify-end gap-3">
-          <span className="text-2xl sm:text-3xl font-medium text-slate-800 dark:text-slate-100">
-            {t("lit_club_join")}
-          </span>
+            <div className="mt-8 flex flex-col sm:flex-row items-center justify-end gap-3">
+              <span className="text-2xl sm:text-3xl font-medium text-slate-800 dark:text-slate-100">
+                {t("lit_club_join")}
+              </span>
 
-          <LinkButton
-            href="#"
-            className="rounded-2xl px-6 py-3 text-xl"
-            aria-label="PayPal $10"
-          >
-            <ExternalLink className="w-5 h-5" />
-            <span>$10 PayPal</span>
-          </LinkButton>
-        </div>
+              <LinkButton
+                href="#"
+                className="rounded-2xl px-6 py-3 text-xl"
+                aria-label="PayPal $10"
+              >
+                <ExternalLink className="w-5 h-5" />
+                <span>$10 PayPal</span>
+              </LinkButton>
+            </div>
+          </div>
+        </Card>
       </div>
-    </Card>
-  </div>
-</div>
-    
+    </div>
   </div>
 </section>
 
