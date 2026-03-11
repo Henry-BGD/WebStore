@@ -1694,19 +1694,23 @@ const TAB_FROM_PATH = (p) => {
        {/* RUSSIAN LITERATURE CLUB */}
 <section hidden={!showLitClub} aria-hidden={!showLitClub}>
   <div className="grid md:grid-cols-3 gap-6 sm:gap-8 items-start">
-    <div className="md:col-span-2 space-y-4">
+    
+    <div className="md:col-span-2 space-y-3">
       <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight break-words">
         {t("lit_club_title")}
       </h1>
-      <p className="leading-relaxed text-slate-700 dark:text-slate-300">
+
+      <p className="text-base leading-relaxed text-slate-700 dark:text-slate-300">
         {t("lit_club_desc")}
       </p>
     </div>
 
     <Card className="p-5 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl">
       <CardTitle className="mb-2">{t("contacts")}</CardTitle>
+
       <div className="text-sm space-y-1 text-slate-700 dark:text-slate-300">
         <p>E-mail: genndybogdanov@gmail.com</p>
+
         <p>
           <a
             className="underline hover:text-slate-900 dark:hover:text-white break-all"
@@ -1721,19 +1725,23 @@ const TAB_FROM_PATH = (p) => {
     </Card>
 
     <div className="md:col-span-3 grid md:grid-cols-2 gap-5 sm:gap-6">
-      {/* A2-B1 */}
+
+      {/* A2 */}
       <div>
-        <h3 className="text-2xl sm:text-3xl font-semibold text-center mb-4">
+        <h3 className="text-2xl sm:text-3xl font-semibold text-center mb-2">
           {t("lit_club_a2b1")}
         </h3>
 
-        <Card className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl h-full">
-          <div className="p-5 flex flex-col h-full">
-            <p className="text-lg sm:text-xl text-blue-600 text-center font-medium mb-4">
-              {t("lit_club_next")}
-            </p>
+        <Card className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl">
+          <div className="p-5 flex flex-col divide-y divide-slate-200 dark:divide-slate-800">
 
-            <ul className="list-disc pl-5 text-base leading-relaxed text-slate-700 dark:text-slate-300 space-y-2 marker:text-slate-500 dark:marker:text-slate-400">
+            <div className="pb-2">
+              <p className="text-lg sm:text-xl text-blue-600 text-center font-medium">
+                {t("lit_club_next")}
+              </p>
+            </div>
+
+            <ul className="pt-3 list-disc pl-5 text-base leading-snug text-slate-700 dark:text-slate-300 space-y-0.5 marker:text-slate-500 dark:marker:text-slate-400">
               <li>{t("lit_club_point_1")}</li>
               <li>{t("lit_club_point_2")}</li>
               <li>{t("lit_club_point_3")}</li>
@@ -1742,37 +1750,41 @@ const TAB_FROM_PATH = (p) => {
               <li>{t("lit_club_point_6")}</li>
             </ul>
 
-            <div className="mt-6 flex flex-col sm:flex-row items-center justify-end gap-3">
+            <div className="pt-3 mt-3 flex flex-col sm:flex-row items-center justify-end gap-3">
               <span className="text-lg sm:text-xl font-medium text-slate-800 dark:text-slate-100">
                 {t("lit_club_join")}
               </span>
 
               <LinkButton
                 href="#"
-                className="rounded-full px-5 py-2.5"
+                className="rounded-full px-5 py-2"
                 aria-label="PayPal $10"
               >
                 <ExternalLink className="w-4 h-4" />
                 <span className="whitespace-nowrap">$10 PayPal</span>
               </LinkButton>
             </div>
+
           </div>
         </Card>
       </div>
 
       {/* B1-B2 */}
       <div>
-        <h3 className="text-2xl sm:text-3xl font-semibold text-center mb-4">
+        <h3 className="text-2xl sm:text-3xl font-semibold text-center mb-2">
           {t("lit_club_b1b2")}
         </h3>
 
-        <Card className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl h-full">
-          <div className="p-5 flex flex-col h-full">
-            <p className="text-lg sm:text-xl text-blue-600 text-center font-medium mb-4">
-              {t("lit_club_next")}
-            </p>
+        <Card className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl">
+          <div className="p-5 flex flex-col divide-y divide-slate-200 dark:divide-slate-800">
 
-            <ul className="list-disc pl-5 text-base leading-relaxed text-slate-700 dark:text-slate-300 space-y-2 marker:text-slate-500 dark:marker:text-slate-400">
+            <div className="pb-2">
+              <p className="text-lg sm:text-xl text-blue-600 text-center font-medium">
+                {t("lit_club_next")}
+              </p>
+            </div>
+
+            <ul className="pt-3 list-disc pl-5 text-base leading-snug text-slate-700 dark:text-slate-300 space-y-0.5 marker:text-slate-500 dark:marker:text-slate-400">
               <li>{t("lit_club_point_1")}</li>
               <li>{t("lit_club_point_2")}</li>
               <li>{t("lit_club_point_3")}</li>
@@ -1781,23 +1793,25 @@ const TAB_FROM_PATH = (p) => {
               <li>{t("lit_club_point_6")}</li>
             </ul>
 
-            <div className="mt-6 flex flex-col sm:flex-row items-center justify-end gap-3">
+            <div className="pt-3 mt-3 flex flex-col sm:flex-row items-center justify-end gap-3">
               <span className="text-lg sm:text-xl font-medium text-slate-800 dark:text-slate-100">
                 {t("lit_club_join")}
               </span>
 
               <LinkButton
                 href="#"
-                className="rounded-full px-5 py-2.5"
+                className="rounded-full px-5 py-2"
                 aria-label="PayPal $10"
               >
                 <ExternalLink className="w-4 h-4" />
                 <span className="whitespace-nowrap">$10 PayPal</span>
               </LinkButton>
             </div>
+
           </div>
         </Card>
       </div>
+
     </div>
   </div>
 </section>
