@@ -1637,7 +1637,7 @@ const TAB_FROM_PATH = (p) => {
         >
           {/* ABOUT */}
           <section hidden={!showAbout} aria-hidden={!showAbout}>
-            <div className="grid md:grid-cols-3 gap-6 sm:gap-8 items-start">
+            <div className="grid md:grid-cols-3 gap-4 sm:gap-5 items-start">
               <div className="md:col-span-2 space-y-4">
                 <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight break-words">{t("about_title")}</h1>
                 <p className="leading-relaxed text-slate-700 dark:text-slate-300">{t("about_p1")}</p>
@@ -1695,7 +1695,7 @@ const TAB_FROM_PATH = (p) => {
 <section hidden={!showLitClub} aria-hidden={!showLitClub}>
   <div className="grid md:grid-cols-3 gap-6 sm:gap-8 items-start">
     
-    <div className="md:col-span-2 space-y-3">
+    <div className="md:col-span-2 space-y-1">
       <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight break-words">
         {t("lit_club_title")}
       </h1>
@@ -1705,7 +1705,7 @@ const TAB_FROM_PATH = (p) => {
       </p>
     </div>
 
-    <div className="md:col-span-3 grid md:grid-cols-2 gap-5 sm:gap-6">
+    <div className="md:col-span-3 grid md:grid-cols-2 gap-4 sm:gap-4">
 
       {/* A2 */}
       <div>
@@ -1714,15 +1714,15 @@ const TAB_FROM_PATH = (p) => {
         </h3>
 
         <Card className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl">
-          <div className="p-5 flex flex-col divide-y divide-slate-200 dark:divide-slate-800">
+          <div className="p-4 flex flex-col divide-y divide-slate-200 dark:divide-slate-800">
 
-            <div className="pb-2">
+            <div className="pb-1">
               <p className="text-lg sm:text-xl text-blue-600 text-center font-medium">
                 {t("lit_club_next")}
               </p>
             </div>
 
-            <ul className="pt-3 list-disc pl-5 text-base leading-snug text-slate-700 dark:text-slate-300 space-y-0.5 marker:text-slate-500 dark:marker:text-slate-400">
+            <ul className="pt-2 list-disc pl-5 text-base leading-snug text-slate-700 dark:text-slate-300 space-y-0 marker:text-slate-500 dark:marker:text-slate-400 max-w-[42ch]">
               <li>{t("lit_club_point_1")}</li>
               <li>{t("lit_club_point_2")}</li>
               <li>{t("lit_club_point_3")}</li>
@@ -1731,7 +1731,7 @@ const TAB_FROM_PATH = (p) => {
               <li>{t("lit_club_point_6")}</li>
             </ul>
 
-            <div className="pt-3 mt-3 flex flex-col sm:flex-row items-center justify-end gap-3">
+            <div className="pt-2 mt-2 flex flex-col sm:flex-row items-center justify-end gap-2">
               <span className="text-lg sm:text-xl font-medium text-slate-800 dark:text-slate-100">
                 {t("lit_club_join")}
               </span>
@@ -1757,15 +1757,15 @@ const TAB_FROM_PATH = (p) => {
         </h3>
 
         <Card className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl">
-          <div className="p-5 flex flex-col divide-y divide-slate-200 dark:divide-slate-800">
+          <div className="p-4 flex flex-col divide-y divide-slate-200 dark:divide-slate-800">
 
-            <div className="pb-2">
+            <div className="pb-1">
               <p className="text-lg sm:text-xl text-blue-600 text-center font-medium">
                 {t("lit_club_next")}
               </p>
             </div>
 
-            <ul className="pt-3 list-disc pl-5 text-base leading-snug text-slate-700 dark:text-slate-300 space-y-0.5 marker:text-slate-500 dark:marker:text-slate-400">
+            <ul className="pt-2 list-disc pl-5 text-base leading-snug text-slate-700 dark:text-slate-300 space-y-0 marker:text-slate-500 dark:marker:text-slate-400 max-w-[42ch]">
               <li>{t("lit_club_point_1")}</li>
               <li>{t("lit_club_point_2")}</li>
               <li>{t("lit_club_point_3")}</li>
@@ -1774,7 +1774,7 @@ const TAB_FROM_PATH = (p) => {
               <li>{t("lit_club_point_6")}</li>
             </ul>
 
-            <div className="pt-3 mt-3 flex flex-col sm:flex-row items-center justify-end gap-3">
+            <div className="pt-2 mt-2 flex flex-col sm:flex-row items-center justify-end gap-2">
               <span className="text-lg sm:text-xl font-medium text-slate-800 dark:text-slate-100">
                 {t("lit_club_join")}
               </span>
