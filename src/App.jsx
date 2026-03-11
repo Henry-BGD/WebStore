@@ -1691,7 +1691,7 @@ const TAB_FROM_PATH = (p) => {
             </div>
           </section>
 
-        {/* RUSSIAN LITERATURE CLUB */}
+       {/* RUSSIAN LITERATURE CLUB */}
 <section hidden={!showLitClub} aria-hidden={!showLitClub}>
   <div className="grid md:grid-cols-3 gap-6 sm:gap-8 items-start">
     <div className="md:col-span-2 space-y-4">
@@ -1729,31 +1729,31 @@ const TAB_FROM_PATH = (p) => {
 
         <Card className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl h-full">
           <div className="p-5 flex flex-col h-full">
-            <p className="text-2xl sm:text-3xl text-blue-600 text-center font-medium mb-6">
+            <p className="text-lg sm:text-xl text-blue-600 text-center font-medium mb-4">
               {t("lit_club_next")}
             </p>
 
-            <div className="text-base sm:text-lg text-slate-800 dark:text-slate-200 space-y-2">
-              <p>— {t("lit_club_point_1")}</p>
-              <p>— {t("lit_club_point_2")}</p>
-              <p>— {t("lit_club_point_3")}</p>
-              <p>— {t("lit_club_point_4")}</p>
-              <p>— {t("lit_club_point_5")}</p>
-              <p>— {t("lit_club_point_6")}</p>
-            </div>
+            <ul className="list-disc pl-5 text-base leading-relaxed text-slate-700 dark:text-slate-300 space-y-2 marker:text-slate-500 dark:marker:text-slate-400">
+              <li>{t("lit_club_point_1")}</li>
+              <li>{t("lit_club_point_2")}</li>
+              <li>{t("lit_club_point_3")}</li>
+              <li>{t("lit_club_point_4")}</li>
+              <li>{t("lit_club_point_5")}</li>
+              <li>{t("lit_club_point_6")}</li>
+            </ul>
 
-            <div className="mt-8 flex flex-col sm:flex-row items-center justify-end gap-3">
-              <span className="text-2xl sm:text-3xl font-medium text-slate-800 dark:text-slate-100">
+            <div className="mt-6 flex flex-col sm:flex-row items-center justify-end gap-3">
+              <span className="text-lg sm:text-xl font-medium text-slate-800 dark:text-slate-100">
                 {t("lit_club_join")}
               </span>
 
               <LinkButton
                 href="#"
-                className="rounded-2xl px-6 py-3 text-xl"
+                className="rounded-full px-5 py-2.5"
                 aria-label="PayPal $10"
               >
-                <ExternalLink className="w-5 h-5" />
-                <span>$10 PayPal</span>
+                <ExternalLink className="w-4 h-4" />
+                <span className="whitespace-nowrap">$10 PayPal</span>
               </LinkButton>
             </div>
           </div>
@@ -1768,31 +1768,31 @@ const TAB_FROM_PATH = (p) => {
 
         <Card className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl h-full">
           <div className="p-5 flex flex-col h-full">
-            <p className="text-2xl sm:text-3xl text-blue-600 text-center font-medium mb-6">
+            <p className="text-lg sm:text-xl text-blue-600 text-center font-medium mb-4">
               {t("lit_club_next")}
             </p>
 
-            <div className="text-base sm:text-lg text-slate-800 dark:text-slate-200 space-y-2">
-              <p>— {t("lit_club_point_1")}</p>
-              <p>— {t("lit_club_point_2")}</p>
-              <p>— {t("lit_club_point_3")}</p>
-              <p>— {t("lit_club_point_4")}</p>
-              <p>— {t("lit_club_point_5")}</p>
-              <p>— {t("lit_club_point_6")}</p>
-            </div>
+            <ul className="list-disc pl-5 text-base leading-relaxed text-slate-700 dark:text-slate-300 space-y-2 marker:text-slate-500 dark:marker:text-slate-400">
+              <li>{t("lit_club_point_1")}</li>
+              <li>{t("lit_club_point_2")}</li>
+              <li>{t("lit_club_point_3")}</li>
+              <li>{t("lit_club_point_4")}</li>
+              <li>{t("lit_club_point_5")}</li>
+              <li>{t("lit_club_point_6")}</li>
+            </ul>
 
-            <div className="mt-8 flex flex-col sm:flex-row items-center justify-end gap-3">
-              <span className="text-2xl sm:text-3xl font-medium text-slate-800 dark:text-slate-100">
+            <div className="mt-6 flex flex-col sm:flex-row items-center justify-end gap-3">
+              <span className="text-lg sm:text-xl font-medium text-slate-800 dark:text-slate-100">
                 {t("lit_club_join")}
               </span>
 
               <LinkButton
                 href="#"
-                className="rounded-2xl px-6 py-3 text-xl"
+                className="rounded-full px-5 py-2.5"
                 aria-label="PayPal $10"
               >
-                <ExternalLink className="w-5 h-5" />
-                <span>$10 PayPal</span>
+                <ExternalLink className="w-4 h-4" />
+                <span className="whitespace-nowrap">$10 PayPal</span>
               </LinkButton>
             </div>
           </div>
