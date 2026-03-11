@@ -1705,25 +1705,6 @@ const TAB_FROM_PATH = (p) => {
       </p>
     </div>
 
-    <Card className="p-5 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl">
-      <CardTitle className="mb-2">{t("contacts")}</CardTitle>
-
-      <div className="text-sm space-y-1 text-slate-700 dark:text-slate-300">
-        <p>E-mail: genndybogdanov@gmail.com</p>
-
-        <p>
-          <a
-            className="underline hover:text-slate-900 dark:hover:text-white break-all"
-            href="https://substack.com/@gbogdanov"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Substack
-          </a>
-        </p>
-      </div>
-    </Card>
-
     <div className="md:col-span-3 grid md:grid-cols-2 gap-5 sm:gap-6">
 
       {/* A2 */}
