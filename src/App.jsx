@@ -1722,7 +1722,7 @@ const TAB_FROM_PATH = (p) => {
               </p>
             </div>
 
-            <ul className="pt-2 list-disc pl-5 text-base leading-snug text-slate-700 dark:text-slate-300 space-y-0 marker:text-slate-500 dark:marker:text-slate-400 max-w-[42ch]">
+            <ul className="pt-2 list-disc pl-5 text-base leading-snug text-slate-700 dark:text-slate-300 space-y-0 marker:text-slate-500 dark:marker:text-slate-400">
               <li>{t("lit_club_point_1")}</li>
               <li>{t("lit_club_point_2")}</li>
               <li>{t("lit_club_point_3")}</li>
@@ -1765,7 +1765,7 @@ const TAB_FROM_PATH = (p) => {
               </p>
             </div>
 
-            <ul className="pt-2 list-disc pl-5 text-base leading-snug text-slate-700 dark:text-slate-300 space-y-0 marker:text-slate-500 dark:marker:text-slate-400 max-w-[42ch]">
+            <ul className="pt-2 list-disc pl-5 text-base leading-snug text-slate-700 dark:text-slate-300 space-y-0 marker:text-slate-500 dark:marker:text-slate-400">
               <li>{t("lit_club_point_1")}</li>
               <li>{t("lit_club_point_2")}</li>
               <li>{t("lit_club_point_3")}</li>
