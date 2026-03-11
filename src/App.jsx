@@ -1716,7 +1716,7 @@ const TAB_FROM_PATH = (p) => {
         <Card className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl">
           <div className="p-4 flex flex-col divide-y divide-slate-200 dark:divide-slate-800">
 
-<div className="py-3">
+<div className="py-0">
   <p className="text-lg sm:text-xl text-blue-600 text-center font-medium">
                 {t("lit_club_next")}
               </p>
@@ -1759,7 +1759,7 @@ const TAB_FROM_PATH = (p) => {
         <Card className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl">
           <div className="p-4 flex flex-col divide-y divide-slate-200 dark:divide-slate-800">
 
-<div className="py-3">
+<div className="py-0">
   <p className="text-lg sm:text-xl text-blue-600 text-center font-medium">
                 {t("lit_club_next")}
               </p>
