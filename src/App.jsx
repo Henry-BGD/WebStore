@@ -349,6 +349,21 @@ const I18N = {
     nav_products: "Store",
     nav_audio: "Audiobooks",
 
+lit_club_title: "Russian Literature Club",
+lit_club_desc: "Description will go here.",
+
+lit_club_a2b1: "Level A2 (1.5 hours)",
+lit_club_b1b2: "Level B1 - B2 (2 hours)",
+lit_club_next: "Next club: 25/03/2026 3PM",
+lit_club_join: "Join the Club",
+
+lit_club_point_1: "Perfect if you can already speak and read a little.",
+lit_club_point_2: "Club plan: introductions and questions (~15 min), reading by roles (~45 min), discussion of the text (~30 min).",
+lit_club_point_3: "Maximum 5 people (+ club host).",
+lit_club_point_4: "Meeting in Zoom (if all students agree, the lesson may be recorded and sent to you after the club).",
+lit_club_point_5: "During reading and Q&A, I will write down your mistakes in a document.",
+lit_club_point_6: "After the lesson, you will receive this document (with corrected mistakes) and the text with stress marks that we read.",
+
     about_title: "Hi everyone! I’m Genndy. I’m a Russian language teacher and the author of books",
     about_p1:
       "I help learners at all levels learn Russian faster and with confidence. I’ve taught over 1,000 lessons and consistently maintain a high rating.",
@@ -383,6 +398,21 @@ const I18N = {
     nav_lit_club: "Русский литературный клуб",
     nav_products: "Магазин",
     nav_audio: "Аудиокниги",
+
+lit_club_title: "Русский литературный клуб",
+lit_club_desc: "Описание будет здесь.",
+
+lit_club_a2b1: "Уровень A2 (1,5 часа)",
+lit_club_b1b2: "Уровень B1 - B2 (2 часа)",
+lit_club_next: "Ближайший клуб: 25/03/2026 15:00",
+lit_club_join: "Вступить в клуб",
+
+lit_club_point_1: "идеально подходит, если вы уже немного умеете говорить и читать",
+lit_club_point_2: "план клуба: знакомство и ответы на вопросы (~15 минут), чтение по ролям (~45 минут), обсуждение текста (~30 минут)",
+lit_club_point_3: "максимум 5 человек (+ ведущий клуба)",
+lit_club_point_4: "встреча в Zoom (если все ученики согласны, урок может быть записан и отправлен вам после клуба)",
+lit_club_point_5: "во время чтения и ответов на вопросы я буду записывать ваши ошибки в документ",
+lit_club_point_6: "после урока вы получите этот документ (с исправленными ошибками) и текст с ударениями, который мы читали",
 
     about_title: "Всем привет, друзья! Меня зовут Геннадий. Я\u00A0преподаватель русского языка и автор книг",
     about_p1: "Я помогаю ученикам разных уровней быстрее осваивать русский язык. Более 1000 проведённых уроков и высокий рейтинг.",
@@ -1690,35 +1720,91 @@ const TAB_FROM_PATH = (p) => {
       </div>
     </Card>
 
-    <Card className="md:col-span-3 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl">
-      <div className="p-5">
-        <div className="flex items-start gap-5">
-          <div className="flex-none w-28 sm:w-32 md:w-36 aspect-[3/4] rounded-2xl overflow-hidden bg-white dark:bg-slate-950 shadow">
-            <img
-              src="/Portrait_1.webp"
-              alt="Portrait"
-              className="w-full h-full object-contain"
-              loading="eager"
-              decoding="async"
-              fetchPriority="high"
-              sizes="(max-width: 640px) 112px, (max-width: 768px) 128px, 144px"
-            />
-          </div>
+  <div className="md:col-span-3 grid md:grid-cols-2 gap-5 sm:gap-6">
+  {/* A2-B1 */}
+  <div>
+    <h3 className="text-2xl sm:text-3xl font-semibold text-center mb-4">
+      Level A2 - B1 (1,5 hours)
+    </h3>
 
-          <div className="min-w-0 flex-1 md:flex md:flex-col md:items-center md:text-center">
-            <h3 className="text-lg sm:text-xl font-semibold leading-snug">
-              Russian Literature Club
-            </h3>
+<div className="md:col-span-3 grid md:grid-cols-2 gap-5 sm:gap-6">
+  <div>
+    <h3 className="text-2xl sm:text-3xl font-semibold text-center mb-4">
+      {t("lit_club_a2b1")}
+    </h3>
 
-            <div className="mt-3 flex flex-col gap-2 w-full max-w-[260px]">
-              <ExternalLinkChip href="#">
-                Coming soon
-              </ExternalLinkChip>
-            </div>
-          </div>
+    <Card className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl h-full">
+      <div className="p-5 flex flex-col h-full">
+        <p className="text-2xl sm:text-3xl text-blue-600 text-center font-medium mb-6">
+          {t("lit_club_next")}
+        </p>
+
+        <div className="text-base sm:text-lg text-slate-800 dark:text-slate-200 space-y-2">
+          <p>— {t("lit_club_point_1")}</p>
+          <p>— {t("lit_club_point_2")}</p>
+          <p>— {t("lit_club_point_3")}</p>
+          <p>— {t("lit_club_point_4")}</p>
+          <p>— {t("lit_club_point_5")}</p>
+          <p>— {t("lit_club_point_6")}</p>
+        </div>
+
+        <div className="mt-8 flex flex-col sm:flex-row items-center justify-end gap-3">
+          <span className="text-2xl sm:text-3xl font-medium text-slate-800 dark:text-slate-100">
+            {t("lit_club_join")}
+          </span>
+
+          <LinkButton
+            href="#"
+            className="rounded-2xl px-6 py-3 text-xl"
+            aria-label="PayPal $10"
+          >
+            <ExternalLink className="w-5 h-5" />
+            <span>$10 PayPal</span>
+          </LinkButton>
         </div>
       </div>
     </Card>
+  </div>
+
+  <div>
+    <h3 className="text-2xl sm:text-3xl font-semibold text-center mb-4">
+      {t("lit_club_b1b2")}
+    </h3>
+
+    <Card className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl h-full">
+      <div className="p-5 flex flex-col h-full">
+        <p className="text-2xl sm:text-3xl text-blue-600 text-center font-medium mb-6">
+          {t("lit_club_next")}
+        </p>
+
+        <div className="text-base sm:text-lg text-slate-800 dark:text-slate-200 space-y-2">
+          <p>— {t("lit_club_point_1")}</p>
+          <p>— {t("lit_club_point_2")}</p>
+          <p>— {t("lit_club_point_3")}</p>
+          <p>— {t("lit_club_point_4")}</p>
+          <p>— {t("lit_club_point_5")}</p>
+          <p>— {t("lit_club_point_6")}</p>
+        </div>
+
+        <div className="mt-8 flex flex-col sm:flex-row items-center justify-end gap-3">
+          <span className="text-2xl sm:text-3xl font-medium text-slate-800 dark:text-slate-100">
+            {t("lit_club_join")}
+          </span>
+
+          <LinkButton
+            href="#"
+            className="rounded-2xl px-6 py-3 text-xl"
+            aria-label="PayPal $10"
+          >
+            <ExternalLink className="w-5 h-5" />
+            <span>$10 PayPal</span>
+          </LinkButton>
+        </div>
+      </div>
+    </Card>
+  </div>
+</div>
+    
   </div>
 </section>
 
