@@ -1745,7 +1745,7 @@ const TAB_FROM_PATH = (p) => {
           </p>
         </div>
 
-        <ul className="pt-2 list-disc pl-5 text-base leading-snug text-slate-700 dark:text-slate-300 space-y-0>
+        <ul className="pt-2 list-disc pl-5 text-base leading-snug text-slate-700 dark:text-slate-300 space-y-0">
           <li>{t("lit_club_1_point_1")}</li>
           <li>{t("lit_club_1_point_2")}</li>
           <li>{t("lit_club_1_point_3")}</li>
