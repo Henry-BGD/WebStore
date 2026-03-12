@@ -1732,7 +1732,7 @@ const TAB_FROM_PATH = (p) => {
    <div className="md:col-span-3 grid md:grid-cols-2 gap-4 sm:gap-4">
 
   {/* CLUB 1 */}
-  <div>
+  <div className="h-full">
     <h3 className="text-2xl sm:text-3xl font-semibold text-center mb-2">
       {t("lit_club_1_title")}
     </h3>
@@ -1745,7 +1745,7 @@ const TAB_FROM_PATH = (p) => {
           </p>
         </div>
 
-        <ul className="pt-2 list-disc pl-5 text-base leading-snug text-slate-700 dark:text-slate-300 space-y-0 flex-1">
+        <ul className="pt-2 list-disc pl-5 text-base leading-snug text-slate-700 dark:text-slate-300 space-y-0>
           <li>{t("lit_club_1_point_1")}</li>
           <li>{t("lit_club_1_point_2")}</li>
           <li>{t("lit_club_1_point_3")}</li>
@@ -1773,7 +1773,7 @@ const TAB_FROM_PATH = (p) => {
   </div>
 
   {/* CLUB 2 */}
-  <div>
+  <div className="h-full">
     <h3 className="text-2xl sm:text-3xl font-semibold text-center mb-2">
       {t("lit_club_2_title")}
     </h3>
@@ -1786,7 +1786,7 @@ const TAB_FROM_PATH = (p) => {
           </p>
         </div>
 
-        <ul className="pt-2 list-disc pl-5 text-base leading-snug text-slate-700 dark:text-slate-300 space-y-0 flex-1">
+        <ul className="pt-2 list-disc pl-5 text-base leading-snug text-slate-700 dark:text-slate-300 space-y-0">
           <li>{t("lit_club_2_point_1")}</li>
           <li>{t("lit_club_2_point_2")}</li>
           <li>{t("lit_club_2_point_3")}</li>
