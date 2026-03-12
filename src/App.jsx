@@ -352,17 +352,31 @@ const I18N = {
 lit_club_title: "Russian Literature Club",
 lit_club_desc: "Description will go here.",
 
-lit_club_a2b1: "Level A2 (1.5 hours)",
-lit_club_b1b2: "Level B1 - B2 (2 hours)",
-lit_club_next: "Next club: 25/03/2026 3PM",
-lit_club_join: "Join the Club",
 
-lit_club_point_1: "Perfect if you already have some basic speaking and reading skills.",
-lit_club_point_2: "Club plan: introductions and questions (~15 min), reading by roles (~30 min), discussion of the text (~45 min).",
-lit_club_point_3: "Maximum 4 people (+ club host).",
-lit_club_point_4: "Meeting on Zoom.",
-lit_club_point_5: "During the reading and discussion, your mistakes will be written in a document.",
-lit_club_point_6: "After the club, you will receive this document (with corrected mistakes) and the text we read with stress marks.",
+
+lit_club_1_title: "Level A2 (1.5 hours)",
+lit_club_1_next: "Next club: 25/03/2026 3PM",
+lit_club_1_join: "Sign Up for a Club Meeting",
+lit_club_1_price: "$10 PayPal",
+
+lit_club_1_point_1: "Perfect if you already have some basic speaking and reading skills.",
+lit_club_1_point_2: "Club plan: introductions and questions (~15 min), reading by roles (~30 min), discussion of the text (~45 min).",
+lit_club_1_point_3: "Maximum 4 people (+ club host).",
+lit_club_1_point_4: "Meeting on Zoom.",
+lit_club_1_point_5: "During the reading and discussion, your mistakes will be written in a document.",
+lit_club_1_point_6: "After the club, you will receive this document (with corrected mistakes) and the text we read with stress marks.",
+
+lit_club_2_title: "Level B1 - B2 (2 hours)",
+lit_club_2_next: "Next club: 27/03/2026 6PM",
+lit_club_2_join: "Sign Up for a Club Meeting",
+lit_club_2_price: "$12 PayPal",
+
+lit_club_2_point_1: "Perfect for upper-intermediate learners who can already discuss texts more freely.",
+lit_club_2_point_2: "Club plan: introductions and questions (~15 min), reading by roles (~40 min), discussion of the text (~65 min).",
+lit_club_2_point_3: "Maximum 4 people (+ club host).",
+lit_club_2_point_4: "Meeting on Zoom.",
+lit_club_2_point_5: "During the reading and discussion, your mistakes will be written in a document.",
+lit_club_2_point_6: "After the club, you will receive this document (with corrected mistakes) and the text we read",
 
     about_title: "Hi everyone! I’m Genndy. I’m a Russian language teacher and the author of books",
     about_p1:
@@ -405,15 +419,27 @@ lit_club_desc: "Описание будет здесь.",
 lit_club_a2b1: "Уровень A2 (1,5 часа)",
 lit_club_b1b2: "Уровень B1 - B2 (2 часа)",
 lit_club_next: "Ближайший клуб: 25/03/2026 15:00",
-lit_club_join: "Вступить в клуб",
+lit_club_join: "Записаться на встречу клуба",
  
-lit_club_point_1: "Идеально подходит, если вы уже немного умеете говорить и читать.",
-lit_club_point_2: "План клуба: знакомство и ответы на вопросы (~15 минут), чтение по ролям (~30 минут), обсуждение текста (~45 минут).",
-lit_club_point_3: "Максимум 4 ученика (+ ведущий клуба).",
-lit_club_point_4: "Встреча в Zoom.",
-lit_club_point_5: "Во время чтения и ответов на вопросы ваши ошибки будут записаны в документ.",
-lit_club_point_6: "После клуба вы получите этот документ (с исправленными ошибками) и текст с ударениями, который мы читали.",
+lit_club_1_point_1: "Идеально подходит, если вы уже немного умеете говорить и читать.",
+lit_club_1_point_2: "План клуба: знакомство и ответы на вопросы (~15 минут), чтение по ролям (~30 минут), обсуждение текста (~45 минут).",
+lit_club_1_point_3: "Максимум 4 ученика (+ ведущий клуба).",
+lit_club_1_point_4: "Встреча в Zoom.",
+lit_club_1_point_5: "Во время чтения и ответов на вопросы ваши ошибки будут записаны в документ.",
+lit_club_1_point_6: "После клуба вы получите этот документ (с исправленными ошибками) и текст с ударениями, который мы читали.",
 
+lit_club_2_title: "Уровень B1 - B2 (2 часа)",
+lit_club_2_next: "Ближайший клуб: 27/03/2026 18:00",
+lit_club_2_join: "Вступить в клуб",
+lit_club_2_price: "$12 PayPal",
+
+lit_club_2_point_1: "Идеально подходит для учеников среднего уровня,
+lit_club_2_point_2: "План клуба: знакомство и ответы на вопросы (~15 минут), чтение по ролям (~45 минут), обсуждение текста (~60 минут).",
+lit_club_2_point_3: "Максимум 4 ученика (+ ведущий клуба).",
+lit_club_2_point_4: "Встреча в Zoom.",
+lit_club_2_point_5: "Во время чтения и ответов на вопросы ваши ошибки будут записаны в документ.",
+lit_club_2_point_6: "После клуба вы получите этот документ (с исправленными ошибками) и текст, который мы читали.",
+    
     about_title: "Всем привет, друзья! Меня зовут Геннадий. Я\u00A0преподаватель русского языка и автор книг",
     about_p1: "Я помогаю ученикам разных уровней быстрее осваивать русский язык. Более 1000 проведённых уроков и высокий рейтинг.",
     contacts: "Контакты",
@@ -1705,95 +1731,91 @@ const TAB_FROM_PATH = (p) => {
       </p>
     </div>
 
-    <div className="md:col-span-3 grid md:grid-cols-2 gap-4 sm:gap-4">
+   <div className="md:col-span-3 grid md:grid-cols-2 gap-4 sm:gap-4">
 
-      {/* A2 */}
-      <div>
-        <h3 className="text-2xl sm:text-3xl font-semibold text-center mb-2">
-          {t("lit_club_a2b1")}
-        </h3>
+  {/* CLUB 1 */}
+  <div>
+    <h3 className="text-2xl sm:text-3xl font-semibold text-center mb-2">
+      {t("lit_club_1_title")}
+    </h3>
 
-        <Card className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl">
-          <div className="p-4 flex flex-col divide-y divide-slate-200 dark:divide-slate-800">
+    <Card className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl">
+      <div className="p-4 flex flex-col divide-y divide-slate-200 dark:divide-slate-800">
+        <div className="py-2.5">
+          <p className="text-lg sm:text-xl text-blue-600 text-center font-medium">
+            {t("lit_club_1_next")}
+          </p>
+        </div>
 
-            <div className="pb-1">
-              <p className="text-lg sm:text-xl text-blue-600 text-center font-medium">
-                {t("lit_club_next")}
-              </p>
-            </div>
+        <ul className="pt-2 list-disc pl-5 text-base leading-snug text-slate-700 dark:text-slate-300 space-y-0">
+          <li>{t("lit_club_1_point_1")}</li>
+          <li>{t("lit_club_1_point_2")}</li>
+          <li>{t("lit_club_1_point_3")}</li>
+          <li>{t("lit_club_1_point_4")}</li>
+          <li>{t("lit_club_1_point_5")}</li>
+          <li>{t("lit_club_1_point_6")}</li>
+        </ul>
 
-            <ul className="pt-2 list-disc pl-5 text-base leading-snug text-slate-700 dark:text-slate-300 space-y-0 marker:text-slate-500 dark:marker:text-slate-400">
-              <li>{t("lit_club_point_1")}</li>
-              <li>{t("lit_club_point_2")}</li>
-              <li>{t("lit_club_point_3")}</li>
-              <li>{t("lit_club_point_4")}</li>
-              <li>{t("lit_club_point_5")}</li>
-              <li>{t("lit_club_point_6")}</li>
-            </ul>
+        <div className="pt-2 mt-2 flex flex-col sm:flex-row items-center justify-end gap-2">
+          <span className="text-lg sm:text-xl font-medium text-slate-800 dark:text-slate-100">
+            {t("lit_club_1_join")}
+          </span>
 
-            <div className="pt-2 mt-2 flex flex-col sm:flex-row items-center justify-end gap-2">
-              <span className="text-lg sm:text-xl font-medium text-slate-800 dark:text-slate-100">
-                {t("lit_club_join")}
-              </span>
-
-              <LinkButton
-                href="#"
-                className="rounded-full px-5 py-2"
-                aria-label="PayPal $10"
-              >
-                <ExternalLink className="w-4 h-4" />
-                <span className="whitespace-nowrap">$10 PayPal</span>
-              </LinkButton>
-            </div>
-
-          </div>
-        </Card>
+          <LinkButton
+            href="#"
+            className="rounded-full px-5 py-2.5"
+            aria-label={t("lit_club_1_price")}
+          >
+            <ExternalLink className="w-4 h-4" />
+            <span className="whitespace-nowrap">{t("lit_club_1_price")}</span>
+          </LinkButton>
+        </div>
       </div>
+    </Card>
+  </div>
 
-      {/* B1-B2 */}
-      <div>
-        <h3 className="text-2xl sm:text-3xl font-semibold text-center mb-2">
-          {t("lit_club_b1b2")}
-        </h3>
+  {/* CLUB 2 */}
+  <div>
+    <h3 className="text-2xl sm:text-3xl font-semibold text-center mb-2">
+      {t("lit_club_2_title")}
+    </h3>
 
-        <Card className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl">
-          <div className="p-4 flex flex-col divide-y divide-slate-200 dark:divide-slate-800">
+    <Card className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl">
+      <div className="p-4 flex flex-col divide-y divide-slate-200 dark:divide-slate-800">
+        <div className="py-2.5">
+          <p className="text-lg sm:text-xl text-blue-600 text-center font-medium">
+            {t("lit_club_2_next")}
+          </p>
+        </div>
 
-            <div className="pb-1">
-              <p className="text-lg sm:text-xl text-blue-600 text-center font-medium">
-                {t("lit_club_next")}
-              </p>
-            </div>
+        <ul className="pt-2 list-disc pl-5 text-base leading-snug text-slate-700 dark:text-slate-300 space-y-0">
+          <li>{t("lit_club_2_point_1")}</li>
+          <li>{t("lit_club_2_point_2")}</li>
+          <li>{t("lit_club_2_point_3")}</li>
+          <li>{t("lit_club_2_point_4")}</li>
+          <li>{t("lit_club_2_point_5")}</li>
+          <li>{t("lit_club_2_point_6")}</li>
+        </ul>
 
-            <ul className="pt-2 list-disc pl-5 text-base leading-snug text-slate-700 dark:text-slate-300 space-y-0 marker:text-slate-500 dark:marker:text-slate-400">
-              <li>{t("lit_club_point_1")}</li>
-              <li>{t("lit_club_point_2")}</li>
-              <li>{t("lit_club_point_3")}</li>
-              <li>{t("lit_club_point_4")}</li>
-              <li>{t("lit_club_point_5")}</li>
-              <li>{t("lit_club_point_6")}</li>
-            </ul>
+        <div className="pt-2 mt-2 flex flex-col sm:flex-row items-center justify-end gap-2">
+          <span className="text-lg sm:text-xl font-medium text-slate-800 dark:text-slate-100">
+            {t("lit_club_2_join")}
+          </span>
 
-            <div className="pt-2 mt-2 flex flex-col sm:flex-row items-center justify-end gap-2">
-              <span className="text-lg sm:text-xl font-medium text-slate-800 dark:text-slate-100">
-                {t("lit_club_join")}
-              </span>
-
-              <LinkButton
-                href="#"
-                className="rounded-full px-5 py-2"
-                aria-label="PayPal $10"
-              >
-                <ExternalLink className="w-4 h-4" />
-                <span className="whitespace-nowrap">$10 PayPal</span>
-              </LinkButton>
-            </div>
-
-          </div>
-        </Card>
+          <LinkButton
+            href="#"
+            className="rounded-full px-5 py-2.5"
+            aria-label={t("lit_club_2_price")}
+          >
+            <ExternalLink className="w-4 h-4" />
+            <span className="whitespace-nowrap">{t("lit_club_2_price")}</span>
+          </LinkButton>
+        </div>
       </div>
+    </Card>
+  </div>
 
-    </div>
+</div>
   </div>
 </section>
 
