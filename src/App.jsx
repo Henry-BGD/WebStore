@@ -1732,13 +1732,13 @@ const TAB_FROM_PATH = (p) => {
    <div className="md:col-span-3 grid md:grid-cols-2 gap-4 sm:gap-4">
 
   {/* CLUB 1 */}
-  <div className="h-full">
+  <div>
     <h3 className="text-2xl sm:text-3xl font-semibold text-center mb-2">
       {t("lit_club_1_title")}
     </h3>
 
-    <Card className="h-full border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl">
-      <div className="h-full p-4 flex flex-col divide-y divide-slate-200 dark:divide-slate-800">
+    <Card className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl">
+      <div className="p-4 flex flex-col divide-y divide-slate-200 dark:divide-slate-800">
           <div className="pt-0 pb-0">
           <p className="text-lg sm:text-xl text-blue-600 text-center font-medium">
             {t("lit_club_1_next")}
@@ -1754,7 +1754,7 @@ const TAB_FROM_PATH = (p) => {
           <li>{t("lit_club_1_point_6")}</li>
         </ul>
 
-        <div className="pt-2 mt-auto flex flex-col sm:flex-row items-center justify-end gap-2">
+        <div className="pt-2 mt-2 flex flex-col sm:flex-row items-center justify-end gap-2">
           <span className="text-lg sm:text-xl font-medium text-slate-800 dark:text-slate-100">
             {t("lit_club_1_join")}
           </span>
@@ -1773,13 +1773,13 @@ const TAB_FROM_PATH = (p) => {
   </div>
 
   {/* CLUB 2 */}
-  <div className="h-full">
+  <div>
     <h3 className="text-2xl sm:text-3xl font-semibold text-center mb-2">
       {t("lit_club_2_title")}
     </h3>
 
-    <Card className="h-full border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl">
-      <div className="h-full p-4 flex flex-col divide-y divide-slate-200 dark:divide-slate-800">
+    <Card className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl">
+      <div className="p-4 flex flex-col divide-y divide-slate-200 dark:divide-slate-800">
           <div className="pt-0 pb-0">
           <p className="text-lg sm:text-xl text-blue-600 text-center font-medium">
             {t("lit_club_2_next")}
@@ -1795,7 +1795,7 @@ const TAB_FROM_PATH = (p) => {
           <li>{t("lit_club_2_point_6")}</li>
         </ul>
 
-        <div className="pt-2 mt-auto flex flex-col sm:flex-row items-center justify-end gap-2">
+        <div className="pt-2 mt-2 flex flex-col sm:flex-row items-center justify-end gap-2">
           <span className="text-lg sm:text-xl font-medium text-slate-800 dark:text-slate-100">
             {t("lit_club_2_join")}
           </span>
