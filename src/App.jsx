@@ -352,8 +352,6 @@ const I18N = {
 lit_club_title: "Russian Literature Club",
 lit_club_desc: "Description will go here.",
 
-
-
 lit_club_1_title: "Level A2 (1.5 hours)",
 lit_club_1_next: "Next club: 25/03/2026 3PM",
 lit_club_1_join: "Sign Up for a Club Meeting",
@@ -371,7 +369,7 @@ lit_club_2_next: "Next club: 27/03/2026 6PM",
 lit_club_2_join: "Sign Up for a Club Meeting",
 lit_club_2_price: "$12 PayPal",
 
-lit_club_2_point_1: "Perfect for upper-intermediate learners who can already discuss texts more freely.",
+lit_club_2_point_1: "1",
 lit_club_2_point_2: "Club plan: introductions and questions (~15 min), reading by roles (~40 min), discussion of the text (~65 min).",
 lit_club_2_point_3: "Maximum 4 people (+ club host).",
 lit_club_2_point_4: "Meeting on Zoom.",
@@ -1741,7 +1739,8 @@ const TAB_FROM_PATH = (p) => {
 
     <Card className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl">
       <div className="p-4 flex flex-col divide-y divide-slate-200 dark:divide-slate-800">
-        <div className="py-2.5">
+        //<div className="py-2.5">
+          <div className="pt-0 pb-0">
           <p className="text-lg sm:text-xl text-blue-600 text-center font-medium">
             {t("lit_club_1_next")}
           </p>
@@ -1782,7 +1781,8 @@ const TAB_FROM_PATH = (p) => {
 
     <Card className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl">
       <div className="p-4 flex flex-col divide-y divide-slate-200 dark:divide-slate-800">
-        <div className="py-2.5">
+        //<div className="py-2.5">
+          <div className="pt-0 pb-0">
           <p className="text-lg sm:text-xl text-blue-600 text-center font-medium">
             {t("lit_club_2_next")}
           </p>
