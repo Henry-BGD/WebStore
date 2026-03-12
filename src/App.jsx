@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/Card.j
 import { Button } from "./components/ui/Button.jsx";
 import { Input } from "./components/ui/Input.jsx";
 import { Badge } from "./components/ui/Badge.jsx";
-import { ExternalLink, Download, Play, Pause, X, Search, Sun, Moon } from "lucide-react";
+import { ExternalLink, Download, Play, Pause, X, Search, Sun, Moon, ChevronDown } from "lucide-react";
 import { Analytics } from "@vercel/analytics/react";
 
 // ================== LAYOUT ==================
@@ -369,12 +369,30 @@ lit_club_2_next: "Next club: 27/03/2026 6PM",
 lit_club_2_join: "Sign Up for a Club Meeting",
 lit_club_2_price: "$12 PayPal",
 
-lit_club_2_point_1: "1",
+lit_club_2_point_1: "Perfect for intermediate-level learners.",
 lit_club_2_point_2: "Club plan: introductions and questions (~15 min), reading by roles (~40 min), discussion of the text (~65 min).",
 lit_club_2_point_3: "Maximum 4 people (+ club host).",
 lit_club_2_point_4: "Meeting on Zoom.",
 lit_club_2_point_5: "During the reading and discussion, your mistakes will be written in a document.",
 lit_club_2_point_6: "After the club, you will receive this document (with corrected mistakes) and the text we read",
+
+lit_club_more_info: "Additional Information",
+
+lit_club_more_0_q: "Do I need to read anything before the club?",
+lit_club_more_0_a: "No — we will read the text together during the meeting.",
+
+lit_club_more_01_q: "What if I do not understand some words while reading during the club?",
+lit_club_more_01_a: "The club host will help explain unfamiliar words and sentences, and will also correct pronunciation and reading mistakes.",
+
+lit_club_more_1_q: "Please check the date and time carefully.",
+lit_club_more_1_a: "Payments are non-refundable after booking.",
+
+lit_club_more_2_q: "Will the club be recorded?",
+lit_club_more_2_a: "A recording may be made and sent to you after the club, if all participants agree.",
+
+lit_club_more_3_q: "Approximate level of the text we will read and discuss during the club:",
+lit_club_more_3_a_a2: "*add text*",
+lit_club_more_3_a_b1b2: "*add text*",
 
     about_title: "Hi everyone! I’m Genndy. I’m a Russian language teacher and the author of books",
     about_p1:
@@ -428,15 +446,33 @@ lit_club_1_point_6: "После клуба вы получите этот док
 
 lit_club_2_title: "Уровень B1 - B2 (2 часа)",
 lit_club_2_next: "Ближайший клуб: 27/03/2026 18:00",
-lit_club_2_join: "Вступить в клуб",
+lit_club_2_join: "Записаться на встречу клуба",
 lit_club_2_price: "$12 PayPal",
 
-lit_club_2_point_1: "Идеально подходит для учеников среднего уровня",
+lit_club_2_point_1: "Идеально подходит для учеников среднего уровня.",
 lit_club_2_point_2: "План клуба: знакомство и ответы на вопросы (~15 минут), чтение по ролям (~45 минут), обсуждение текста (~60 минут).",
 lit_club_2_point_3: "Максимум 4 ученика (+ ведущий клуба).",
 lit_club_2_point_4: "Встреча в Zoom.",
 lit_club_2_point_5: "Во время чтения и ответов на вопросы ваши ошибки будут записаны в документ.",
 lit_club_2_point_6: "После клуба вы получите этот документ (с исправленными ошибками) и текст, который мы читали.",
+
+lit_club_more_info: "Дополнительная информация",
+
+lit_club_more_0_q: "Надо ли что-то читать перед клубом?",
+lit_club_more_0_a: "Нет — мы прочитаем текст вместе во время встречи.",
+
+lit_club_more_01_q: "Что если я не пойму некоторые слова во время чтения в клубе?",
+lit_club_more_01_a: "Ведущий клуба поможет разобраться с непонятными словами и предложениями, поправит произношение и ошибки чтения.",
+
+lit_club_more_1_q: "Пожалуйста, внимательно посмотрите на дату и время.",
+lit_club_more_1_a: "После оплаты деньги не возвращаются.",
+
+lit_club_more_2_q: "Будет ли запись клуба?",
+lit_club_more_2_a: "Возможна запись клуба, которая будет отправлена вам после клуба, если все участники согласны.",
+
+lit_club_more_3_q: "Примерный уровень текста, который мы будем читать и обсуждать во время клуба:",
+lit_club_more_3_a_a2: "*добавить текст*",
+lit_club_more_3_a_b1b2: "*добавить текст*",
     
     about_title: "Всем привет, друзья! Меня зовут Геннадий. Я\u00A0преподаватель русского языка и автор книг",
     about_p1: "Я помогаю ученикам разных уровней быстрее осваивать русский язык. Более 1000 проведённых уроков и высокий рейтинг.",
@@ -968,6 +1004,54 @@ function TabsSlider({ isMobile, activeIndex, dragX, isDragging, children }) {
 
 // ================== APP ==================
 export default function App() {
+
+  function ClubExtraInfo({ title, children }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="pt-2 mt-2 border-t border-slate-200 dark:border-slate-800">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        data-no-swipe="true"
+        aria-expanded={open}
+        className={[
+          "w-full flex items-center justify-between gap-3",
+          "rounded-xl px-4 py-3",
+          "bg-slate-200 text-slate-700 hover:bg-slate-300",
+          "dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700",
+          "transition",
+          "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
+          "dark:focus-visible:ring-blue-500/40 dark:focus-visible:ring-offset-slate-950",
+        ].join(" ")}
+      >
+        <span className="text-sm sm:text-base font-medium text-center flex-1">
+          {title}
+        </span>
+
+        <ChevronDown
+          className={[
+            "w-5 h-5 flex-none transition-transform duration-200",
+            open ? "rotate-180" : "rotate-0",
+          ].join(" ")}
+        />
+      </button>
+
+      <div
+        className={[
+          "grid transition-all duration-300 ease-in-out",
+          open ? "grid-rows-[1fr] opacity-100 mt-3" : "grid-rows-[0fr] opacity-0 mt-0",
+        ].join(" ")}
+      >
+        <div className="overflow-hidden">
+          <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 px-4 py-4 text-sm sm:text-[15px] leading-relaxed text-slate-700 dark:text-slate-300 space-y-4">
+            {children}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
   // ---- language ----
   const detectLanguage = () => {
     try {
@@ -1718,7 +1802,6 @@ const TAB_FROM_PATH = (p) => {
        {/* RUSSIAN LITERATURE CLUB */}
 <section hidden={!showLitClub} aria-hidden={!showLitClub}>
   <div className="grid md:grid-cols-3 gap-6 sm:gap-8 items-start">
-    
     <div className="md:col-span-2 space-y-1">
       <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight break-words">
         {t("lit_club_title")}
@@ -1729,95 +1812,146 @@ const TAB_FROM_PATH = (p) => {
       </p>
     </div>
 
-   <div className="md:col-span-3 grid md:grid-cols-2 gap-4 sm:gap-4">
+    <div className="md:col-span-3 grid md:grid-cols-2 gap-4 sm:gap-4 items-start">
+      {/* CLUB 1 */}
+      <div>
+        <h3 className="text-2xl sm:text-3xl font-semibold text-center mb-2">
+          {t("lit_club_1_title")}
+        </h3>
 
-  {/* CLUB 1 */}
-  <div>
-    <h3 className="text-2xl sm:text-3xl font-semibold text-center mb-2">
-      {t("lit_club_1_title")}
-    </h3>
+        <Card className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl">
+          <div className="p-4 flex flex-col divide-y divide-slate-200 dark:divide-slate-800">
+            <div className="pt-0 pb-0">
+              <p className="text-lg sm:text-xl text-blue-600 text-center font-medium">
+                {t("lit_club_1_next")}
+              </p>
+            </div>
 
-    <Card className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl">
-      <div className="p-4 flex flex-col divide-y divide-slate-200 dark:divide-slate-800">
-          <div className="pt-0 pb-0">
-          <p className="text-lg sm:text-xl text-blue-600 text-center font-medium">
-            {t("lit_club_1_next")}
-          </p>
-        </div>
+            <ul className="pt-2 list-disc pl-5 text-base leading-snug text-slate-700 dark:text-slate-300 space-y-0">
+              <li>{t("lit_club_1_point_1")}</li>
+              <li>{t("lit_club_1_point_2")}</li>
+              <li>{t("lit_club_1_point_3")}</li>
+              <li>{t("lit_club_1_point_4")}</li>
+              <li>{t("lit_club_1_point_5")}</li>
+              <li>{t("lit_club_1_point_6")}</li>
+            </ul>
 
-        <ul className="pt-2 list-disc pl-5 text-base leading-snug text-slate-700 dark:text-slate-300 space-y-0">
-          <li>{t("lit_club_1_point_1")}</li>
-          <li>{t("lit_club_1_point_2")}</li>
-          <li>{t("lit_club_1_point_3")}</li>
-          <li>{t("lit_club_1_point_4")}</li>
-          <li>{t("lit_club_1_point_5")}</li>
-          <li>{t("lit_club_1_point_6")}</li>
-        </ul>
+            <div className="pt-2 mt-2 flex flex-col sm:flex-row items-center justify-end gap-2">
+              <span className="text-lg sm:text-xl font-medium text-slate-800 dark:text-slate-100 text-center sm:text-left">
+                {t("lit_club_1_join")}
+              </span>
 
-        <div className="pt-2 mt-2 flex flex-col sm:flex-row items-center justify-end gap-2">
-          <span className="text-lg sm:text-xl font-medium text-slate-800 dark:text-slate-100">
-            {t("lit_club_1_join")}
-          </span>
+              <LinkButton
+                href="#"
+                className="rounded-full px-5 py-2.5"
+                aria-label={t("lit_club_1_price")}
+              >
+                <ExternalLink className="w-4 h-4" />
+                <span className="whitespace-nowrap">{t("lit_club_1_price")}</span>
+              </LinkButton>
+            </div>
 
-          <LinkButton
-            href="#"
-            className="rounded-full px-5 py-2.5"
-            aria-label={t("lit_club_1_price")}
-          >
-            <ExternalLink className="w-4 h-4" />
-            <span className="whitespace-nowrap">{t("lit_club_1_price")}</span>
-          </LinkButton>
-        </div>
+            <ClubExtraInfo title={t("lit_club_more_info")}>
+              <div>
+                <p className="font-semibold">{t("lit_club_more_0_q")}</p>
+                <p>{t("lit_club_more_0_a")}</p>
+              </div>
+
+              <div>
+                <p className="font-semibold">{t("lit_club_more_01_q")}</p>
+                <p>{t("lit_club_more_01_a")}</p>
+              </div>
+
+              <div>
+                <p className="font-semibold">{t("lit_club_more_1_q")}</p>
+                <p>{t("lit_club_more_1_a")}</p>
+              </div>
+
+              <div>
+                <p className="font-semibold">{t("lit_club_more_2_q")}</p>
+                <p>{t("lit_club_more_2_a")}</p>
+              </div>
+
+              <div>
+                <p className="font-semibold">{t("lit_club_more_3_q")}</p>
+                <p>{t("lit_club_more_3_a_a2")}</p>
+              </div>
+            </ClubExtraInfo>
+          </div>
+        </Card>
       </div>
-    </Card>
-  </div>
 
-  {/* CLUB 2 */}
-  <div>
-    <h3 className="text-2xl sm:text-3xl font-semibold text-center mb-2">
-      {t("lit_club_2_title")}
-    </h3>
+      {/* CLUB 2 */}
+      <div>
+        <h3 className="text-2xl sm:text-3xl font-semibold text-center mb-2">
+          {t("lit_club_2_title")}
+        </h3>
 
-    <Card className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl">
-      <div className="p-4 flex flex-col divide-y divide-slate-200 dark:divide-slate-800">
-          <div className="pt-0 pb-0">
-          <p className="text-lg sm:text-xl text-blue-600 text-center font-medium">
-            {t("lit_club_2_next")}
-          </p>
-        </div>
+        <Card className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl">
+          <div className="p-4 flex flex-col divide-y divide-slate-200 dark:divide-slate-800">
+            <div className="pt-0 pb-0">
+              <p className="text-lg sm:text-xl text-blue-600 text-center font-medium">
+                {t("lit_club_2_next")}
+              </p>
+            </div>
 
-        <ul className="pt-2 list-disc pl-5 text-base leading-snug text-slate-700 dark:text-slate-300 space-y-0">
-          <li>{t("lit_club_2_point_1")}</li>
-          <li>{t("lit_club_2_point_2")}</li>
-          <li>{t("lit_club_2_point_3")}</li>
-          <li>{t("lit_club_2_point_4")}</li>
-          <li>{t("lit_club_2_point_5")}</li>
-          <li>{t("lit_club_2_point_6")}</li>
-          <li>&nbsp;</li>
-        </ul>
+            <ul className="pt-2 list-disc pl-5 text-base leading-snug text-slate-700 dark:text-slate-300 space-y-0">
+              <li>{t("lit_club_2_point_1")}</li>
+              <li>{t("lit_club_2_point_2")}</li>
+              <li>{t("lit_club_2_point_3")}</li>
+              <li>{t("lit_club_2_point_4")}</li>
+              <li>{t("lit_club_2_point_5")}</li>
+              <li>{t("lit_club_2_point_6")}</li>
+            </ul>
 
-        <div className="pt-2 mt-2 flex flex-col sm:flex-row items-center justify-end gap-2">
-          <span className="text-lg sm:text-xl font-medium text-slate-800 dark:text-slate-100">
-            {t("lit_club_2_join")}
-          </span>
+            <div className="pt-2 mt-2 flex flex-col sm:flex-row items-center justify-end gap-2">
+              <span className="text-lg sm:text-xl font-medium text-slate-800 dark:text-slate-100 text-center sm:text-left">
+                {t("lit_club_2_join")}
+              </span>
 
-          <LinkButton
-            href="#"
-            className="rounded-full px-5 py-2.5"
-            aria-label={t("lit_club_2_price")}
-          >
-            <ExternalLink className="w-4 h-4" />
-            <span className="whitespace-nowrap">{t("lit_club_2_price")}</span>
-          </LinkButton>
-        </div>
+              <LinkButton
+                href="#"
+                className="rounded-full px-5 py-2.5"
+                aria-label={t("lit_club_2_price")}
+              >
+                <ExternalLink className="w-4 h-4" />
+                <span className="whitespace-nowrap">{t("lit_club_2_price")}</span>
+              </LinkButton>
+            </div>
+
+            <ClubExtraInfo title={t("lit_club_more_info")}>
+              <div>
+                <p className="font-semibold">{t("lit_club_more_0_q")}</p>
+                <p>{t("lit_club_more_0_a")}</p>
+              </div>
+
+              <div>
+                <p className="font-semibold">{t("lit_club_more_01_q")}</p>
+                <p>{t("lit_club_more_01_a")}</p>
+              </div>
+
+              <div>
+                <p className="font-semibold">{t("lit_club_more_1_q")}</p>
+                <p>{t("lit_club_more_1_a")}</p>
+              </div>
+
+              <div>
+                <p className="font-semibold">{t("lit_club_more_2_q")}</p>
+                <p>{t("lit_club_more_2_a")}</p>
+              </div>
+
+              <div>
+                <p className="font-semibold">{t("lit_club_more_3_q")}</p>
+                <p>{t("lit_club_more_3_a_b1b2")}</p>
+              </div>
+            </ClubExtraInfo>
+          </div>
+        </Card>
       </div>
-    </Card>
-  </div>
-
-</div>
+    </div>
   </div>
 </section>
-
+          
           {/* PRODUCTS */}
           <section hidden={!showProducts} aria-hidden={!showProducts}>
             <div className="space-y-4 sm:space-y-6">
