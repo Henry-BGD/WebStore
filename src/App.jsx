@@ -1094,13 +1094,13 @@ function formatUtcForViewer(isoString, locale = "en-US") {
   const LIT_CLUB_A2_SAMPLE = (
   <div className="mt-2 space-y-3 text-[9px] sm:text-[10px] leading-snug text-slate-800 dark:text-slate-200">
     <p>
-      Были́ брат и сестра́ — Ва́ся и Ка́тя; и у них была́ ко́шка. Весно́й ко́шка пропа́ла.
+      Бы́ли брат и сестра́ — Ва́ся и Ка́тя; и у них была́ ко́шка. Весно́й ко́шка пропа́ла.
       Де́ти иска́ли её <strong>везде́</strong>, но не могли́ найти́.
     </p>
 
     <p>
       Оди́н раз они́ игра́ли <strong>во́зле амба́ра</strong> и услы́шали — над голово́й
-      что-то <strong>мяу́чит</strong> то́нким го́лосом.
+      что́-то <strong>мяу́чит</strong> то́нким го́лосом.
     </p>
 
     <p>
@@ -1111,9 +1111,10 @@ function formatUtcForViewer(isoString, locale = "en-US") {
     <p>— Нашёл? Нашёл?</p>
 
     <div className="pt-1 space-y-1">
+      <p><strong>везде́</strong> — everywhere</p>
       <p><strong>во́зле</strong> — near</p>
       <p><strong>амба́р</strong> — barn</p>
-      <p><strong>мяука́ть / замяука́ть</strong> — to meow</p>
+      <p><strong>мяу́кать / замяу́кать</strong> — to meow</p>
     </div>
   </div>
 );
