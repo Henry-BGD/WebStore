@@ -2110,7 +2110,7 @@ const TAB_FROM_PATH = (p) => {
               
                 <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
                   {t("lit_club_timezone_note")}
-                </p
+                </p>
                   {clubB1B2SpotsText ? (
                     <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
                       {clubB1B2SpotsText}
