@@ -1918,10 +1918,17 @@ const TAB_FROM_PATH = (p) => {
       <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight break-words">
         {t("lit_club_title")}
       </h1>
-    
-      <p className="text-base leading-relaxed text-slate-700 dark:text-slate-300 max-w-none">
-        {t("lit_club_desc")}
-      </p>
+      <div className="space-y-1">
+        <p className="text-base leading-relaxed text-slate-700 dark:text-slate-300">
+          {t("lit_club_desc")}
+        </p>
+      
+        <p className="text-base text-slate-700 dark:text-slate-300">
+          {lang === "ru"
+            ? "Вступай в группу литературного клуба в Телеграме."
+            : "Join the Literature Club group on Telegram."}
+        </p>
+      </div>
     </div>
 
     <div className="md:col-span-3 grid md:grid-cols-2 gap-4 sm:gap-4 items-start">
