@@ -1505,6 +1505,64 @@ const showAudio = tab === "free-audio";
   // ✅ active index for animated slider
   const activeIndex = useMemo(() => TABS_ORDER.indexOf(tab), [tab]);
 
+  // ================== PPPlata ==================
+const [clubA2, setClubA2] = useState(null);
+const [clubB1B2, setClubB1B2] = useState(null);
+const [clubsLoading, setClubsLoading] = useState(true);
+
+  useEffect(() => {
+  let isMounted = true;
+
+  async function loadClubs() {
+    try {
+      setClubsLoading(true);
+
+      const [a2Res, b1b2Res] = await Promise.all([
+        fetch("/api/club/current?level=a2"),
+        fetch("/api/club/current?level=b1b2"),
+      ]);
+
+      const a2Data = await a2Res.json();
+      const b1b2Data = await b1b2Res.json();
+
+      if (!isMounted) return;
+
+      if (a2Res.ok) setClubA2(a2Data);
+      if (b1b2Res.ok) setClubB1B2(b1b2Data);
+    } catch (error) {
+      console.error("Failed to load clubs:", error);
+    } finally {
+      if (isMounted) setClubsLoading(false);
+    }
+  }
+
+  loadClubs();
+
+  return () => {
+    isMounted = false;
+  };
+}, []);
+
+const clubA2PriceText =
+  clubA2?.price_usd != null ? `$${clubA2.price_usd} PayPal` : t("lit_club_1_price");
+
+const clubB1B2PriceText =
+  clubB1B2?.price_usd != null ? `$${clubB1B2.price_usd} PayPal` : t("lit_club_2_price");
+
+  const clubA2SpotsText =
+  clubA2?.spots_left != null
+    ? lang === "ru"
+      ? `Осталось мест: ${clubA2.spots_left}`
+      : `Spots left: ${clubA2.spots_left}`
+    : "";
+
+const clubB1B2SpotsText =
+  clubB1B2?.spots_left != null
+    ? lang === "ru"
+      ? `Осталось мест: ${clubB1B2.spots_left}`
+      : `Spots left: ${clubB1B2.spots_left}`
+    : "";
+
   // ================== EASTER EGG STATE ==================
   const [eggText, setEggText] = useState("");
   const [eggVisible, setEggVisible] = useState(false);
@@ -1946,25 +2004,29 @@ const TAB_FROM_PATH = (p) => {
               {t("lit_club_1_books_author")}
             </p>
         </div>
-
-        <Card className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl">
-          <div className="p-4 flex flex-col divide-y divide-slate-200 dark:divide-slate-800">
-            <div className="pt-0 pb-0">
-              <div className="text-center">
-                <p className="text-lg sm:text-xl text-blue-600 font-medium flex items-center justify-center gap-2">
-                  <Clock className="w-4 h-4 opacity-70" />
-                
-                  {lang === "ru"
-                    ? `Ближайший клуб: ${club1DateText}`
-                    : `Next club: ${club1DateText}`}
-                </p>
-              
-                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
-                  {t("lit_club_timezone_note")}
-                </p>
+          <Card className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl">
+            <div className="p-4 flex flex-col divide-y divide-slate-200 dark:divide-slate-800">
+              <div className="pt-0 pb-0">
+                <div className="text-center">
+                  <p className="text-lg sm:text-xl text-blue-600 font-medium flex items-center justify-center gap-2">
+                    <Clock className="w-4 h-4 opacity-70" />
+          
+                    {lang === "ru"
+                      ? `Ближайший клуб: ${club1DateText}`
+                      : `Next club: ${club1DateText}`}
+                  </p>
+          
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+                    {t("lit_club_timezone_note")}
+                  </p>
+          
+                  {clubA2SpotsText ? (
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+                      {clubA2SpotsText}
+                    </p>
+                  ) : null}
+                </div>
               </div>
-            </div>
-
             <ul className="pt-2 list-disc pl-5 text-base leading-snug text-slate-700 dark:text-slate-300 space-y-0">
               <li>{t("lit_club_1_point_1")}</li>
               <li>{t("lit_club_1_point_2")}</li>
@@ -1978,14 +2040,14 @@ const TAB_FROM_PATH = (p) => {
               <span className="text-lg sm:text-xl font-medium text-slate-800 dark:text-slate-100 text-center sm:text-left">
                 {t("lit_club_1_join")}
               </span>
-
-              <LinkButton
-                href="#"
-                className="rounded-full px-5 py-2.5"
-                aria-label={t("lit_club_1_price")}
-              >
+                  <LinkButton
+                    href={clubA2?.is_payable ? "#" : ""}
+                    disabled={!clubA2?.is_payable}
+                    className="rounded-full px-5 py-2.5"
+                    aria-label={clubA2PriceText}
+                  >
                 <ExternalLink className="w-4 h-4" />
-                <span className="whitespace-nowrap">{t("lit_club_1_price")}</span>
+                <span className="whitespace-nowrap">{clubA2PriceText}</span>
               </LinkButton>
             </div>
 
@@ -2048,7 +2110,12 @@ const TAB_FROM_PATH = (p) => {
               
                 <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
                   {t("lit_club_timezone_note")}
-                </p>
+                </p
+                  {clubB1B2SpotsText ? (
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+                      {clubB1B2SpotsText}
+                    </p>
+                  ) : null}
               </div>
             </div>
 
@@ -2065,14 +2132,14 @@ const TAB_FROM_PATH = (p) => {
               <span className="text-lg sm:text-xl font-medium text-slate-800 dark:text-slate-100 text-center sm:text-left">
                 {t("lit_club_2_join")}
               </span>
-
-              <LinkButton
-                href="#"
-                className="rounded-full px-5 py-2.5"
-                aria-label={t("lit_club_2_price")}
-              >
+                  <LinkButton
+                    href={clubB1B2?.is_payable ? "#" : ""}
+                    disabled={!clubB1B2?.is_payable}
+                    className="rounded-full px-5 py-2.5"
+                    aria-label={clubB1B2PriceText}
+                  >
                 <ExternalLink className="w-4 h-4" />
-                <span className="whitespace-nowrap">{t("lit_club_2_price")}</span>
+                <span className="whitespace-nowrap">{clubB1B2PriceText}</span>
               </LinkButton>
             </div>
 
