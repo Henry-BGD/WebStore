@@ -1912,7 +1912,7 @@ const TAB_FROM_PATH = (p) => {
 
     {/* RUSSIAN LITERATURE CLUB */}
 <section hidden={!showLitClub} aria-hidden={!showLitClub}>
-  <div className="grid md:grid-cols-3 gap-x-4 gap-y-1 sm:gap-x-4 sm:gap-y-1 items-start">
+  <div className="grid md:grid-cols-3 gap-x-4 gap-y-2 sm:gap-x-4 sm:gap-y-2 items-start">
     <div className="md:col-span-3 space-y-1">
       <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight break-words">
         {t("lit_club_title")}
@@ -1926,7 +1926,7 @@ const TAB_FROM_PATH = (p) => {
     <div className="md:col-span-3 grid md:grid-cols-2 gap-4 sm:gap-4 items-start">
       {/* CLUB 1 */}
       <div>
-        <div className="text-center mb-1.5">
+        <div className="text-center mb-2.5">
           <h3 className="text-2xl sm:text-3xl font-semibold">
             {t("lit_club_1_title")}
           </h3>
@@ -2013,7 +2013,7 @@ const TAB_FROM_PATH = (p) => {
 
       {/* CLUB 2 */}
       <div>
-        <div className="text-center mb-1.5">
+        <div className="text-center mb-2.5">
           <h3 className="text-2xl sm:text-3xl font-semibold">
             {t("lit_club_2_title")}
           </h3>
