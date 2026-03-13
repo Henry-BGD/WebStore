@@ -393,8 +393,6 @@ lit_club_more_2_q: "Will the club be recorded?",
 lit_club_more_2_a: "A recording may be made and sent to you after the club, if all participants agree.",
 
 lit_club_more_3_q: "Approximate level of the text we will read and discuss during the club:",
-lit_club_more_3_a_a2: "*add text*",
-lit_club_more_3_a_b1b2: "*add text*",
 
     about_title: "Hi everyone! I’m Genndy. I’m a Russian language teacher and the author of books",
     about_p1:
@@ -439,9 +437,9 @@ lit_club_1_next: "Ближайший клуб: 25/03/2026 15:00",
 lit_club_1_books: "«Акула» Лев Толстой",
 lit_club_2_books: "«Зелёная лампа» Александр Грин",
 lit_club_1_join: "Записаться на встречу клуба",
-lit_club_1_price: "$10 PayPal",
+lit_club_1_price: "$5 PayPal",
  
-lit_club_1_point_1: "Идеально подходит, если вы уже немного умеете говорить и читать.",
+lit_club_1_point_1: "Подойдёт вам, если вы уже умеете немного говорить и читать.",
 lit_club_1_point_2: "План клуба: знакомство (~15 минут), чтение по ролям (~30 минут), обсуждение текста (~45 минут).",
 lit_club_1_point_3: "Максимум 4 ученика (+ ведущий клуба).",
 lit_club_1_point_4: "Встреча в Zoom.",
@@ -451,7 +449,7 @@ lit_club_1_point_6: "После клуба вы получите этот док
 lit_club_2_title: "Уровень B1 - B2 (2 часа)",
 lit_club_2_next: "Ближайший клуб: 27/03/2026 18:00",
 lit_club_2_join: "Записаться на встречу клуба",
-lit_club_2_price: "$12 PayPal",
+lit_club_2_price: "$6 PayPal",
 
 lit_club_2_point_1: "Идеально подходит для учеников среднего уровня.",
 lit_club_2_point_2: "План клуба: знакомство и ответы на вопросы (~20 минут), чтение по ролям (~45 минут), обсуждение текста (~55 минут).",
@@ -463,18 +461,18 @@ lit_club_2_point_6: "После клуба вы получите этот док
 lit_club_more_info: "Дополнительная информация",
 
 lit_club_more_0_q: "Надо ли что-то читать перед клубом?",
-lit_club_more_0_a: "Нет — мы прочитаем текст вместе во время встречи.",
+lit_club_more_0_a: "Нет. Мы прочитаем текст вместе во время встречи.",
 
 lit_club_more_01_q: "Что если я не пойму некоторые слова во время чтения в клубе?",
 lit_club_more_01_a: "Ведущий клуба поможет разобраться с непонятными словами и предложениями, поправит произношение и ошибки чтения.",
 
-lit_club_more_1_q: "Пожалуйста, внимательно посмотрите на дату и время.",
-lit_club_more_1_a: "После оплаты деньги не возвращаются.",
+lit_club_more_1_q: "Будет ли запись клуба?",
+lit_club_more_1_a: "Возможна запись клуба, которая будет отправлена вам после клуба, если все участники согласны.",
 
-lit_club_more_2_q: "Будет ли запись клуба?",
-lit_club_more_2_a: "Возможна запись клуба, которая будет отправлена вам после клуба, если все участники согласны.",
+lit_club_more_2_q: "Пожалуйста, внимательно посмотрите на дату и время.",
+lit_club_more_2_a: "После оплаты деньги не возвращаются ⚠️.",
 
-lit_club_more_3_q: "Примерный уровень текста, который мы будем читать и обсуждать во время клуба:",
+lit_club_more_3_q: "Примерный уровень текста, который мы будем читать и обсуждать во время встречи клуба:",
 lit_club_more_3_a_a2: "*добавить текст*",
 lit_club_more_3_a_b1b2: "*добавить текст*",
     
@@ -1056,6 +1054,66 @@ export default function App() {
     </div>
   );
 }
+
+  const LIT_CLUB_A2_SAMPLE = (
+  <div className="mt-2 space-y-3 text-[9px] sm:text-[10px] leading-snug text-slate-800 dark:text-slate-200">
+    <p>
+      Были́ брат и сестра́ — Ва́ся и Ка́тя; и у них была́ ко́шка. Весно́й ко́шка пропа́ла.
+      Де́ти иска́ли её <strong>везде́</strong>, но не могли́ найти́.
+    </p>
+
+    <p>
+      Оди́н раз они́ игра́ли <strong>во́зле амба́ра</strong> и услы́шали — над голово́й
+      что-то <strong>мяу́чит</strong> то́нким го́лосом.
+    </p>
+
+    <p>
+      Ва́ся влез по ле́стнице под кры́шу <strong>амба́ра</strong>. А Ка́тя стоя́ла внизу́
+      и всё спра́шивала:
+    </p>
+
+    <p>— Нашёл? Нашёл?</p>
+
+    <div className="pt-1 space-y-1">
+      <p><strong>во́зле</strong> — near</p>
+      <p><strong>амба́р</strong> — barn</p>
+      <p><strong>мяука́ть / замяука́ть</strong> — to meow</p>
+    </div>
+  </div>
+);
+
+const LIT_CLUB_B1B2_SAMPLE = (
+  <div className="mt-2 space-y-3 text-[9px] sm:text-[10px] leading-snug text-slate-800 dark:text-slate-200">
+    <p>
+      Шестой час вечера. Один из достаточно известных русских учёных — будем
+      называть его просто учёным — сидит у себя в кабинете и нервно кусает ногти.
+    </p>
+
+    <p>
+      — Это просто <strong>возмутительно</strong>! — говорит он, то и дело
+      посматривая на часы. — Это верх неуважения к чужому времени и труду.
+      В Англии такой субъект не заработал бы ни <strong>гроша́</strong>, умер бы
+      с голода! Ну, погоди же, придёшь ты…
+    </p>
+
+    <p>
+      И, чувствуя потребность изли́ть на что-нибудь свой гнев и нетерпение,
+      учёный подходит к двери, ведущей в комнату жены, и стучится.
+    </p>
+
+    <p>
+      — Послушай, Катя, — говорит он <strong>негодующим</strong> голосом. —
+      Если увидишь Петра Данилыча, то передай ему, что порядочные люди так не делают!
+    </p>
+
+    <div className="pt-1 space-y-1">
+      <p><strong>возмутительно</strong> = неправильно</p>
+      <p><strong>гроши</strong> — очень маленькая сумма денег</p>
+      <p><strong>негодующий</strong> = недовольный, злой</p>
+    </div>
+  </div>
+);
+  
   // ---- language ----
   const detectLanguage = () => {
     try {
@@ -1881,10 +1939,10 @@ const TAB_FROM_PATH = (p) => {
                 <p>{t("lit_club_more_2_a")}</p>
               </div>
 
-              <div>
+             <div>
                 <p className="font-semibold">{t("lit_club_more_3_q")}</p>
-                <p>{t("lit_club_more_3_a_a2")}</p>
-              </div>
+                {LIT_CLUB_A2_SAMPLE}
+            </div>
             </ClubExtraInfo>
           </div>
         </Card>
@@ -1956,7 +2014,7 @@ const TAB_FROM_PATH = (p) => {
 
               <div>
                 <p className="font-semibold">{t("lit_club_more_3_q")}</p>
-                <p>{t("lit_club_more_3_a_b1b2")}</p>
+                {LIT_CLUB_B1B2_SAMPLE}
               </div>
             </ClubExtraInfo>
           </div>
