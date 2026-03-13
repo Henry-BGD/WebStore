@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/Card.j
 import { Button } from "./components/ui/Button.jsx";
 import { Input } from "./components/ui/Input.jsx";
 import { Badge } from "./components/ui/Badge.jsx";
-import { ExternalLink, Download, Play, Pause, X, Search, Sun, Moon, ChevronDown } from "lucide-react";
+import { ExternalLink, Download, Play, Pause, X, Search, Sun, Moon, ChevronDown, Clock } from "lucide-react";
 import { Analytics } from "@vercel/analytics/react";
 
 // ================== LAYOUT ==================
@@ -355,6 +355,7 @@ lit_club_desc: "This is a literary club for adults where we improve our reading 
 lit_club_1_title: "Level A2 (1.5 hours)",
 lit_club_1_books: `"Акула" Leo Tolstoy`,
 lit_club_2_books: `"Зелёная лампа" Alexander Grin`,
+lit_club_timezone_note: "Time is shown in your local time zone",
 lit_club_1_join: "Sign Up for a Club Meeting",
 lit_club_1_price: "$5 PayPal",
 
@@ -433,6 +434,7 @@ lit_club_desc: "Это литературный клуб для взрослых
 lit_club_1_title: "Уровень A2 (1,5 часа)",
 lit_club_1_books: "«Акула» Лев Толстой",
 lit_club_2_books: "«Зелёная лампа» Александр Грин",
+lit_club_timezone_note: "Время показано в вашем часовом поясе",
 lit_club_1_join: "Записаться на встречу клуба",
 lit_club_1_price: "$5 PayPal",
  
@@ -1020,7 +1022,7 @@ function formatUtcForViewer(isoString, locale = "en-US") {
   const date = new Date(isoString);
 
   const formatter = new Intl.DateTimeFormat(locale, {
-    dateStyle: "short",
+    dateStyle: "medium",
     timeStyle: "short",
   });
 
@@ -1924,11 +1926,19 @@ const TAB_FROM_PATH = (p) => {
         <Card className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl">
           <div className="p-4 flex flex-col divide-y divide-slate-200 dark:divide-slate-800">
             <div className="pt-0 pb-0">
-             <p className="text-lg sm:text-xl text-blue-600 text-center font-medium">
-                {lang === "ru"
-                  ? `Ближайший клуб: ${club1DateText}`
-                  : `Next club: ${club1DateText}`}
-            </p>
+              <div className="text-center">
+                <p className="text-lg sm:text-xl text-blue-600 font-medium flex items-center justify-center gap-2">
+                  <Clock className="w-4 h-4 opacity-70" />
+                
+                  {lang === "ru"
+                    ? `Ближайший клуб: ${club1DateText}`
+                    : `Next club: ${club1DateText}`}
+                </p>
+              
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+                  {t("lit_club_timezone_note")}
+                </p>
+              </div>
             </div>
 
             <ul className="pt-2 list-disc pl-5 text-base leading-snug text-slate-700 dark:text-slate-300 space-y-0">
@@ -1999,11 +2009,19 @@ const TAB_FROM_PATH = (p) => {
         <Card className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl">
           <div className="p-4 flex flex-col divide-y divide-slate-200 dark:divide-slate-800">
             <div className="pt-0 pb-0">
-              <p className="text-lg sm:text-xl text-blue-600 text-center font-medium">
-                {lang === "ru"
-                  ? `Ближайший клуб: ${club2DateText}`
-                  : `Next club: ${club2DateText}`}
-              </p>
+              <div className="text-center">
+                <p className="text-lg sm:text-xl text-blue-600 font-medium flex items-center justify-center gap-2">
+                  <Clock className="w-4 h-4 opacity-70" />
+                
+                  {lang === "ru"
+                    ? `Ближайший клуб: ${club2DateText}`
+                    : `Next club: ${club2DateText}`}
+                </p>
+              
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+                  {t("lit_club_timezone_note")}
+                </p>
+              </div>
             </div>
 
             <ul className="pt-2 list-disc pl-5 text-base leading-snug text-slate-700 dark:text-slate-300 space-y-0">
