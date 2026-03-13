@@ -350,15 +350,17 @@ const I18N = {
     nav_audio: "Audiobooks",
 
 lit_club_title: "Russian Literature Club",
-lit_club_desc: "Description will go here.",
+lit_club_desc: "This is a literary club for adults where we improve our reading and speaking skills by reading and discussing Russian literature. The literary club group is on Telegram.",
 
 lit_club_1_title: "Level A2 (1.5 hours)",
+lit_club_1_books: `"Акула" Leo Tolstoy`,
+lit_club_2_books: `"Зелёная лампа" Alexander Grin`,
 lit_club_1_next: "Next club: 25/03/2026 3PM",
 lit_club_1_join: "Sign Up for a Club Meeting",
-lit_club_1_price: "$10 PayPal",
+lit_club_1_price: "$5 PayPal",
 
 lit_club_1_point_1: "Perfect if you already have some basic speaking and reading skills.",
-lit_club_1_point_2: "Club plan: introductions and questions (~15 min), reading by roles (~30 min), discussion of the text (~45 min).",
+lit_club_1_point_2: "Club plan: introductions (~15 min), reading by roles (~30 min), discussion of the text (~45 min).",
 lit_club_1_point_3: "Maximum 4 people (+ club host).",
 lit_club_1_point_4: "Meeting on Zoom.",
 lit_club_1_point_5: "During the reading and discussion, your mistakes will be written in a document.",
@@ -367,10 +369,10 @@ lit_club_1_point_6: "After the club, you will receive this document (with correc
 lit_club_2_title: "Level B1 - B2 (2 hours)",
 lit_club_2_next: "Next club: 27/03/2026 6PM",
 lit_club_2_join: "Sign Up for a Club Meeting",
-lit_club_2_price: "$12 PayPal",
+lit_club_2_price: "$6 PayPal",
 
 lit_club_2_point_1: "Perfect for intermediate-level learners.",
-lit_club_2_point_2: "Club plan: introductions and questions (~15 min), reading by roles (~40 min), discussion of the text (~65 min).",
+lit_club_2_point_2: "Club plan: introductions and questions (~20 min), reading by roles (~45 min), discussion of the text (~55 min).",
 lit_club_2_point_3: "Maximum 4 people (+ club host).",
 lit_club_2_point_4: "Meeting on Zoom.",
 lit_club_2_point_5: "During the reading and discussion, your mistakes will be written in a document.",
@@ -430,15 +432,17 @@ lit_club_more_3_a_b1b2: "*add text*",
     nav_audio: "Аудиокниги",
 
 lit_club_title: "Русский литературный клуб",
-lit_club_desc: "Описание будет здесь.",
+lit_club_desc: "Это литературный клуб для взрослых, где мы улучшаем навыки чтения и разговора, читая и обсуждая русскую литературу. Группа литературного клуба в Телеграме.",
 
 lit_club_1_title: "Уровень A2 (1,5 часа)",
 lit_club_1_next: "Ближайший клуб: 25/03/2026 15:00",
+lit_club_1_books: "«Акула» Лев Толстой",
+lit_club_2_books: "«Зелёная лампа» Александр Грин",
 lit_club_1_join: "Записаться на встречу клуба",
 lit_club_1_price: "$10 PayPal",
  
 lit_club_1_point_1: "Идеально подходит, если вы уже немного умеете говорить и читать.",
-lit_club_1_point_2: "План клуба: знакомство и ответы на вопросы (~15 минут), чтение по ролям (~30 минут), обсуждение текста (~45 минут).",
+lit_club_1_point_2: "План клуба: знакомство (~15 минут), чтение по ролям (~30 минут), обсуждение текста (~45 минут).",
 lit_club_1_point_3: "Максимум 4 ученика (+ ведущий клуба).",
 lit_club_1_point_4: "Встреча в Zoom.",
 lit_club_1_point_5: "Во время чтения и ответов на вопросы ваши ошибки будут записаны в документ.",
@@ -450,7 +454,7 @@ lit_club_2_join: "Записаться на встречу клуба",
 lit_club_2_price: "$12 PayPal",
 
 lit_club_2_point_1: "Идеально подходит для учеников среднего уровня.",
-lit_club_2_point_2: "План клуба: знакомство и ответы на вопросы (~15 минут), чтение по ролям (~45 минут), обсуждение текста (~60 минут).",
+lit_club_2_point_2: "План клуба: знакомство и ответы на вопросы (~20 минут), чтение по ролям (~45 минут), обсуждение текста (~55 минут).",
 lit_club_2_point_3: "Максимум 4 ученика (+ ведущий клуба).",
 lit_club_2_point_4: "Встреча в Zoom.",
 lit_club_2_point_5: "Во время чтения и ответов на вопросы ваши ошибки будут записаны в документ.",
@@ -1005,7 +1009,7 @@ function TabsSlider({ isMobile, activeIndex, dragX, isDragging, children }) {
 // ================== APP ==================
 export default function App() {
 
-  function ClubExtraInfo({ title, children }) {
+ function ClubExtraInfo({ title, children }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -1017,7 +1021,7 @@ export default function App() {
         aria-expanded={open}
         className={[
           "w-full flex items-center justify-between gap-3",
-          "rounded-xl px-4 py-3",
+          "rounded-xl px-4 py-1.5 min-h-[34px]",
           "bg-slate-200 text-slate-700 hover:bg-slate-300",
           "dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700",
           "transition",
@@ -1025,13 +1029,13 @@ export default function App() {
           "dark:focus-visible:ring-blue-500/40 dark:focus-visible:ring-offset-slate-950",
         ].join(" ")}
       >
-        <span className="text-sm sm:text-base font-medium text-center flex-1">
+        <span className="text-xs sm:text-sm font-medium text-center flex-1 leading-none">
           {title}
         </span>
 
         <ChevronDown
           className={[
-            "w-5 h-5 flex-none transition-transform duration-200",
+            "w-4 h-4 flex-none transition-transform duration-200",
             open ? "rotate-180" : "rotate-0",
           ].join(" ")}
         />
@@ -1040,7 +1044,7 @@ export default function App() {
       <div
         className={[
           "grid transition-all duration-300 ease-in-out",
-          open ? "grid-rows-[1fr] opacity-100 mt-3" : "grid-rows-[0fr] opacity-0 mt-0",
+          open ? "grid-rows-[1fr] opacity-100 mt-2" : "grid-rows-[0fr] opacity-0 mt-0",
         ].join(" ")}
       >
         <div className="overflow-hidden">
@@ -1799,7 +1803,7 @@ const TAB_FROM_PATH = (p) => {
             </div>
           </section>
 
-       {/* RUSSIAN LITERATURE CLUB */}
+    {/* RUSSIAN LITERATURE CLUB */}
 <section hidden={!showLitClub} aria-hidden={!showLitClub}>
   <div className="grid md:grid-cols-3 gap-6 sm:gap-8 items-start">
     <div className="md:col-span-2 space-y-1">
@@ -1815,9 +1819,14 @@ const TAB_FROM_PATH = (p) => {
     <div className="md:col-span-3 grid md:grid-cols-2 gap-4 sm:gap-4 items-start">
       {/* CLUB 1 */}
       <div>
-        <h3 className="text-2xl sm:text-3xl font-semibold text-center mb-2">
-          {t("lit_club_1_title")}
-        </h3>
+        <div className="text-center mb-2">
+          <h3 className="text-2xl sm:text-3xl font-semibold">
+            {t("lit_club_1_title")}
+          </h3>
+          <p className="mt-0.5 text-[11px] sm:text-xs italic tracking-[0.01em] leading-tight text-slate-500 dark:text-slate-400">
+            {t("lit_club_1_books")}
+          </p>
+        </div>
 
         <Card className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl">
           <div className="p-4 flex flex-col divide-y divide-slate-200 dark:divide-slate-800">
@@ -1883,9 +1892,14 @@ const TAB_FROM_PATH = (p) => {
 
       {/* CLUB 2 */}
       <div>
-        <h3 className="text-2xl sm:text-3xl font-semibold text-center mb-2">
-          {t("lit_club_2_title")}
-        </h3>
+        <div className="text-center mb-2">
+          <h3 className="text-2xl sm:text-3xl font-semibold">
+            {t("lit_club_2_title")}
+          </h3>
+          <p className="mt-0.5 text-[11px] sm:text-xs italic tracking-[0.01em] leading-tight text-slate-500 dark:text-slate-400">
+            {t("lit_club_2_books")}
+          </p>
+        </div>
 
         <Card className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl">
           <div className="p-4 flex flex-col divide-y divide-slate-200 dark:divide-slate-800">
