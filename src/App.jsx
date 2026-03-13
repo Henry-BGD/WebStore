@@ -217,7 +217,7 @@ const PRODUCTS = [
     id: "prod-ru-book-1",
     title: "Russian Short Stories by Leo Tolstoy",
     kind: "A1-B1 Level",
-    price: 6.99,
+    price: 9.99,
     image: "/Product_Leo.webp",
     externalUrl: "https://www.amazon.com/dp/B0GMCCFMQQ",
     marketplace: "amazon",
@@ -355,7 +355,6 @@ lit_club_desc: "This is a literary club for adults where we improve our reading 
 lit_club_1_title: "Level A2 (1.5 hours)",
 lit_club_1_books: `"Акула" Leo Tolstoy`,
 lit_club_2_books: `"Зелёная лампа" Alexander Grin`,
-lit_club_1_next: "Next club: 25/03/2026 3PM",
 lit_club_1_join: "Sign Up for a Club Meeting",
 lit_club_1_price: "$5 PayPal",
 
@@ -367,7 +366,6 @@ lit_club_1_point_5: "During the reading and discussion, your mistakes will be wr
 lit_club_1_point_6: "After the club, you will receive this document (with corrected mistakes) and the text we read with stress marks.",
 
 lit_club_2_title: "Level B1 - B2 (2 hours)",
-lit_club_2_next: "Next club: 27/03/2026 6PM",
 lit_club_2_join: "Sign Up for a Club Meeting",
 lit_club_2_price: "$6 PayPal",
 
@@ -381,16 +379,16 @@ lit_club_2_point_6: "After the club, you will receive this document (with correc
 lit_club_more_info: "Additional Information",
 
 lit_club_more_0_q: "Do I need to read anything before the club?",
-lit_club_more_0_a: "No — we will read the text together during the meeting.",
+lit_club_more_0_a: "No. We will read the text together during the meeting.",
 
 lit_club_more_01_q: "What if I do not understand some words while reading during the club?",
 lit_club_more_01_a: "The club host will help explain unfamiliar words and sentences, and will also correct pronunciation and reading mistakes.",
 
-lit_club_more_1_q: "Please check the date and time carefully.",
-lit_club_more_1_a: "Payments are non-refundable after booking.",
+lit_club_more_1_q: "Will the club be recorded?",
+lit_club_more_1_a: "A recording may be made and sent to you after the club, if all participants agree.",
 
-lit_club_more_2_q: "Will the club be recorded?",
-lit_club_more_2_a: "A recording may be made and sent to you after the club, if all participants agree.",
+lit_club_more_2_q: "Please check the date and time carefully.",
+lit_club_more_2_a: "Payments are non-refundable after booking ⚠️.",
 
 lit_club_more_3_q: "Approximate level of the text we will read and discuss during the club:",
 
@@ -433,7 +431,6 @@ lit_club_title: "Русский литературный клуб",
 lit_club_desc: "Это литературный клуб для взрослых, где мы улучшаем навыки чтения и разговора, читая и обсуждая русскую литературу. Группа литературного клуба в Телеграме.",
 
 lit_club_1_title: "Уровень A2 (1,5 часа)",
-lit_club_1_next: "Ближайший клуб: 25/03/2026 15:00",
 lit_club_1_books: "«Акула» Лев Толстой",
 lit_club_2_books: "«Зелёная лампа» Александр Грин",
 lit_club_1_join: "Записаться на встречу клуба",
@@ -447,7 +444,6 @@ lit_club_1_point_5: "Во время чтения и ответов на воп�
 lit_club_1_point_6: "После клуба вы получите этот документ (с исправленными ошибками) и текст с ударениями, который мы читали.",
 
 lit_club_2_title: "Уровень B1 - B2 (2 часа)",
-lit_club_2_next: "Ближайший клуб: 27/03/2026 18:00",
 lit_club_2_join: "Записаться на встречу клуба",
 lit_club_2_price: "$6 PayPal",
 
@@ -1007,6 +1003,32 @@ function TabsSlider({ isMobile, activeIndex, dragX, isDragging, children }) {
 // ================== APP ==================
 export default function App() {
 
+// ---TimeZone---
+  function getTimeZoneLabel(date, locale = "en-US") {
+  try {
+    const parts = new Intl.DateTimeFormat(locale, {
+      timeZoneName: "short",
+    }).formatToParts(date);
+
+    return parts.find((p) => p.type === "timeZoneName")?.value || "";
+  } catch {
+    return "";
+  }
+}
+
+function formatUtcForViewer(isoString, locale = "en-US") {
+  const date = new Date(isoString);
+
+  const formatter = new Intl.DateTimeFormat(locale, {
+    dateStyle: "short",
+    timeStyle: "short",
+  });
+
+  const tzLabel = getTimeZoneLabel(date, locale);
+  return tzLabel ? `${formatter.format(date)} (${tzLabel})` : formatter.format(date);
+}
+
+// ---LitClub---
  function ClubExtraInfo({ title, children }) {
   const [open, setOpen] = useState(false);
 
@@ -1130,6 +1152,19 @@ const LIT_CLUB_B1B2_SAMPLE = (
 
   const [lang, setLang] = useState(() => detectLanguage());
   const t = (key) => I18N[lang]?.[key] ?? I18N.en[key] ?? key;
+  const club1DateText = useMemo(() => {
+  return formatUtcForViewer(
+    "2026-03-25T11:00:00Z", // 2026-03-25T11:00:00Z = 15:00 (Tbilisi Time) - 4 (UTC)
+    lang === "ru" ? "ru-RU" : "en-US"
+  );
+}, [lang]);
+
+const club2DateText = useMemo(() => {
+  return formatUtcForViewer(
+    "2026-03-27T14:00:00Z",   // 2026-03-25T11:00:00Z = 18:00 (Tbilisi Time) - 4 (UTC)
+    lang === "ru" ? "ru-RU" : "en-US"
+  );
+}, [lang]);
 
   const switchLang = (next) => {
     setLang(next);
@@ -1889,9 +1924,11 @@ const TAB_FROM_PATH = (p) => {
         <Card className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl">
           <div className="p-4 flex flex-col divide-y divide-slate-200 dark:divide-slate-800">
             <div className="pt-0 pb-0">
-              <p className="text-lg sm:text-xl text-blue-600 text-center font-medium">
-                {t("lit_club_1_next")}
-              </p>
+             <p className="text-lg sm:text-xl text-blue-600 text-center font-medium">
+                {lang === "ru"
+                  ? `Ближайший клуб: ${club1DateText}`
+                  : `Next club: ${club1DateText}`}
+            </p>
             </div>
 
             <ul className="pt-2 list-disc pl-5 text-base leading-snug text-slate-700 dark:text-slate-300 space-y-0">
@@ -1963,7 +2000,9 @@ const TAB_FROM_PATH = (p) => {
           <div className="p-4 flex flex-col divide-y divide-slate-200 dark:divide-slate-800">
             <div className="pt-0 pb-0">
               <p className="text-lg sm:text-xl text-blue-600 text-center font-medium">
-                {t("lit_club_2_next")}
+                {lang === "ru"
+                  ? `Ближайший клуб: ${club2DateText}`
+                  : `Next club: ${club2DateText}`}
               </p>
             </div>
 
