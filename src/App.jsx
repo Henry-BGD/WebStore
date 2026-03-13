@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/Card.j
 import { Button } from "./components/ui/Button.jsx";
 import { Input } from "./components/ui/Input.jsx";
 import { Badge } from "./components/ui/Badge.jsx";
-import { ExternalLink, Download, Play, Pause, X, Search, Sun, Moon, ChevronDown, Clock } from "lucide-react";
+import { ExternalLink, Download, Play, Pause, X, Search, Sun, Moon, ChevronDown, Clock, BookOpen } from "lucide-react";
 import { Analytics } from "@vercel/analytics/react";
 
 // ================== LAYOUT ==================
@@ -353,8 +353,14 @@ lit_club_title: "Russian Literature Club",
 lit_club_desc: "This is a literary club for adults where we improve our reading and speaking skills by reading and discussing Russian literature. The literary club group is on Telegram.",
 
 lit_club_1_title: "Level A2 (1.5 hours)",
-lit_club_1_books: `"Акула" Leo Tolstoy`,
-lit_club_2_books: `"Зелёная лампа" Alexander Grin`,
+
+lit_club_1_books_prefix: "Reading the short story",
+lit_club_1_books_title: "“The Shark”",
+lit_club_1_books_author: "by Leo Tolstoy",
+lit_club_2_books_prefix: "Reading the short story",
+lit_club_2_books_title: "“The Green Lamp”",
+lit_club_2_books_author: "by Alexander Grin",
+    
 lit_club_timezone_note: "Time is shown in your local time zone",
 lit_club_1_join: "Sign Up for a Club Meeting",
 lit_club_1_price: "$5 PayPal",
@@ -432,8 +438,14 @@ lit_club_title: "Русский литературный клуб",
 lit_club_desc: "Это литературный клуб для взрослых, где мы улучшаем навыки чтения и разговора, читая и обсуждая русскую литературу. Группа литературного клуба в Телеграме.",
 
 lit_club_1_title: "Уровень A2 (1,5 часа)",
-lit_club_1_books: "«Акула» Лев Толстой",
-lit_club_2_books: "«Зелёная лампа» Александр Грин",
+
+lit_club_1_books_prefix: "Читаем рассказ",
+lit_club_1_books_title: "«Акула»",
+lit_club_1_books_author: "(Лев Толстой)",
+lit_club_2_books_prefix: "Читаем рассказ",
+lit_club_2_books_title: "«Зелёная лампа»",
+lit_club_2_books_author: "(Александр Грин)",
+    
 lit_club_timezone_note: "Время показано в вашем часовом поясе",
 lit_club_1_join: "Записаться на встречу клуба",
 lit_club_1_price: "$5 PayPal",
@@ -1918,9 +1930,13 @@ const TAB_FROM_PATH = (p) => {
           <h3 className="text-2xl sm:text-3xl font-semibold">
             {t("lit_club_1_title")}
           </h3>
-          <p className="mt-0.5 text-[11px] sm:text-xs italic tracking-[0.01em] leading-tight text-slate-500 dark:text-slate-400">
-            {t("lit_club_1_books")}
-          </p>
+            <p className="mt-0.5 text-[11px] sm:text-xs tracking-[0.01em] leading-tight text-slate-500 dark:text-slate-400 flex items-center justify-center gap-1.5">
+              <BookOpen className="w-3.5 h-3.5 text-blue-500 opacity-80 shrink-0" />
+            
+              {t("lit_club_1_books_prefix")}{" "}
+              <strong>{t("lit_club_1_books_title")}</strong>{" "}
+              {t("lit_club_1_books_author")}
+            </p>
         </div>
 
         <Card className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl">
@@ -2001,9 +2017,13 @@ const TAB_FROM_PATH = (p) => {
           <h3 className="text-2xl sm:text-3xl font-semibold">
             {t("lit_club_2_title")}
           </h3>
-          <p className="mt-0.5 text-[11px] sm:text-xs italic tracking-[0.01em] leading-tight text-slate-500 dark:text-slate-400">
-            {t("lit_club_2_books")}
-          </p>
+            <p className="mt-0.5 text-[11px] sm:text-xs tracking-[0.01em] leading-tight text-slate-500 dark:text-slate-400 flex items-center justify-center gap-1.5">
+              <BookOpen className="w-3.5 h-3.5 text-blue-500 opacity-80 shrink-0" />
+            
+              {t("lit_club_2_books_prefix")}{" "}
+              <strong>{t("lit_club_2_books_title")}</strong>{" "}
+              {t("lit_club_2_books_author")}
+            </p>
         </div>
 
         <Card className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl">
