@@ -1926,7 +1926,7 @@ const TAB_FROM_PATH = (p) => {
     <div className="md:col-span-3 grid md:grid-cols-2 gap-4 sm:gap-4 items-start">
       {/* CLUB 1 */}
       <div>
-        <div className="text-center mb-0.5">
+        <div className="text-center mb-1.5">
           <h3 className="text-2xl sm:text-3xl font-semibold">
             {t("lit_club_1_title")}
           </h3>
@@ -2013,7 +2013,7 @@ const TAB_FROM_PATH = (p) => {
 
       {/* CLUB 2 */}
       <div>
-        <div className="text-center mb-0.5">
+        <div className="text-center mb-1.5">
           <h3 className="text-2xl sm:text-3xl font-semibold">
             {t("lit_club_2_title")}
           </h3>
