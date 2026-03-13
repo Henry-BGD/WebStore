@@ -350,7 +350,7 @@ const I18N = {
     nav_audio: "Audiobooks",
 
 lit_club_title: "Russian Literature Club",
-lit_club_desc: "This is a literary club for adults where we practice reading and speaking Russian by reading and discussing Russian literature. Join Literature Club group on Telegram.",
+lit_club_desc: "This is a literary club for adults where we practice reading and speaking Russian by reading and discussing Russian literature.",
 
 lit_club_1_title: "Level A2 (1.5 hours)",
 
@@ -435,7 +435,7 @@ lit_club_more_3_q: "Approximate level of the text we will read and discuss durin
     nav_audio: "Аудиокниги",
 
 lit_club_title: "Русский литературный клуб",
-lit_club_desc: "Это литературный клуб для взрослых, где мы улучшаем навыки чтения и разговора, читая и обсуждая русскую литературу на русском языке. Вступай в группу литературного клуба в Телеграме.",
+lit_club_desc: "Это литературный клуб для взрослых, где мы улучшаем навыки чтения и разговора, читая и обсуждая русскую литературу на русском языке.",
 
 lit_club_1_title: "Уровень A2 (1,5 часа)",
 
