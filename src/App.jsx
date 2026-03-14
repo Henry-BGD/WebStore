@@ -2472,6 +2472,7 @@ const TAB_FROM_PATH = (p) => {
             </div>
           </section>
         </TabsSlider>
+            )}
       </main>
 
       <footer className="mt-auto border-t border-slate-200 dark:border-slate-800">
