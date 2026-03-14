@@ -1740,11 +1740,9 @@ useEffect(() => {
   };
 
   window.addEventListener("pageshow", onPageShow);
-  document.addEventListener("visibilitychange", onVisibility);
 
   return () => {
     window.removeEventListener("pageshow", onPageShow);
-    document.removeEventListener("visibilitychange", onVisibility);
   };
 }, [clubA2, lang, navigate]);
 
@@ -1894,11 +1892,9 @@ useEffect(() => {
   };
 
   window.addEventListener("pageshow", onPageShow);
-  document.addEventListener("visibilitychange", onVisibility);
 
   return () => {
     window.removeEventListener("pageshow", onPageShow);
-    document.removeEventListener("visibilitychange", onVisibility);
   };
 }, [clubB1B2, lang, navigate]);
 
