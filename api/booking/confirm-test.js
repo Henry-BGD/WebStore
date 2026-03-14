@@ -32,7 +32,7 @@ function buildEmailContent({ language, clubTitle, clubTimeText, zoomLink, payerN
 
   if (isRu) {
     return {
-      subject: "Русский литературный клуб — подтверждение записи",
+      subject: "Русский литературный клуб",
       html: `
         <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #111827;">
           <h2>Запись подтверждена 🎉</h2>
@@ -41,14 +41,14 @@ function buildEmailContent({ language, clubTitle, clubTimeText, zoomLink, payerN
           <p><strong>Клуб:</strong> ${clubTitle}</p>
           <p><strong>Время:</strong> ${clubTimeText}</p>
           <p><strong>Ссылка Zoom:</strong><br /><a href="${zoomLink}">${zoomLink}</a></p>
-          <p>До встречи на клубе!</p>
+          <p>До встречи в клубе!</p>
         </div>
       `,
     };
   }
 
   return {
-    subject: "Russian Literature Club — booking confirmation",
+    subject: "Russian Literature Club",
     html: `
       <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #111827;">
         <h2>Booking confirmed 🎉</h2>
