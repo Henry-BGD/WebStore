@@ -56,7 +56,7 @@ body {
 }
 
 /* ================================
-   PayPal Animation Remover
+   PayPal shells
 ================================ */
 #paypal-button-container-a2,
 #paypal-button-container-b1b2 {
@@ -69,4 +69,11 @@ body {
 
 .paypal-shell.paypal-ready {
   opacity: 1;
+}
+
+/* optional: try to suppress extra iframe transitions */
+#paypal-button-container-a2 iframe,
+#paypal-button-container-b1b2 iframe {
+  animation: none !important;
+  transition: none !important;
 }
