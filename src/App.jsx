@@ -340,13 +340,6 @@ const AUDIO_BOOKS = [
   },
 ];
 
-//===Price Badge===
-const clubA2PriceBadge =
-  clubA2?.price_usd != null ? `$${clubA2.price_usd}` : "$5";
-
-const clubB1B2PriceBadge =
-  clubB1B2?.price_usd != null ? `$${clubB1B2.price_usd}` : "$6";
-
 // ================== I18N ==================
 const I18N = {
   en: {
@@ -1522,6 +1515,12 @@ const [clubA2, setClubA2] = useState(null);
 const [clubB1B2, setClubB1B2] = useState(null);
 const [clubsLoading, setClubsLoading] = useState(true);
 
+const clubA2PriceBadge =
+  clubA2?.price_usd != null ? `$${clubA2.price_usd}` : "$5";
+
+const clubB1B2PriceBadge =
+  clubB1B2?.price_usd != null ? `$${clubB1B2.price_usd}` : "$6";
+
   useEffect(() => {
   let isMounted = true;
 
@@ -2225,11 +2224,6 @@ const TAB_FROM_PATH = (p) => {
 
 
         {/* PAYPAL BUTTON */}
-        <div
-          id="paypal-button-container-a2"
-          className="mt-4 flex justify-center"
-        />
-          
                 </div>
               </div>
             <ul className="pt-2 list-disc pl-5 text-base leading-snug text-slate-700 dark:text-slate-300 space-y-0">
