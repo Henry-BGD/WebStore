@@ -77,3 +77,10 @@ body {
   animation: none !important;
   transition: none !important;
 }
+
+.dark #paypal-shell-a2,
+.dark #paypal-shell-b1b2 {
+  background: #0f172a; /* slate-900 */
+  border-radius: 16px;
+  padding: 8px;
+}
