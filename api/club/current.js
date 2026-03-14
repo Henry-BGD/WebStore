@@ -44,6 +44,7 @@ export default async function handler(req, res) {
       booked_count: data.booked_count,
       spots_left: spotsLeft,
       status: data.status,
+      zoom_link: club.zoom_link,
       is_payable: data.status === "open" && spotsLeft > 0,
     });
   } catch (err) {
