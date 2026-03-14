@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/Card.j
 import { Button } from "./components/ui/Button.jsx";
 import { Input } from "./components/ui/Input.jsx";
 import { Badge } from "./components/ui/Badge.jsx";
-import { ExternalLink, Download, Play, Pause, X, Search, Sun, Moon, ChevronDown, Clock, BookOpen } from "lucide-react";
+import { ExternalLink, Download, Play, Pause, X, Search, Sun, Moon, ChevronDown, Clock, } from "lucide-react";
 import { Analytics } from "@vercel/analytics/react";
 import PaymentSuccess from "./PaymentSuccess.jsx";
 
@@ -340,6 +340,13 @@ const AUDIO_BOOKS = [
   },
 ];
 
+//===Price Badge===
+const clubA2PriceBadge =
+  clubA2?.price_usd != null ? `$${clubA2.price_usd}` : "$5";
+
+const clubB1B2PriceBadge =
+  clubB1B2?.price_usd != null ? `$${clubB1B2.price_usd}` : "$6";
+
 // ================== I18N ==================
 const I18N = {
   en: {
@@ -363,8 +370,6 @@ lit_club_2_books_title: "“The Green Lamp”",
 lit_club_2_books_author: "by Alexander Grin",
     
 lit_club_timezone_note: "Time is shown in your local time zone",
-lit_club_1_join: "Sign Up for a Club Meeting",
-lit_club_1_price: "$5 PayPal",
 
 lit_club_1_point_1: "Perfect if you already have some basic speaking and reading skills.",
 lit_club_1_point_2: "Club plan: introductions (~15 min), reading by roles (~30 min), discussion of the text (~45 min).",
@@ -374,8 +379,6 @@ lit_club_1_point_5: "During the reading and discussion, your mistakes will be wr
 lit_club_1_point_6: "After the club, you will receive this document (with corrected mistakes) and the text we read with stress marks.",
 
 lit_club_2_title: "Level B1 - B2 (2 hours)",
-lit_club_2_join: "Sign Up for a Club Meeting",
-lit_club_2_price: "$6 PayPal",
 
 lit_club_2_point_1: "Perfect for intermediate-level learners.",
 lit_club_2_point_2: "Club plan: introductions and questions (~20 min), reading by roles (~45 min), discussion of the text (~55 min).",
@@ -384,7 +387,13 @@ lit_club_2_point_4: "Meeting on Zoom.",
 lit_club_2_point_5: "During the reading and discussion, your mistakes will be written in a document.",
 lit_club_2_point_6: "After the club, you will receive this document (with corrected mistakes) and the text we read",
 
+lit_club_sold_out: "Unfortunately, all spots are taken. Please wait for the next club meeting.",
+
 lit_club_more_info: "Additional Information",
+
+lit_club_what_read_q: "What will we read?",
+lit_club_1_what_read_a: 'The short story "The Shark" by Leo Tolstoy).',
+lit_club_2_what_read_a: 'The short story "The Green Lamp" by Alexander Grin.',
 
 lit_club_more_0_q: "Do I need to read anything before the club?",
 lit_club_more_0_a: "No. We will read the text together during the meeting.",
@@ -448,8 +457,6 @@ lit_club_2_books_title: "«Зелёная лампа»",
 lit_club_2_books_author: "(Александр Грин)",
     
 lit_club_timezone_note: "Время показано в вашем часовом поясе",
-lit_club_1_join: "Записаться на встречу клуба",
-lit_club_1_price: "$5 PayPal",
  
 lit_club_1_point_1: "Подойдёт вам, если вы уже умеете немного говорить и читать.",
 lit_club_1_point_2: "План клуба: знакомство (~15 минут), чтение по ролям (~30 минут), обсуждение текста (~45 минут).",
@@ -459,8 +466,6 @@ lit_club_1_point_5: "Во время чтения и ответов на воп�
 lit_club_1_point_6: "После клуба вы получите этот документ (с исправленными ошибками) и текст с ударениями, который мы читали.",
 
 lit_club_2_title: "Уровень B1 - B2 (2 часа)",
-lit_club_2_join: "Записаться на встречу клуба",
-lit_club_2_price: "$6 PayPal",
 
 lit_club_2_point_1: "Идеально подходит для учеников среднего уровня.",
 lit_club_2_point_2: "План клуба: знакомство и ответы на вопросы (~20 минут), чтение по ролям (~45 минут), обсуждение текста (~55 минут).",
@@ -469,7 +474,13 @@ lit_club_2_point_4: "Встреча в Zoom.",
 lit_club_2_point_5: "Во время чтения и ответов на вопросы ваши ошибки будут записаны в документ.",
 lit_club_2_point_6: "После клуба вы получите этот документ (с исправленными ошибками) и текст, который мы читали.",
 
+lit_club_sold_out: "К сожалению, все места заняты. Пожалуйста, подождите следующую встречу клуба.",
+
 lit_club_more_info: "Дополнительная информация",
+
+lit_club_what_read_q: "Что мы будем читать?",
+lit_club_1_what_read_a: "Рассказ «Акула» (Лев Толстой).",
+lit_club_2_what_read_a: "Рассказ «Зелёная лампа» (Александр Грин).",
 
 lit_club_more_0_q: "Надо ли что-то читать перед клубом?",
 lit_club_more_0_a: "Нет. Мы прочитаем текст вместе во время встречи.",
@@ -1544,26 +1555,6 @@ const [clubsLoading, setClubsLoading] = useState(true);
   };
 }, []);
 
-const clubA2PriceText =
-  clubA2?.price_usd != null ? `$${clubA2.price_usd} PayPal` : t("lit_club_1_price");
-
-const clubB1B2PriceText =
-  clubB1B2?.price_usd != null ? `$${clubB1B2.price_usd} PayPal` : t("lit_club_2_price");
-
-  const clubA2SpotsText =
-  clubA2?.spots_left != null
-    ? lang === "ru"
-      ? `Осталось мест: ${clubA2.spots_left}`
-      : `Spots left: ${clubA2.spots_left}`
-    : "";
-
-const clubB1B2SpotsText =
-  clubB1B2?.spots_left != null
-    ? lang === "ru"
-      ? `Осталось мест: ${clubB1B2.spots_left}`
-      : `Spots left: ${clubB1B2.spots_left}`
-    : "";
-
   // ================== EASTER EGG STATE ==================
   const [eggText, setEggText] = useState("");
   const [eggVisible, setEggVisible] = useState(false);
@@ -1601,7 +1592,7 @@ const clubB1B2SpotsText =
   return () => {};
 }, []);
 
-// Render of the PP Button
+// Render of the PP Button A2
 useEffect(() => {
   if (!clubA2?.id || !clubA2?.is_payable) return;
   if (!window.paypal) return;
@@ -1678,6 +1669,83 @@ navigate("/payment-success");
     })
     .render("#paypal-button-container-a2");
 }, [clubA2]);
+
+// Render of the PP Button B1-B2
+  useEffect(() => {
+  if (!clubB1B2?.id || !clubB1B2?.is_payable) return;
+  if (!window.paypal) return;
+
+  const container = document.getElementById("paypal-button-container-b1b2");
+  if (!container) return;
+
+  container.innerHTML = "";
+
+  window.paypal
+    .Buttons({
+      createOrder: async () => {
+        const response = await fetch("/api/paypal/create-order", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            clubId: clubB1B2.id,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || "Failed to create PayPal order");
+        }
+
+        return data.orderID;
+      },
+
+      onApprove: async (data) => {
+        try {
+          const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+          const response = await fetch("/api/paypal/capture-order", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              orderID: data.orderID,
+              clubId: clubB1B2.id,
+              language: lang === "ru" ? "ru" : "en",
+              timeZone,
+            }),
+          });
+
+          const result = await response.json();
+
+          if (!response.ok) {
+            throw new Error(result.error || "Capture failed");
+          }
+
+          try {
+            sessionStorage.setItem("payment_success_data", JSON.stringify(result));
+          } catch (error) {
+            console.error("Failed to save payment success data:", error);
+          }
+
+          setShowPaymentSuccess(true);
+          navigate("/payment-success");
+        } catch (error) {
+          console.error("Capture error:", error);
+          alert(lang === "ru" ? "Ошибка после оплаты" : "Error after payment");
+        }
+      },
+
+      onError: (err) => {
+        console.error("PayPal error:", err);
+        alert(lang === "ru" ? "Ошибка PayPal" : "PayPal error");
+      },
+    })
+    .render("#paypal-button-container-b1b2");
+}, [clubB1B2, lang]);
 
 
   useEffect(() => {
@@ -2119,17 +2187,25 @@ const TAB_FROM_PATH = (p) => {
     <div className="md:col-span-3 grid md:grid-cols-2 gap-4 sm:gap-4 items-start">
       {/* CLUB 1 */}
       <div>
-        <div className="text-center mb-2.5">
-          <h3 className="text-2xl sm:text-3xl font-semibold">
-            {t("lit_club_1_title")}
-          </h3>
-            <p className="mt-0.5 text-[11px] sm:text-xs tracking-[0.01em] leading-tight text-slate-500 dark:text-slate-400 flex items-center justify-center gap-1.5">
-              <BookOpen className="w-3.5 h-3.5 text-blue-500 opacity-80 shrink-0" />
-            
-              {t("lit_club_1_books_prefix")}{" "}
-              <strong>{t("lit_club_1_books_title")}</strong>{" "}
-              {t("lit_club_1_books_author")}
-            </p>
+        <div className="text-center mb-1">
+          <div className="flex items-center justify-center gap-2 flex-wrap">
+            <h3 className="text-2xl sm:text-3xl font-semibold">
+              {t("lit_club_1_title")}
+            </h3>
+        
+            <span
+              className="
+                inline-flex items-center rounded-full border
+                border-slate-200 dark:border-slate-700
+                bg-white dark:bg-slate-900
+                px-3 py-1 text-sm sm:text-base font-semibold
+                text-slate-800 dark:text-slate-100
+                shadow-sm
+              "
+            >
+              {clubA2PriceBadge}
+            </span>
+          </div>
         </div>
           <Card className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl">
             <div className="p-4 flex flex-col divide-y divide-slate-200 dark:divide-slate-800">
@@ -2154,11 +2230,6 @@ const TAB_FROM_PATH = (p) => {
           className="mt-4 flex justify-center"
         />
           
-                  {clubA2SpotsText ? (
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
-                      {clubA2SpotsText}
-                    </p>
-                  ) : null}
                 </div>
               </div>
             <ul className="pt-2 list-disc pl-5 text-base leading-snug text-slate-700 dark:text-slate-300 space-y-0">
@@ -2169,23 +2240,26 @@ const TAB_FROM_PATH = (p) => {
               <li>{t("lit_club_1_point_5")}</li>
               <li>{t("lit_club_1_point_6")}</li>
             </ul>
-
-            <div className="pt-2 mt-2 flex flex-col sm:flex-row items-center justify-end gap-2">
-              <span className="text-lg sm:text-xl font-medium text-slate-800 dark:text-slate-100 text-center sm:text-left">
-                {t("lit_club_1_join")}
-              </span>
-                  <LinkButton
-                    href={clubA2?.is_payable ? "#" : ""}
-                    disabled={!clubA2?.is_payable}
-                    className="rounded-full px-5 py-2.5"
-                    aria-label={clubA2PriceText}
-                  >
-                <ExternalLink className="w-4 h-4" />
-                <span className="whitespace-nowrap">{clubA2PriceText}</span>
-              </LinkButton>
-            </div>
+              
+              <div className="pt-3 mt-2">
+                {clubA2?.is_payable ? (
+                  <div
+                    id="paypal-button-container-a2"
+                    className="max-w-[420px] mx-auto"
+                  />
+                ) : (
+                  <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 px-4 py-4 text-center text-sm sm:text-base text-slate-700 dark:text-slate-300">
+                    {t("lit_club_sold_out")}
+                  </div>
+                )}
+              </div>
 
             <ClubExtraInfo title={t("lit_club_more_info")}>
+              <div>
+                <p className="font-semibold">{t("lit_club_what_read_q")}</p>
+                <p>{t("lit_club_1_what_read_a")}</p>
+              </div>
+              
               <div>
                 <p className="font-semibold">{t("lit_club_more_0_q")}</p>
                 <p>{t("lit_club_more_0_a")}</p>
@@ -2217,17 +2291,25 @@ const TAB_FROM_PATH = (p) => {
 
       {/* CLUB 2 */}
       <div>
-        <div className="text-center mb-2.5">
-          <h3 className="text-2xl sm:text-3xl font-semibold">
-            {t("lit_club_2_title")}
-          </h3>
-            <p className="mt-0.5 text-[11px] sm:text-xs tracking-[0.01em] leading-tight text-slate-500 dark:text-slate-400 flex items-center justify-center gap-1.5">
-              <BookOpen className="w-3.5 h-3.5 text-blue-500 opacity-80 shrink-0" />
-            
-              {t("lit_club_2_books_prefix")}{" "}
-              <strong>{t("lit_club_2_books_title")}</strong>{" "}
-              {t("lit_club_2_books_author")}
-            </p>
+        <div className="text-center mb-1">
+          <div className="flex items-center justify-center gap-2 flex-wrap">
+            <h3 className="text-2xl sm:text-3xl font-semibold">
+              {t("lit_club_2_title")}
+            </h3>
+        
+            <span
+              className="
+                inline-flex items-center rounded-full border
+                border-slate-200 dark:border-slate-700
+                bg-white dark:bg-slate-900
+                px-3 py-1 text-sm sm:text-base font-semibold
+                text-slate-800 dark:text-slate-100
+                shadow-sm
+              "
+            >
+              {clubB1B2PriceBadge}
+            </span>
+          </div>
         </div>
 
         <Card className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl">
@@ -2245,11 +2327,7 @@ const TAB_FROM_PATH = (p) => {
                 <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
                   {t("lit_club_timezone_note")}
                 </p>
-                  {clubB1B2SpotsText ? (
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
-                      {clubB1B2SpotsText}
-                    </p>
-                  ) : null}
+
               </div>
             </div>
 
@@ -2262,22 +2340,25 @@ const TAB_FROM_PATH = (p) => {
               <li>{t("lit_club_2_point_6")}</li>
             </ul>
 
-            <div className="pt-2 mt-2 flex flex-col sm:flex-row items-center justify-end gap-2">
-              <span className="text-lg sm:text-xl font-medium text-slate-800 dark:text-slate-100 text-center sm:text-left">
-                {t("lit_club_2_join")}
-              </span>
-                  <LinkButton
-                    href={clubB1B2?.is_payable ? "#" : ""}
-                    disabled={!clubB1B2?.is_payable}
-                    className="rounded-full px-5 py-2.5"
-                    aria-label={clubB1B2PriceText}
-                  >
-                <ExternalLink className="w-4 h-4" />
-                <span className="whitespace-nowrap">{clubB1B2PriceText}</span>
-              </LinkButton>
-            </div>
+              <div className="pt-3 mt-2">
+                {clubB1B2?.is_payable ? (
+                  <div
+                    id="paypal-button-container-b1b2"
+                    className="max-w-[420px] mx-auto"
+                  />
+                ) : (
+                  <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 px-4 py-4 text-center text-sm sm:text-base text-slate-700 dark:text-slate-300">
+                    {t("lit_club_sold_out")}
+                  </div>
+                )}
+              </div>
 
             <ClubExtraInfo title={t("lit_club_more_info")}>
+              <div>
+                <p className="font-semibold">{t("lit_club_what_read_q")}</p>
+                <p>{t("lit_club_2_what_read_a")}</p>
+              </div>
+              
               <div>
                 <p className="font-semibold">{t("lit_club_more_0_q")}</p>
                 <p>{t("lit_club_more_0_a")}</p>
