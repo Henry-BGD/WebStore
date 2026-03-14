@@ -1515,6 +1515,9 @@ const [clubA2, setClubA2] = useState(null);
 const [clubB1B2, setClubB1B2] = useState(null);
 const [clubsLoading, setClubsLoading] = useState(true);
 
+const paypalA2Rendered = useRef(false);
+const paypalB1B2Rendered = useRef(false);
+
 const clubA2PriceBadge =
   clubA2?.price_usd != null ? `$${clubA2.price_usd}` : "$5";
 
@@ -1594,157 +1597,310 @@ const clubB1B2PriceBadge =
 // Render of the PP Button A2
 useEffect(() => {
   if (!clubA2?.id || !clubA2?.is_payable) return;
-  if (!window.paypal) return;
 
-  const container = document.getElementById("paypal-button-container-a2");
-  if (!container) return;
+  const containerId = "paypal-button-container-a2";
+  const shellId = "paypal-shell-a2";
 
-  container.innerHTML = "";
+  const markReadyWhenIframeLoads = () => {
+    const shell = document.getElementById(shellId);
+    const container = document.getElementById(containerId);
+    if (!shell || !container) return;
 
-  window.paypal
-    .Buttons({
-      createOrder: async () => {
-        const response = await fetch("/api/paypal/create-order", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            clubId: clubA2.id,
-          }),
-        });
+    const iframe = container.querySelector("iframe");
+    if (!iframe) return;
 
-        const data = await response.json();
+    const show = () => shell.classList.add("paypal-ready");
 
-        if (!response.ok) {
-          throw new Error(data.error || "Failed to create PayPal order");
-        }
+    if (iframe.dataset.readyBound === "1") return;
+    iframe.dataset.readyBound = "1";
 
-        return data.orderID;
-      },
+    iframe.addEventListener("load", show, { once: true });
 
-onApprove: async (data) => {
-  try {
-    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    setTimeout(show, 250);
+  };
 
-    const response = await fetch("/api/paypal/capture-order", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        orderID: data.orderID,
-        clubId: clubA2.id,
-        language: lang === "ru" ? "ru" : "en",
-        timeZone,
-      }),
-    });
+  const renderA2 = () => {
+    const container = document.getElementById(containerId);
+    const shell = document.getElementById(shellId);
 
-    const result = await response.json();
+    if (!container || !shell) return;
+    if (!window.paypal) return;
 
-    if (!response.ok) {
-      throw new Error(result.error || "Capture failed");
+    if (container.childElementCount > 0) {
+      paypalA2Rendered.current = true;
+      markReadyWhenIframeLoads();
+      return;
     }
 
-try {
-  sessionStorage.setItem("payment_success_data", JSON.stringify(result));
-} catch (error) {
-  console.error("Failed to save payment success data:", error);
-}
+    shell.classList.remove("paypal-ready");
 
-setShowPaymentSuccess(true);
-navigate("/payment-success");    
-    
-  } catch (error) {
-    console.error("Capture error:", error);
-    alert(lang === "ru" ? "Ошибка после оплаты" : "Error after payment");
-  }
-},
+    window.paypal
+      .Buttons({
+        style: {
+          layout: "vertical",
+          color: "gold",
+          shape: "rect",
+          label: "paypal",
+          tagline: false,
+        },
 
-      onError: (err) => {
-        console.error("PayPal error:", err);
-        alert("PayPal error");
-      },
-    })
-    .render("#paypal-button-container-a2");
-}, [clubA2]);
-
-// Render of the PP Button B1-B2
-  useEffect(() => {
-  if (!clubB1B2?.id || !clubB1B2?.is_payable) return;
-  if (!window.paypal) return;
-
-  const container = document.getElementById("paypal-button-container-b1b2");
-  if (!container) return;
-
-  container.innerHTML = "";
-
-  window.paypal
-    .Buttons({
-      createOrder: async () => {
-        const response = await fetch("/api/paypal/create-order", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            clubId: clubB1B2.id,
-          }),
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(data.error || "Failed to create PayPal order");
-        }
-
-        return data.orderID;
-      },
-
-      onApprove: async (data) => {
-        try {
-          const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
-          const response = await fetch("/api/paypal/capture-order", {
+        createOrder: async () => {
+          const response = await fetch("/api/paypal/create-order", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              orderID: data.orderID,
-              clubId: clubB1B2.id,
-              language: lang === "ru" ? "ru" : "en",
-              timeZone,
+              clubId: clubA2.id,
             }),
           });
 
-          const result = await response.json();
+          const data = await response.json();
 
           if (!response.ok) {
-            throw new Error(result.error || "Capture failed");
+            throw new Error(data.error || "Failed to create PayPal order");
           }
 
+          return data.orderID;
+        },
+
+        onApprove: async (data) => {
           try {
-            sessionStorage.setItem("payment_success_data", JSON.stringify(result));
+            const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+            const response = await fetch("/api/paypal/capture-order", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                orderID: data.orderID,
+                clubId: clubA2.id,
+                language: lang === "ru" ? "ru" : "en",
+                timeZone,
+              }),
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+              throw new Error(result.error || "Capture failed");
+            }
+
+            try {
+              sessionStorage.setItem("payment_success_data", JSON.stringify(result));
+            } catch (error) {
+              console.error("Failed to save payment success data:", error);
+            }
+
+            setShowPaymentSuccess(true);
+            navigate("/payment-success");
           } catch (error) {
-            console.error("Failed to save payment success data:", error);
+            console.error("Capture error:", error);
+            alert(lang === "ru" ? "Ошибка после оплаты" : "Error after payment");
+          }
+        },
+
+        onError: (err) => {
+          console.error("PayPal error:", err);
+          alert(lang === "ru" ? "Ошибка PayPal" : "PayPal error");
+        },
+      })
+      .render(`#${containerId}`)
+      .then(() => {
+        paypalA2Rendered.current = true;
+        markReadyWhenIframeLoads();
+      })
+      .catch((err) => {
+        console.error("PayPal render A2 failed:", err);
+      });
+  };
+
+  const ensureA2Rendered = () => {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    if (!window.paypal) {
+      setTimeout(ensureA2Rendered, 300);
+      return;
+    }
+
+    if (!paypalA2Rendered.current || container.childElementCount === 0) {
+      renderA2();
+    } else {
+      markReadyWhenIframeLoads();
+    }
+  };
+
+  ensureA2Rendered();
+
+  const onPageShow = () => ensureA2Rendered();
+  const onVisibility = () => {
+    if (document.visibilityState === "visible") ensureA2Rendered();
+  };
+
+  window.addEventListener("pageshow", onPageShow);
+  document.addEventListener("visibilitychange", onVisibility);
+
+  return () => {
+    window.removeEventListener("pageshow", onPageShow);
+    document.removeEventListener("visibilitychange", onVisibility);
+  };
+}, [clubA2, lang, navigate]);
+
+// Render of the PP Button B1-B2
+useEffect(() => {
+  if (!clubB1B2?.id || !clubB1B2?.is_payable) return;
+
+  const containerId = "paypal-button-container-b1b2";
+  const shellId = "paypal-shell-b1b2";
+
+  const markReadyWhenIframeLoads = () => {
+    const shell = document.getElementById(shellId);
+    const container = document.getElementById(containerId);
+    if (!shell || !container) return;
+
+    const iframe = container.querySelector("iframe");
+    if (!iframe) return;
+
+    const show = () => shell.classList.add("paypal-ready");
+
+    if (iframe.dataset.readyBound === "1") return;
+    iframe.dataset.readyBound = "1";
+
+    iframe.addEventListener("load", show, { once: true });
+
+    setTimeout(show, 250);
+  };
+
+  const renderB1B2 = () => {
+    const container = document.getElementById(containerId);
+    const shell = document.getElementById(shellId);
+
+    if (!container || !shell) return;
+    if (!window.paypal) return;
+
+    if (container.childElementCount > 0) {
+      paypalB1B2Rendered.current = true;
+      markReadyWhenIframeLoads();
+      return;
+    }
+
+    shell.classList.remove("paypal-ready");
+
+    window.paypal
+      .Buttons({
+        style: {
+          layout: "vertical",
+          color: "gold",
+          shape: "rect",
+          label: "paypal",
+          tagline: false,
+        },
+
+        createOrder: async () => {
+          const response = await fetch("/api/paypal/create-order", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              clubId: clubB1B2.id,
+            }),
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(data.error || "Failed to create PayPal order");
           }
 
-          setShowPaymentSuccess(true);
-          navigate("/payment-success");
-        } catch (error) {
-          console.error("Capture error:", error);
-          alert(lang === "ru" ? "Ошибка после оплаты" : "Error after payment");
-        }
-      },
+          return data.orderID;
+        },
 
-      onError: (err) => {
-        console.error("PayPal error:", err);
-        alert(lang === "ru" ? "Ошибка PayPal" : "PayPal error");
-      },
-    })
-    .render("#paypal-button-container-b1b2");
-}, [clubB1B2]);
+        onApprove: async (data) => {
+          try {
+            const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+            const response = await fetch("/api/paypal/capture-order", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                orderID: data.orderID,
+                clubId: clubB1B2.id,
+                language: lang === "ru" ? "ru" : "en",
+                timeZone,
+              }),
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+              throw new Error(result.error || "Capture failed");
+            }
+
+            try {
+              sessionStorage.setItem("payment_success_data", JSON.stringify(result));
+            } catch (error) {
+              console.error("Failed to save payment success data:", error);
+            }
+
+            setShowPaymentSuccess(true);
+            navigate("/payment-success");
+          } catch (error) {
+            console.error("Capture error:", error);
+            alert(lang === "ru" ? "Ошибка после оплаты" : "Error after payment");
+          }
+        },
+
+        onError: (err) => {
+          console.error("PayPal error:", err);
+          alert(lang === "ru" ? "Ошибка PayPal" : "PayPal error");
+        },
+      })
+      .render(`#${containerId}`)
+      .then(() => {
+        paypalB1B2Rendered.current = true;
+        markReadyWhenIframeLoads();
+      })
+      .catch((err) => {
+        console.error("PayPal render B1-B2 failed:", err);
+      });
+  };
+
+  const ensureB1B2Rendered = () => {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    if (!window.paypal) {
+      setTimeout(ensureB1B2Rendered, 300);
+      return;
+    }
+
+    if (!paypalB1B2Rendered.current || container.childElementCount === 0) {
+      renderB1B2();
+    } else {
+      markReadyWhenIframeLoads();
+    }
+  };
+
+  ensureB1B2Rendered();
+
+  const onPageShow = () => ensureB1B2Rendered();
+  const onVisibility = () => {
+    if (document.visibilityState === "visible") ensureB1B2Rendered();
+  };
+
+  window.addEventListener("pageshow", onPageShow);
+  document.addEventListener("visibilitychange", onVisibility);
+
+  return () => {
+    window.removeEventListener("pageshow", onPageShow);
+    document.removeEventListener("visibilitychange", onVisibility);
+  };
+}, [clubB1B2, lang, navigate]);
 
 
   useEffect(() => {
@@ -2237,10 +2393,12 @@ const TAB_FROM_PATH = (p) => {
               
               <div className="pt-3 mt-2">
                 {clubA2?.is_payable ? (
-                  <div
-                    id="paypal-button-container-a2"
-                    className="max-w-[420px] mx-auto"
-                  />
+                  <div className="paypal-shell" id="paypal-shell-a2">
+                    <div
+                      id="paypal-button-container-a2"
+                      className="max-w-[420px] mx-auto"
+                    />
+                  </div>
                 ) : (
                   <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 px-4 py-4 text-center text-sm sm:text-base text-slate-700 dark:text-slate-300">
                     {t("lit_club_sold_out")}
@@ -2336,10 +2494,12 @@ const TAB_FROM_PATH = (p) => {
 
               <div className="pt-3 mt-2">
                 {clubB1B2?.is_payable ? (
-                  <div
-                    id="paypal-button-container-b1b2"
-                    className="max-w-[420px] mx-auto"
-                  />
+                  <div className="paypal-shell" id="paypal-shell-b1b2">
+                    <div
+                      id="paypal-button-container-b1b2"
+                      className="max-w-[420px] mx-auto"
+                    />
+                  </div>
                 ) : (
                   <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 px-4 py-4 text-center text-sm sm:text-base text-slate-700 dark:text-slate-300">
                     {t("lit_club_sold_out")}
