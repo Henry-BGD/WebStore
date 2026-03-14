@@ -1155,6 +1155,14 @@ const LIT_CLUB_B1B2_SAMPLE = (
     </div>
   </div>
 );
+
+  function syncPayPalShellTheme(shellId) {
+  const shell = document.getElementById(shellId);
+  if (!shell) return;
+
+  shell.classList.remove("paypal-shell-light", "paypal-shell-dark");
+  shell.classList.add(theme === "dark" ? "paypal-shell-dark" : "paypal-shell-light");
+}
   
   // ---- language ----
   const detectLanguage = () => {
@@ -1626,6 +1634,8 @@ useEffect(() => {
     if (!container || !shell) return;
     if (!window.paypal) return;
 
+    syncPayPalShellTheme(shellId);
+
     if (container.childElementCount > 0) {
       paypalA2Rendered.current = true;
       markReadyWhenIframeLoads();
@@ -1777,6 +1787,8 @@ useEffect(() => {
 
     if (!container || !shell) return;
     if (!window.paypal) return;
+
+    syncPayPalShellTheme(shellId);
 
     if (container.childElementCount > 0) {
       paypalB1B2Rendered.current = true;
@@ -2389,7 +2401,10 @@ const TAB_FROM_PATH = (p) => {
               
               <div className="pt-3 mt-2">
                 {clubA2?.is_payable ? (
-                  <div className="paypal-shell" id="paypal-shell-a2">
+                  <div
+                    className={`paypal-shell ${theme === "dark" ? "paypal-shell-dark" : "paypal-shell-light"}`}
+                    id="paypal-shell-a2"
+                  >
                     <div
                       id="paypal-button-container-a2"
                       className="max-w-[420px] mx-auto"
@@ -2490,7 +2505,10 @@ const TAB_FROM_PATH = (p) => {
 
               <div className="pt-3 mt-2">
                 {clubB1B2?.is_payable ? (
-                  <div className="paypal-shell" id="paypal-shell-b1b2">
+                  <div
+                    className={`paypal-shell ${theme === "dark" ? "paypal-shell-dark" : "paypal-shell-light"}`}
+                    id="paypal-shell-b1b2"
+                  >
                     <div
                       id="paypal-button-container-b1b2"
                       className="max-w-[420px] mx-auto"
