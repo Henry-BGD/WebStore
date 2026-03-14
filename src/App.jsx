@@ -5,6 +5,7 @@ import { Input } from "./components/ui/Input.jsx";
 import { Badge } from "./components/ui/Badge.jsx";
 import { ExternalLink, Download, Play, Pause, X, Search, Sun, Moon, ChevronDown, Clock, BookOpen } from "lucide-react";
 import { Analytics } from "@vercel/analytics/react";
+import PaymentSuccess from "./PaymentSuccess.jsx";
 
 // ================== LAYOUT ==================
 const CONTAINER = "w-full max-w-6xl mx-auto px-4 sm:px-8";
@@ -1041,6 +1042,8 @@ function formatUtcForViewer(isoString, locale = "en-US") {
 }
 
 // ---LitClub---
+const [showPaymentSuccess, setShowPaymentSuccess] = useState(false);
+  
  function ClubExtraInfo({ title, children }) {
   const [open, setOpen] = useState(false);
 
@@ -1653,11 +1656,15 @@ onApprove: async (data) => {
       throw new Error(result.error || "Capture failed");
     }
 
-    alert(
-      `${result.message}\n\n${lang === "ru" ? "Ссылка Zoom:" : "Zoom link:"}\n${result.zoom_link}`
-    );
+try {
+  sessionStorage.setItem("payment_success_data", JSON.stringify(result));
+} catch (error) {
+  console.error("Failed to save payment success data:", error);
+}
 
-    window.location.reload();
+setShowPaymentSuccess(true);
+navigate("/payment-success");    
+    
   } catch (error) {
     console.error("Capture error:", error);
     alert(lang === "ru" ? "Ошибка после оплаты" : "Error after payment");
@@ -1671,6 +1678,23 @@ onApprove: async (data) => {
     })
     .render("#paypal-button-container-a2");
 }, [clubA2]);
+
+
+  useEffect(() => {
+  if (typeof window === "undefined") return;
+
+  const syncPaymentSuccessFromUrl = () => {
+    const path = window.location.pathname || "/";
+    setShowPaymentSuccess(path === "/payment-success");
+  };
+
+  syncPaymentSuccessFromUrl();
+  window.addEventListener("popstate", syncPaymentSuccessFromUrl);
+
+  return () => {
+    window.removeEventListener("popstate", syncPaymentSuccessFromUrl);
+  };
+}, []);
 
   // auto-hide timer
   const eggTimerRef = useRef(null);
@@ -1984,25 +2008,38 @@ const TAB_FROM_PATH = (p) => {
           </div>
         </div>
       ) : null}
-
-      <main
-        id="content"
-        className={`flex-1 ${CONTAINER} py-4 sm:py-8`}
-        onPointerDown={swipeHandlers.onPointerDown}
-        onPointerMove={swipeHandlers.onPointerMove}
-        onPointerUp={swipeHandlers.onPointerUp}
-        onPointerCancel={swipeHandlers.onPointerCancel}
-        onClickCapture={swipeHandlers.onClickCapture}
-        // Важно: разрешаем вертикальный скролл, но НЕ даём браузеру "жрать" горизонтальные жесты
-        style={{ touchAction: isMobile ? "pan-y" : "auto" }}
-      >
+        
         {/* ✅ Animated tab content slider (mobile) */}
-        <TabsSlider
-          isMobile={isMobile}
-          activeIndex={activeIndex}
-          dragX={swipeHandlers.dragX}
-          isDragging={swipeHandlers.isDragging}
-        >
+          <main
+            id="content"
+            className={`flex-1 ${CONTAINER} py-4 sm:py-8`}
+            onPointerDown={swipeHandlers.onPointerDown}
+            onPointerMove={swipeHandlers.onPointerMove}
+            onPointerUp={swipeHandlers.onPointerUp}
+            onPointerCancel={swipeHandlers.onPointerCancel}
+            onClickCapture={swipeHandlers.onClickCapture}
+// Важно: разрешаем вертикальный скролл, но НЕ даём браузеру "жрать" горизонтальные жесты
+            style={{ touchAction: isMobile ? "pan-y" : "auto" }}
+          >
+            {showPaymentSuccess ? (
+              <PaymentSuccess
+                lang={lang}
+                onBack={() => {
+                  setShowPaymentSuccess(false);
+                  try {
+                    sessionStorage.removeItem("payment_success_data");
+                  } catch {}
+                  navigate("/literature-club");
+                }}
+              />
+            ) : (
+              <TabsSlider
+                isMobile={isMobile}
+                activeIndex={activeIndex}
+                dragX={swipeHandlers.dragX}
+                isDragging={swipeHandlers.isDragging}
+              >
+ 
           {/* ABOUT */}
           <section hidden={!showAbout} aria-hidden={!showAbout}>
             <div className="grid md:grid-cols-3 gap-4 sm:gap-5 items-start">
