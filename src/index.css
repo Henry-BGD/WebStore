@@ -58,8 +58,15 @@ body {
 /* ================================
    PayPal Animation Remover
 ================================ */
-#paypal-button-container-a2 iframe,
-#paypal-button-container-b1b2 iframe {
-  animation: none !important;
-  transition: none !important;
+#paypal-button-container-a2,
+#paypal-button-container-b1b2 {
+  min-height: 92px;
+}
+
+.paypal-shell {
+  opacity: 0;
+}
+
+.paypal-shell.paypal-ready {
+  opacity: 1;
 }
