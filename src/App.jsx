@@ -1630,9 +1630,39 @@ useEffect(() => {
         return data.orderID;
       },
 
-      onApprove: async (data) => {
-        alert(`PayPal approved. OrderID: ${data.orderID}`);
+onApprove: async (data) => {
+  try {
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+    const response = await fetch("/api/paypal/capture-order", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
       },
+      body: JSON.stringify({
+        orderID: data.orderID,
+        clubId: clubA2.id,
+        language: lang === "ru" ? "ru" : "en",
+        timeZone,
+      }),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error || "Capture failed");
+    }
+
+    alert(
+      `${result.message}\n\n${lang === "ru" ? "Ссылка Zoom:" : "Zoom link:"}\n${result.zoom_link}`
+    );
+
+    window.location.reload();
+  } catch (error) {
+    console.error("Capture error:", error);
+    alert(lang === "ru" ? "Ошибка после оплаты" : "Error after payment");
+  }
+},
 
       onError: (err) => {
         console.error("PayPal error:", err);
