@@ -217,7 +217,7 @@ const PRODUCTS = [
     id: "prod-ru-book-1",
     title: "Russian Short Stories by Leo Tolstoy",
     kind: "A1-B1 Level",
-    price: 6.99,
+    price: 9.99,
     image: "/Product_Leo.webp",
     externalUrl: "https://www.amazon.com/dp/B0GMCCFMQQ",
     marketplace: "amazon",
