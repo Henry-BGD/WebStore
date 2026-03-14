@@ -1744,7 +1744,7 @@ navigate("/payment-success");
       },
     })
     .render("#paypal-button-container-b1b2");
-}, [clubB1B2, lang]);
+}, [clubB1B2]);
 
 
   useEffect(() => {
