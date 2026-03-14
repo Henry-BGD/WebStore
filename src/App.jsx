@@ -1111,10 +1111,10 @@ function formatUtcForViewer(isoString, locale = "en-US") {
     <p>— Нашёл? Нашёл?</p>
 
     <div className="pt-1 space-y-1">
-      <p><strong>везде́</strong> — everywhere</p>
-      <p><strong>во́зле</strong> — near</p>
-      <p><strong>амба́р</strong> — barn</p>
-      <p><strong>мяу́кать / замяу́кать</strong> — to meow</p>
+      <p><strong>везде́</strong> - everywhere</p>
+      <p><strong>во́зле</strong> - near</p>
+      <p><strong>амба́р</strong> - barn</p>
+      <p><strong>мяу́кать / замяу́кать</strong> - to meow</p>
     </div>
   </div>
 );
@@ -1129,12 +1129,12 @@ const LIT_CLUB_B1B2_SAMPLE = (
     <p>
       — Это просто <strong>возмутительно</strong>! — говорит он, то и дело
       посматривая на часы. — Это верх неуважения к чужому времени и труду.
-      В Англии такой субъект не заработал бы ни <strong>гроша́</strong>, умер бы
+      В Англии такой субъект не заработал бы ни <strong>гроша</strong>, умер бы
       с голода! Ну, погоди же, придёшь ты…
     </p>
 
     <p>
-      И, чувствуя потребность изли́ть на что-нибудь свой гнев и нетерпение,
+      И, чувствуя потребность излить на что-нибудь свой гнев и нетерпение,
       учёный подходит к двери, ведущей в комнату жены, и стучится.
     </p>
 
@@ -1145,7 +1145,7 @@ const LIT_CLUB_B1B2_SAMPLE = (
 
     <div className="pt-1 space-y-1">
       <p><strong>возмутительно</strong> = неправильно</p>
-      <p><strong>гроши</strong> — очень маленькая сумма денег</p>
+      <p><strong>гроши</strong> - очень маленькая сумма денег</p>
       <p><strong>негодующий</strong> = недовольный, злой</p>
     </div>
   </div>
