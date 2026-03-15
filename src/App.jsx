@@ -394,8 +394,14 @@ lit_club_more_0_a: "No. We will read the text together during the meeting.",
 lit_club_more_01_q: "What if I do not understand some words while reading during the club?",
 lit_club_more_01_a: "The club host will help explain unfamiliar words and sentences, and will also correct pronunciation and reading mistakes.",
 
-lit_club_more_1_q: "Will the club be recorded?",
-lit_club_more_1_a: "A recording may be made and sent to you after the club, if all participants agree.",
+lit_club_more_1_q: "How does the club work?",
+lit_club_more_1_a: "First, we introduce ourselves (~15 min), then we read by roles (~30 min), and after that we discuss the text (~45 min).",
+
+lit_club_more_1_b_q: "How does the club work?",
+lit_club_more_1_b_a: "First, we introduce ourselves (~20 min), then we read by roles (~45 min), and after that we discuss the text (~55 min).",
+
+lit_club_more_15_q: "What materials will I receive after the club meeting?",
+lit_club_more_15_a: "During the reading and discussion, your mistakes will be written down in a document. After the club meeting, you will receive this document (with corrected mistakes) and the text we read with stress marks.",
 
 lit_club_more_2_q: "Please check the date and time carefully.",
 lit_club_more_2_a: "Payments are non-refundable after booking ⚠️.",
@@ -481,8 +487,14 @@ lit_club_more_0_a: "Нет. Мы прочитаем текст вместе во
 lit_club_more_01_q: "Что если я не пойму некоторые слова во время чтения в клубе?",
 lit_club_more_01_a: "Ведущий клуба поможет разобраться с непонятными словами и предложениями, поправит произношение и ошибки чтения.",
 
-lit_club_more_1_q: "Будет ли запись клуба?",
-lit_club_more_1_a: "Возможна запись клуба, которая будет отправлена вам после клуба, если все участники согласны.",
+lit_club_more_1_q: "Как проходит клуб?",
+lit_club_more_1_a: "Сначала мы знакомимся (~15 минут), потом читаем по ролям (~30 минут), а потом обсуждаем текст (~45 минут).",
+
+lit_club_more_1_b_q: "Как проходит клуб?",
+lit_club_more_1_b_a: "Сначала мы знакомимся (~20 минут), потом читаем по ролям (~45 минут), а потом обсуждаем текст (~55 минут).",
+
+lit_club_more_15_q: "Какие материалы я получу после встречи клуба?",
+lit_club_more_15_a: "Во время чтения и ответов на вопросы ваши ошибки будут записаны в документ. После встречи клуба вы получите этот документ (с исправленными ошибками) и текст с ударениями, который мы читали.",
 
 lit_club_more_2_q: "Пожалуйста, внимательно посмотрите на дату и время.",
 lit_club_more_2_a: "После оплаты деньги не возвращаются ⚠️.",
@@ -2384,11 +2396,8 @@ const TAB_FROM_PATH = (p) => {
               </div>
             <ul className="pt-2 list-disc pl-5 text-base leading-snug text-slate-700 dark:text-slate-300 space-y-0">
               <li>{t("lit_club_1_point_1")}</li>
-              <li>{t("lit_club_1_point_2")}</li>
               <li>{t("lit_club_1_point_3")}</li>
               <li>{t("lit_club_1_point_4")}</li>
-              <li>{t("lit_club_1_point_5")}</li>
-              <li>{t("lit_club_1_point_6")}</li>
             </ul>
               
               <div className="pt-3 mt-2">
@@ -2406,37 +2415,43 @@ const TAB_FROM_PATH = (p) => {
                 )}
               </div>
 
-            <ClubExtraInfo title={t("lit_club_more_info")}>
-              <div>
-                <p className="font-semibold">{t("lit_club_what_read_q")}</p>
-                <p>{t("lit_club_1_what_read_a")}</p>
-              </div>
+              <ClubExtraInfo title={t("lit_club_more_info")}>
+                <div>
+                  <p className="font-semibold">{t("lit_club_what_read_q")}</p>
+                  <p>{t("lit_club_1_what_read_a")}</p>
+                </div>
               
-              <div>
-                <p className="font-semibold">{t("lit_club_more_0_q")}</p>
-                <p>{t("lit_club_more_0_a")}</p>
-              </div>
-
-              <div>
-                <p className="font-semibold">{t("lit_club_more_01_q")}</p>
-                <p>{t("lit_club_more_01_a")}</p>
-              </div>
-
-              <div>
-                <p className="font-semibold">{t("lit_club_more_1_q")}</p>
-                <p>{t("lit_club_more_1_a")}</p>
-              </div>
-
-              <div>
-                <p className="font-semibold">{t("lit_club_more_2_q")}</p>
-                <p>{t("lit_club_more_2_a")}</p>
-              </div>
-
-             <div>
-                <p className="font-semibold">{t("lit_club_more_3_q")}</p>
-                {LIT_CLUB_A2_SAMPLE}
-            </div>
-            </ClubExtraInfo>
+                <div>
+                  <p className="font-semibold">{t("lit_club_more_0_q")}</p>
+                  <p>{t("lit_club_more_0_a")}</p>
+                </div>
+              
+                <div>
+                  <p className="font-semibold">{t("lit_club_more_01_q")}</p>
+                  <p>{t("lit_club_more_01_a")}</p>
+                </div>
+              
+                <div>
+                  <p className="font-semibold">{t("lit_club_more_1_q")}</p>
+                  <p>{t("lit_club_more_1_a")}</p>
+                </div>
+              
+                <div>
+                  <p className="font-semibold">{t("lit_club_more_15_q")}</p>
+                  <p>{t("lit_club_more_15_a")}</p>
+                </div>
+              
+                <div>
+                  <p className="font-semibold">{t("lit_club_more_2_q")}</p>
+                  <p>{t("lit_club_more_2_a")}</p>
+                </div>
+              
+                <div>
+                  <p className="font-semibold">{t("lit_club_more_3_q")}</p>
+                  {LIT_CLUB_A2_SAMPLE}
+                </div>
+              </ClubExtraInfo>
+              
           </div>
         </Card>
       </div>
@@ -2485,11 +2500,8 @@ const TAB_FROM_PATH = (p) => {
 
             <ul className="pt-2 list-disc pl-5 text-base leading-snug text-slate-700 dark:text-slate-300 space-y-0">
               <li>{t("lit_club_2_point_1")}</li>
-              <li>{t("lit_club_2_point_2")}</li>
               <li>{t("lit_club_2_point_3")}</li>
               <li>{t("lit_club_2_point_4")}</li>
-              <li>{t("lit_club_2_point_5")}</li>
-              <li>{t("lit_club_2_point_6")}</li>
             </ul>
 
               <div className="pt-3 mt-2">
@@ -2507,37 +2519,43 @@ const TAB_FROM_PATH = (p) => {
                 )}
               </div>
 
-            <ClubExtraInfo title={t("lit_club_more_info")}>
-              <div>
-                <p className="font-semibold">{t("lit_club_what_read_q")}</p>
-                <p>{t("lit_club_2_what_read_a")}</p>
-              </div>
-              
-              <div>
-                <p className="font-semibold">{t("lit_club_more_0_q")}</p>
-                <p>{t("lit_club_more_0_a")}</p>
-              </div>
-
-              <div>
-                <p className="font-semibold">{t("lit_club_more_01_q")}</p>
-                <p>{t("lit_club_more_01_a")}</p>
-              </div>
-
-              <div>
-                <p className="font-semibold">{t("lit_club_more_1_q")}</p>
-                <p>{t("lit_club_more_1_a")}</p>
-              </div>
-
-              <div>
-                <p className="font-semibold">{t("lit_club_more_2_q")}</p>
-                <p>{t("lit_club_more_2_a")}</p>
-              </div>
-
-              <div>
-                <p className="font-semibold">{t("lit_club_more_3_q")}</p>
-                {LIT_CLUB_B1B2_SAMPLE}
-              </div>
-            </ClubExtraInfo>
+                <ClubExtraInfo title={t("lit_club_more_info")}>
+                  <div>
+                    <p className="font-semibold">{t("lit_club_what_read_q")}</p>
+                    <p>{t("lit_club_2_what_read_a")}</p>
+                  </div>
+                
+                  <div>
+                    <p className="font-semibold">{t("lit_club_more_0_q")}</p>
+                    <p>{t("lit_club_more_0_a")}</p>
+                  </div>
+                
+                  <div>
+                    <p className="font-semibold">{t("lit_club_more_01_q")}</p>
+                    <p>{t("lit_club_more_01_a")}</p>
+                  </div>
+                
+                  <div>
+                    <p className="font-semibold">{t("lit_club_more_1_b_q")}</p>
+                    <p>{t("lit_club_more_1_b_a")}</p>
+                  </div>
+                
+                  <div>
+                    <p className="font-semibold">{t("lit_club_more_15_q")}</p>
+                    <p>{t("lit_club_more_15_a")}</p>
+                  </div>
+                
+                  <div>
+                    <p className="font-semibold">{t("lit_club_more_2_q")}</p>
+                    <p>{t("lit_club_more_2_a")}</p>
+                  </div>
+                
+                  <div>
+                    <p className="font-semibold">{t("lit_club_more_3_q")}</p>
+                    {LIT_CLUB_B1B2_SAMPLE}
+                  </div>
+                </ClubExtraInfo>
+            
           </div>
         </Card>
       </div>
