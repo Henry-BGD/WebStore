@@ -54,39 +54,3 @@ body {
     display: none;
   }
 }
-
-/* ================================
-   PayPal shells
-================================ */
-#paypal-button-container-a2,
-#paypal-button-container-b1b2 {
-  min-height: 92px;
-}
-
-.paypal-shell {
-  opacity: 0;
-  border-radius: 16px;
-  overflow: hidden;
-  padding: 8px;
-}
-
-.paypal-shell.paypal-ready {
-  opacity: 1;
-}
-
-/* Светлая тема */
-.paypal-shell.paypal-shell-light {
-  background: #ffffff;
-}
-
-/* Тёмная тема */
-.paypal-shell.paypal-shell-dark {
-  background: #0f172a; /* slate-900 */
-}
-
-/* optional: try to suppress extra iframe transitions */
-#paypal-button-container-a2 iframe,
-#paypal-button-container-b1b2 iframe {
-  animation: none !important;
-  transition: none !important;
-}
