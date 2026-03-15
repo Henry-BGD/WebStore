@@ -1713,10 +1713,22 @@ useEffect(() => {
           }
         },
 
-        onError: (err) => {
-          console.error("PayPal error:", err);
-          alert(lang === "ru" ? "Ошибка PayPal" : "PayPal error");
-        },
+onCancel: () => {
+  // Пользователь просто закрыл окно PayPal — ничего страшного
+  console.log("PayPal popup was closed by user");
+},
+
+onError: (err) => {
+  console.error("PayPal error:", err);
+
+  const message =
+    lang === "ru"
+      ? "Не удалось открыть или завершить оплату PayPal. Попробуйте ещё раз."
+      : "PayPal could not complete the payment. Please try again.";
+
+  alert(message);
+},
+        
       })
       .render(`#${containerId}`)
       .then(() => {
@@ -1867,10 +1879,22 @@ useEffect(() => {
           }
         },
 
-        onError: (err) => {
-          console.error("PayPal error:", err);
-          alert(lang === "ru" ? "Ошибка PayPal" : "PayPal error");
-        },
+onCancel: () => {
+  // Пользователь просто закрыл окно PayPal — ничего страшного
+  console.log("PayPal popup was closed by user");
+},
+
+onError: (err) => {
+  console.error("PayPal error:", err);
+
+  const message =
+    lang === "ru"
+      ? "Не удалось открыть или завершить оплату PayPal. Попробуйте ещё раз."
+      : "PayPal could not complete the payment. Please try again.";
+
+  alert(message);
+},
+        
       })
       .render(`#${containerId}`)
       .then(() => {
