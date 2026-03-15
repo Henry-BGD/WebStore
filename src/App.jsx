@@ -2383,7 +2383,7 @@ const TAB_FROM_PATH = (p) => {
 <section hidden={!showLitClub} aria-hidden={!showLitClub}>
   <div className="grid md:grid-cols-3 gap-x-4 gap-y-2 sm:gap-x-4 sm:gap-y-2 items-start">
     
-      <div className="md:col-span-3 space-y-1">
+      <div className="md:col-span-3 space-y-1.5">
         <div className="flex items-center gap-2 flex-nowrap min-w-0">
           <h1 className="text-[24px] sm:text-3xl md:text-4xl font-extrabold tracking-tight leading-tight truncate">
             {t("lit_club_title")}
@@ -2409,7 +2409,7 @@ const TAB_FROM_PATH = (p) => {
           </a>
         </div>
       
-        <p className="text-base leading-relaxed text-slate-700 dark:text-slate-300">
+        <p className="text-base leading-relaxed text-slate-700 dark:text-slate-300 mb-6 sm:mb-8">
           {t("lit_club_desc")}
         </p>
       </div>
