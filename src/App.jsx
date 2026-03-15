@@ -2295,7 +2295,7 @@ const TAB_FROM_PATH = (p) => {
         {/* ✅ Animated tab content slider (mobile) */}
           <main
             id="content"
-            className={`flex-1 ${CONTAINER} py-4 sm:py-8`}
+            className={`flex-1 ${CONTAINER} py-1 sm:py-3`}
             onPointerDown={swipeHandlers.onPointerDown}
             onPointerMove={swipeHandlers.onPointerMove}
             onPointerUp={swipeHandlers.onPointerUp}
@@ -2383,36 +2383,36 @@ const TAB_FROM_PATH = (p) => {
 <section hidden={!showLitClub} aria-hidden={!showLitClub}>
   <div className="grid md:grid-cols-3 gap-x-4 gap-y-2 sm:gap-x-4 sm:gap-y-2 items-start">
     
-            <div className="md:col-span-3 space-y-1">
-              <div className="flex items-center justify-between gap-2 flex-nowrap min-w-0">
-                <h1 className="text-[28px] sm:text-3xl md:text-4xl font-extrabold tracking-tight leading-tight truncate min-w-0">
-                  {t("lit_club_title")}
-                </h1>
-            
-                  <a
-                    href="https://t.me/your_link_here"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={[
-                      "inline-flex items-center justify-center gap-1.5 shrink-0",
-                      "rounded-full border px-3 py-1.5",
-                      "text-xs sm:text-sm font-medium whitespace-nowrap",
-                      "border-slate-200 bg-white text-slate-800 hover:bg-slate-50",
-                      "dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800/70",
-                      "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
-                      "dark:focus-visible:ring-blue-500/40 dark:focus-visible:ring-offset-slate-950",
-                      "transition",
-                    ].join(" ")}
-                  >
-                    <Send className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-                    <span>{t("lit_club_telegram")}</span>
-                  </a>
-              </div>
-            
-              <p className="text-base leading-relaxed text-slate-700 dark:text-slate-300">
-                {t("lit_club_desc")}
-              </p>
-            </div>
+      <div className="md:col-span-3 space-y-1">
+        <div className="flex items-center gap-2 flex-nowrap min-w-0">
+          <h1 className="text-[24px] sm:text-3xl md:text-4xl font-extrabold tracking-tight leading-tight truncate">
+            {t("lit_club_title")}
+          </h1>
+      
+          <a
+            href="https://t.me/your_link_here"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={[
+              "inline-flex items-center justify-center gap-1.5 shrink-0",
+              "rounded-full border px-2.5 py-1.5",
+              "text-[11px] sm:text-sm font-medium whitespace-nowrap",
+              "border-slate-200 bg-white text-slate-800 hover:bg-slate-50",
+              "dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800/70",
+              "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
+              "dark:focus-visible:ring-blue-500/40 dark:focus-visible:ring-offset-slate-950",
+              "transition",
+            ].join(" ")}
+          >
+            <Send className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+            <span>{t("lit_club_telegram")}</span>
+          </a>
+        </div>
+      
+        <p className="text-base leading-relaxed text-slate-700 dark:text-slate-300">
+          {t("lit_club_desc")}
+        </p>
+      </div>
 
     <div className="md:col-span-3 grid md:grid-cols-2 gap-4 sm:gap-4 items-start">
       {/* CLUB 1 */}
