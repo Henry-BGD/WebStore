@@ -2381,7 +2381,7 @@ const TAB_FROM_PATH = (p) => {
 
     {/* RUSSIAN LITERATURE CLUB */}
 <section hidden={!showLitClub} aria-hidden={!showLitClub}>
-  <div className="grid md:grid-cols-3 gap-x-4 gap-y-2 sm:gap-x-4 mt-4 sm:mt-6 sm:gap-y-2 items-start">
+  <div className="grid md:grid-cols-3 gap-x-4 gap-y-2 sm:gap-x-4 sm:gap-y-2 items-start">
     
       <div className="md:col-span-3 space-y-1.5">
         <div className="flex items-center gap-2 flex-nowrap min-w-0">
