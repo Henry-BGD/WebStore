@@ -351,7 +351,7 @@ const I18N = {
     nav_audio: "Audiobooks",
 
 lit_club_title: "Russian Literature Club",
-lit_club_desc: "This is a literary club for adults where we practice reading and speaking Russian by reading and discussing Russian literature.",
+lit_club_desc: "This is a literature club for adults where we practice reading and speaking Russian through Russian literature.",
 
 lit_club_1_title: "Level A2 (1.5 hours)",
 
@@ -365,11 +365,8 @@ lit_club_2_books_author: "by Alexander Grin",
 lit_club_timezone_note: "Time is shown in your local time zone",
 
 lit_club_1_point_1: "Perfect if you already have some basic speaking and reading skills.",
-lit_club_1_point_2: "Club plan: introductions (~15 min), reading by roles (~30 min), discussion of the text (~45 min).",
 lit_club_1_point_3: "Maximum 4 people (+ club host).",
-lit_club_1_point_4: "Meeting on Zoom.",
-lit_club_1_point_5: "During the reading and discussion, your mistakes will be written in a document.",
-lit_club_1_point_6: "After the club, you will receive this document (with corrected mistakes) and the text we read with stress marks.",
+lit_club_1_point_4: "Meeting on Zoom.
 
 lit_club_2_title: "Level B1 - B2 (2 hours)",
 
@@ -458,11 +455,8 @@ lit_club_2_books_author: "(Александр Грин)",
 lit_club_timezone_note: "Время показано в вашем часовом поясе",
  
 lit_club_1_point_1: "Подойдёт вам, если вы уже умеете немного говорить и читать.",
-lit_club_1_point_2: "План клуба: знакомство (~15 минут), чтение по ролям (~30 минут), обсуждение текста (~45 минут).",
 lit_club_1_point_3: "Максимум 4 ученика (+ ведущий клуба).",
 lit_club_1_point_4: "Встреча в Zoom.",
-lit_club_1_point_5: "Во время чтения и ответов на вопросы ваши ошибки будут записаны в документ.",
-lit_club_1_point_6: "После клуба вы получите этот документ (с исправленными ошибками) и текст с ударениями, который мы читали.",
 
 lit_club_2_title: "Уровень B1 - B2 (2 часа)",
 
