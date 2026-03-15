@@ -2414,7 +2414,7 @@ const TAB_FROM_PATH = (p) => {
         </p>
       </div>
 
-    <div className="md:col-span-3 grid md:grid-cols-2 gap-4 sm:gap-4 items-start">
+    <div className="md:col-span-3 grid md:grid-cols-2 gap-4 mt-6 sm:mt-8 items-start">
       {/* CLUB 1 */}
       <div>
         <div className="text-center mb-1">
