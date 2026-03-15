@@ -378,7 +378,8 @@ lit_club_2_point_4: "Meeting on Zoom.",
 lit_club_2_point_5: "During the reading and discussion, your mistakes will be written in a document.",
 lit_club_2_point_6: "After the club, you will receive this document (with corrected mistakes) and the text we read",
 
-lit_club_sold_out: "Unfortunately, all spots are taken. Please wait for the next club meeting.",
+lit_club_sold_out_1: "Unfortunately, all spots are taken.",
+lit_club_sold_out_2: "Please wait for the next club meeting.",
 
 lit_club_more_info: "Additional Information",
 
@@ -469,7 +470,8 @@ lit_club_2_point_4: "Встреча в Zoom.",
 lit_club_2_point_5: "Во время чтения и ответов на вопросы ваши ошибки будут записаны в документ.",
 lit_club_2_point_6: "После клуба вы получите этот документ (с исправленными ошибками) и текст, который мы читали.",
 
-lit_club_sold_out: "К сожалению, все места заняты. Пожалуйста, подождите следующую встречу клуба.",
+lit_club_sold_out_1: "К сожалению, все места заняты.",
+lit_club_sold_out_2: "Пожалуйста, подождите следующую встречу клуба.",
 
 lit_club_more_info: "Дополнительная информация",
 
@@ -2385,7 +2387,7 @@ const TAB_FROM_PATH = (p) => {
     
       <div className="md:col-span-3 space-y-1.5">
         <div className="flex items-center gap-2 flex-nowrap min-w-0">
-          <h1 className="text-[24px] sm:text-3xl md:text-4xl font-extrabold tracking-tight leading-tight truncate">
+            <h1 className="text-[24px] sm:text-3xl md:text-4xl font-extrabold tracking-tight leading-[1.12] truncate pb-1">
             {t("lit_club_title")}
           </h1>
       
@@ -2472,8 +2474,12 @@ const TAB_FROM_PATH = (p) => {
                     />
                   </div>
                 ) : (
-                  <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 px-4 py-4 text-center text-sm sm:text-base text-slate-700 dark:text-slate-300">
-                    {t("lit_club_sold_out")}
+                  <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 px-4 py-4 text-center text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed md:min-h-[170px] md:flex md:items-center md:justify-center">
+                    <div>
+                      <span>{t("lit_club_sold_out_1")}</span>
+                      <br />
+                      <span>{t("lit_club_sold_out_2")}</span>
+                    </div>
                   </div>
                 )}
               </div>
@@ -2576,8 +2582,12 @@ const TAB_FROM_PATH = (p) => {
                     />
                   </div>
                 ) : (
-                  <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 px-4 py-4 text-center text-sm sm:text-base text-slate-700 dark:text-slate-300">
-                    {t("lit_club_sold_out")}
+                  <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 px-4 py-4 text-center text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed md:min-h-[170px] md:flex md:items-center md:justify-center">
+                    <div>
+                      <span>{t("lit_club_sold_out_1")}</span>
+                      <br />
+                      <span>{t("lit_club_sold_out_2")}</span>
+                    </div>
                   </div>
                 )}
               </div>
