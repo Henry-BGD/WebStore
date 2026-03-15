@@ -385,7 +385,7 @@ lit_club_sold_out: "Unfortunately, all spots are taken. Please wait for the next
 lit_club_more_info: "Additional Information",
 
 lit_club_what_read_q: "What will we read?",
-lit_club_1_what_read_a: 'The short story "The Shark" by Leo Tolstoy).',
+lit_club_1_what_read_a: 'The short story "The Shark" by Leo Tolstoy.',
 lit_club_2_what_read_a: 'The short story "The Green Lamp" by Alexander Grin.',
 
 lit_club_more_0_q: "Do I need to read anything before the club?",
@@ -404,7 +404,7 @@ lit_club_more_15_q: "What materials will I receive after the club meeting?",
 lit_club_more_15_a: "During the reading and discussion, your mistakes will be written down in a document. After the club meeting, you will receive this document (with corrected mistakes) and the text we read with stress marks.",
 
 lit_club_more_2_q: "Please check the date and time carefully.",
-lit_club_more_2_a: "Payments are non-refundable after booking ⚠️.",
+lit_club_more_2_a: "Payments are non-refundable after booking. ⚠️",
 
 lit_club_more_3_q: "Approximate level of the text we will read and discuss during the club:",
 
@@ -497,7 +497,7 @@ lit_club_more_15_q: "Какие материалы я получу после в
 lit_club_more_15_a: "Во время чтения и ответов на вопросы ваши ошибки будут записаны в документ. После встречи клуба вы получите этот документ (с исправленными ошибками) и текст с ударениями, который мы читали.",
 
 lit_club_more_2_q: "Пожалуйста, внимательно посмотрите на дату и время.",
-lit_club_more_2_a: "После оплаты деньги не возвращаются ⚠️.",
+lit_club_more_2_a: "После оплаты деньги не возвращаются. ⚠️",
 
 lit_club_more_3_q: "Примерный уровень текста, который мы будем читать и обсуждать во время встречи клуба:",
     
@@ -1721,9 +1721,23 @@ onCancel: () => {
 onError: (err) => {
   console.error("PayPal error:", err);
 
+  const text = String(err?.message || err || "").toLowerCase();
+
+  const looksLikeUserClosed =
+    text.includes("popup") ||
+    text.includes("closed") ||
+    text.includes("window closed") ||
+    text.includes("cancel") ||
+    text.includes("user closed") ||
+    text.includes("zoid destroyed before props");
+
+  if (looksLikeUserClosed) {
+    return;
+  }
+
   const message =
     lang === "ru"
-      ? "Не удалось открыть или завершить оплату PayPal. Попробуйте ещё раз."
+      ? "Не удалось завершить оплату PayPal. Попробуйте ещё раз."
       : "PayPal could not complete the payment. Please try again.";
 
   alert(message);
@@ -1887,9 +1901,23 @@ onCancel: () => {
 onError: (err) => {
   console.error("PayPal error:", err);
 
+  const text = String(err?.message || err || "").toLowerCase();
+
+  const looksLikeUserClosed =
+    text.includes("popup") ||
+    text.includes("closed") ||
+    text.includes("window closed") ||
+    text.includes("cancel") ||
+    text.includes("user closed") ||
+    text.includes("zoid destroyed before props");
+
+  if (looksLikeUserClosed) {
+    return;
+  }
+
   const message =
     lang === "ru"
-      ? "Не удалось открыть или завершить оплату PayPal. Попробуйте ещё раз."
+      ? "Не удалось завершить оплату PayPal. Попробуйте ещё раз."
       : "PayPal could not complete the payment. Please try again.";
 
   alert(message);
