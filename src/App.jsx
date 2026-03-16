@@ -2465,43 +2465,26 @@ const TAB_FROM_PATH = (p) => {
               <li>{t("lit_club_1_point_4")}</li>
             </ul>
               
-              <div className="pt-3 mt-2">
-                {clubA2?.is_payable ? (
+            <div className="pt-3 mt-2">
+              {clubA2?.is_payable ? (
+                <div className="relative" id="paypal-shell-a2">
+                  {theme === "dark" && (
+                    <div className="absolute left-[6px] right-[6px] top-[-2px] bottom-[6px] bg-white rounded-xl" />
+                  )}
+            
                   <div
-                    className={`paypal-shell ${theme === "dark" ? "paypal-shell-dark" : "paypal-shell-light"}`}
-                    id="paypal-shell-a2"
-                  >
-                    <div
-                      id="paypal-button-container-a2"
-                      className="max-w-[420px] mx-auto"
-                    />
-                  </div>
-                ) : (
-                  <div className="relative">
-                    {/* Невидимый PayPal-layout для сохранения ТОЧНОЙ высоты */}
-                    <div className="opacity-0 pointer-events-none select-none">
-                      <div className="max-w-[420px] mx-auto">
-                        <div className="rounded-md h-[54px] bg-yellow-400" />
-                        <div className="h-5" />
-                        <div className="rounded-md h-[54px] bg-slate-800" />
-                        <div className="h-5" />
-                        <div className="h-5 flex items-center justify-center">
-                          <span className="text-sm">Powered by PayPal</span>
-                        </div>
-                      </div>
-                    </div>
-              
-                    {/* Видимое сообщение поверх */}
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 px-4 py-4 text-center text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed">
-                        <span>{t("lit_club_sold_out_1")}</span>
-                        <br />
-                        <span>{t("lit_club_sold_out_2")}</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
+                    id="paypal-button-container-a2"
+                    className="relative max-w-[420px] mx-auto"
+                  />
+                </div>
+              ) : (
+                <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 px-4 py-4 text-center text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed">
+                  <span>{t("lit_club_sold_out_1")}</span>
+                  <br />
+                  <span>{t("lit_club_sold_out_2")}</span>
+                </div>
+              )}
+            </div>
 
               <ClubExtraInfo title={t("lit_club_more_info")}>
                 <div>
@@ -2592,44 +2575,26 @@ const TAB_FROM_PATH = (p) => {
               <li>{t("lit_club_2_point_4")}</li>
             </ul>
 
-                <div className="pt-3 mt-2">
-                  {clubB1B2?.is_payable ? (
-                    <div
-                      className={`paypal-shell ${theme === "dark" ? "paypal-shell-dark" : "paypal-shell-light"}`}
-                      id="paypal-shell-b1b2"
-                    >
-                      <div
-                        id="paypal-button-container-b1b2"
-                        className="max-w-[420px] mx-auto"
-                      />
-                    </div>
-                  ) : (
-                    <div className="relative">
-                      {/* Невидимый PayPal-layout для сохранения ТОЧНОЙ высоты */}
-                      <div className="opacity-0 pointer-events-none select-none">
-                        <div className="max-w-[420px] mx-auto">
-                          <div className="rounded-md h-[54px] bg-yellow-400" />
-                          <div className="h-5" />
-                          <div className="rounded-md h-[54px] bg-slate-800" />
-                          <div className="h-5" />
-                          <div className="h-5 flex items-center justify-center">
-                            <span className="text-sm">Powered by PayPal</span>
-                          </div>
-                        </div>
-                      </div>
-                
-                      {/* Видимое сообщение поверх */}
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 px-4 py-4 text-center text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed">
-                          <span>{t("lit_club_sold_out_1")}</span>
-                          <br />
-                          <span>{t("lit_club_sold_out_2")}</span>
-                        </div>
-                      </div>
-                    </div>
+             <div className="pt-3 mt-2">
+              {clubB1B2?.is_payable ? (
+                <div className="relative" id="paypal-shell-b1b2">
+                  {theme === "dark" && (
+                    <div className="absolute left-[6px] right-[6px] top-[-2px] bottom-[6px] bg-white rounded-xl" />
                   )}
+            
+                  <div
+                    id="paypal-button-container-b1b2"
+                    className="relative max-w-[420px] mx-auto"
+                  />
                 </div>
-
+              ) : (
+                <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 px-4 py-4 text-center text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed">
+                  <span>{t("lit_club_sold_out_1")}</span>
+                  <br />
+                  <span>{t("lit_club_sold_out_2")}</span>
+                </div>
+              )}
+            </div>
                 <ClubExtraInfo title={t("lit_club_more_info")}>
                   <div>
                     <p className="font-semibold">{t("lit_club_what_read_q")}</p>
