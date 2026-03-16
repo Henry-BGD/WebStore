@@ -1529,10 +1529,10 @@ const paypalA2Rendered = useRef(false);
 const paypalB1B2Rendered = useRef(false);
 
 const clubA2PriceBadge =
-  clubA2?.price_usd != null ? `$${clubA2.price_usd}` : "$5";
+  clubA2?.price_usd != null ? `$${clubA2.price_usd}` : "";
 
 const clubB1B2PriceBadge =
-  clubB1B2?.price_usd != null ? `$${clubB1B2.price_usd}` : "$6";
+  clubB1B2?.price_usd != null ? `$${clubB1B2.price_usd}` : "";
 
   useEffect(() => {
   let isMounted = true;
@@ -2481,9 +2481,9 @@ const TAB_FROM_PATH = (p) => {
                     {/* Невидимый PayPal-layout для сохранения ТОЧНОЙ высоты */}
                     <div className="opacity-0 pointer-events-none select-none">
                       <div className="max-w-[420px] mx-auto">
-                        <div className="rounded-md h-[40px] bg-yellow-400" />
+                        <div className="rounded-md h-[39px] bg-yellow-400" />
                         <div className="h-5" />
-                        <div className="rounded-md h-[40px] bg-slate-800" />
+                        <div className="rounded-md h-[39px] bg-slate-800" />
                         <div className="h-5" />
                         <div className="h-5 flex items-center justify-center">
                           <span className="text-sm">Powered by PayPal</span>
@@ -2608,9 +2608,9 @@ const TAB_FROM_PATH = (p) => {
                   {/* Невидимый PayPal-layout для сохранения ТОЧНОЙ высоты */}
                   <div className="opacity-0 pointer-events-none select-none">
                     <div className="max-w-[420px] mx-auto">
-                      <div className="rounded-md h-[40px] bg-yellow-400" />
+                      <div className="rounded-md h-[39px] bg-yellow-400" />
                       <div className="h-5" />
-                      <div className="rounded-md h-[40px] bg-slate-800" />
+                      <div className="rounded-md h-[39px] bg-slate-800" />
                       <div className="h-5" />
                       <div className="h-5 flex items-center justify-center">
                         <span className="text-sm">Powered by PayPal</span>
