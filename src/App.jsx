@@ -2473,7 +2473,7 @@ const TAB_FROM_PATH = (p) => {
                     id="paypal-shell-a2"
                   >
                     {theme === "dark" && (
-                      <div className="absolute inset-0 bg-slate-950 rounded-xl" />
+                      <div className="absolute inset-0 bg-white rounded-xl" />
                     )}
                   
                     <div
@@ -2606,7 +2606,7 @@ const TAB_FROM_PATH = (p) => {
                   id="paypal-shell-b1b2"
                 >
                   {theme === "dark" && (
-                    <div className="absolute inset-0 bg-slate-950 rounded-xl" />
+                    <div className="absolute inset-0 bg-white rounded-xl" />
                   )}
                 
                   <div
