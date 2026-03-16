@@ -2465,7 +2465,7 @@ const TAB_FROM_PATH = (p) => {
               <li>{t("lit_club_1_point_4")}</li>
             </ul>
               
-                <div className="pt-3 mt-2 md:min-h-[230px] flex flex-col justify-start">
+                <div className="pt-3 mt-2 md:min-h-[250px] flex flex-col justify-start">
                   {clubA2?.is_payable ? (
                     <div className={`paypal-shell ${theme === "dark" ? "paypal-shell-dark" : "paypal-shell-light"}`} id="paypal-shell-a2">
                       <div
@@ -2573,7 +2573,7 @@ const TAB_FROM_PATH = (p) => {
               <li>{t("lit_club_2_point_4")}</li>
             </ul>
 
-                  <div className="pt-3 mt-2 md:min-h-[230px] flex flex-col justify-start">
+                  <div className="pt-3 mt-2 md:min-h-[250px] flex flex-col justify-start">
                     {clubB1B2?.is_payable ? (
                       <div className={`paypal-shell ${theme === "dark" ? "paypal-shell-dark" : "paypal-shell-light"}`} id="paypal-shell-b1b2">
                         <div
