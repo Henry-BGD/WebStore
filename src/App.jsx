@@ -2465,7 +2465,7 @@ const TAB_FROM_PATH = (p) => {
               <li>{t("lit_club_1_point_4")}</li>
             </ul>
               
-                <div className="pt-3 mt-2 md:min-h-[200px] flex flex-col justify-start">
+                <div className="pt-3 mt-2">
                   {clubA2?.is_payable ? (
                     <div className={`paypal-shell ${theme === "dark" ? "paypal-shell-dark" : "paypal-shell-light"}`} id="paypal-shell-a2">
                       <div
@@ -2474,13 +2474,13 @@ const TAB_FROM_PATH = (p) => {
                       />
                     </div>
                   ) : (
-                    <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 px-4 py-4 text-center text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed md:min-h-[220px] md:flex md:items-center md:justify-center">
+                    <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 px-4 py-4 text-center text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed md:min-h-[205px] md:flex md:items-center md:justify-center">
                       <div>
                         <span>{t("lit_club_sold_out_1")}</span>
                         <br />
                         <span>{t("lit_club_sold_out_2")}</span>
                       </div>
-                    </div>
+                    </div> 
                   )}
                 </div>
 
@@ -2573,7 +2573,7 @@ const TAB_FROM_PATH = (p) => {
               <li>{t("lit_club_2_point_4")}</li>
             </ul>
 
-                  <div className="pt-3 mt-2 md:min-h-[200px] flex flex-col justify-start">
+                  <div className="pt-3 mt-2">
                     {clubB1B2?.is_payable ? (
                       <div className={`paypal-shell ${theme === "dark" ? "paypal-shell-dark" : "paypal-shell-light"}`} id="paypal-shell-b1b2">
                         <div
@@ -2582,7 +2582,7 @@ const TAB_FROM_PATH = (p) => {
                         />
                       </div>
                     ) : (
-                      <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 px-4 py-4 text-center text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed md:min-h-[220px] md:flex md:items-center md:justify-center">
+                      <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 px-4 py-4 text-center text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed md:min-h-[205px] md:flex md:items-center md:justify-center">
                         <div>
                           <span>{t("lit_club_sold_out_1")}</span>
                           <br />
