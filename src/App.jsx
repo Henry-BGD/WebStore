@@ -2481,9 +2481,9 @@ const TAB_FROM_PATH = (p) => {
                     {/* Невидимый PayPal-layout для сохранения ТОЧНОЙ высоты */}
                     <div className="opacity-0 pointer-events-none select-none">
                       <div className="max-w-[420px] mx-auto">
-                        <div className="rounded-md h-[54px] bg-yellow-400" />
+                        <div className="rounded-md h-[50px] bg-yellow-400" />
                         <div className="h-5" />
-                        <div className="rounded-md h-[54px] bg-slate-800" />
+                        <div className="rounded-md h-[50px] bg-slate-800" />
                         <div className="h-5" />
                         <div className="h-5 flex items-center justify-center">
                           <span className="text-sm">Powered by PayPal</span>
@@ -2608,9 +2608,9 @@ const TAB_FROM_PATH = (p) => {
                   {/* Невидимый PayPal-layout для сохранения ТОЧНОЙ высоты */}
                   <div className="opacity-0 pointer-events-none select-none">
                     <div className="max-w-[420px] mx-auto">
-                      <div className="rounded-md h-[54px] bg-yellow-400" />
+                      <div className="rounded-md h-[50px] bg-yellow-400" />
                       <div className="h-5" />
-                      <div className="rounded-md h-[54px] bg-slate-800" />
+                      <div className="rounded-md h-[50px] bg-slate-800" />
                       <div className="h-5" />
                       <div className="h-5 flex items-center justify-center">
                         <span className="text-sm">Powered by PayPal</span>
