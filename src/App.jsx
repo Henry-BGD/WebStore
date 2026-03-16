@@ -2467,15 +2467,21 @@ const TAB_FROM_PATH = (p) => {
               
               <div className="pt-3 mt-2">
                 {clubA2?.is_payable ? (
+  
                   <div
-                    className={`paypal-shell ${theme === "dark" ? "paypal-shell-dark" : "paypal-shell-light"}`}
+                    className="relative"
                     id="paypal-shell-a2"
                   >
+                    {theme === "dark" && (
+                      <div className="absolute inset-0 bg-slate-950 rounded-xl" />
+                    )}
+                  
                     <div
                       id="paypal-button-container-a2"
-                      className="max-w-[420px] mx-auto"
+                      className="relative max-w-[420px] mx-auto"
                     />
                   </div>
+  
                 ) : (
                   <div className="relative">
                     {/* Невидимый PayPal-layout для сохранения ТОЧНОЙ высоты */}
@@ -2594,15 +2600,21 @@ const TAB_FROM_PATH = (p) => {
 
               <div className="pt-3 mt-2">
               {clubB1B2?.is_payable ? (
+  
                 <div
-                  className={`paypal-shell ${theme === "dark" ? "paypal-shell-dark" : "paypal-shell-light"}`}
+                  className="relative"
                   id="paypal-shell-b1b2"
                 >
+                  {theme === "dark" && (
+                    <div className="absolute inset-0 bg-slate-950 rounded-xl" />
+                  )}
+                
                   <div
                     id="paypal-button-container-b1b2"
-                    className="max-w-[420px] mx-auto"
+                    className="relative max-w-[420px] mx-auto"
                   />
                 </div>
+  
               ) : (
                 <div className="relative">
                   {/* Невидимый PayPal-layout для сохранения ТОЧНОЙ высоты */}
