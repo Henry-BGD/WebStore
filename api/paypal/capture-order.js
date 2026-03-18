@@ -45,6 +45,10 @@ function buildEmailContent({ language, clubTitle, clubTimeText, zoomLink, payerN
           <p><strong>Время:</strong> ${clubTimeText}</p>
           <p><strong>Ссылка Zoom:</strong><br /><a href="${zoomLink}">${zoomLink}</a></p>
           <p>До встречи в клубе!</p>
+            <p>
+              Если у вас возникнут вопросы, напишите мне на 
+              <a href="mailto:genndybogdanov@gmail.com">genndybogdanov@gmail.com</a>
+            </p>
         </div>
       `,
     };
@@ -61,6 +65,10 @@ function buildEmailContent({ language, clubTitle, clubTimeText, zoomLink, payerN
         <p><strong>Time:</strong> ${clubTimeText}</p>
         <p><strong>Your Zoom link:</strong><br /><a href="${zoomLink}">${zoomLink}</a></p>
         <p>See you in the club!</p>
+          <p>
+            If you have any questions, feel free to email me at 
+            <a href="mailto:genndybogdanov@gmail.com">genndybogdanov@gmail.com</a>
+          </p>
       </div>
     `,
   };
@@ -198,10 +206,11 @@ export default async function handler(req, res) {
       });
 
       await resend.emails.send({
-        from: "Russian Literature Club <onboarding@resend.dev>",
+        from: "Russian Literature Club <orders@litclub.genndybogdanov.com>",
         to: payerEmail,
         subject: emailContent.subject,
         html: emailContent.html,
+        replyTo: "genndybogdanov@gmail.com",
       });
     }
 
