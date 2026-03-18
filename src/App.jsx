@@ -1458,6 +1458,19 @@ function downloadAllAudio() {
   }, [audioBookId, stopAudio]);
 
   // ---- mobile detection (for swipe + easter placement) ----
+const mobileTabClass = useCallback(
+  (tabKey, extra = "") =>
+    [
+      "flex-none text-center origin-center",
+      "transition-all duration-300 ease-out",
+      tab === tabKey
+        ? "scale-100 opacity-100"
+        : "scale-[0.88] opacity-70",
+      extra,
+    ].join(" "),
+  [tab]
+);
+  
   const [isMobile, setIsMobile] = useState(() => {
     if (typeof window === "undefined") return false;
     return window.matchMedia("(max-width: 768px)").matches;
@@ -1541,22 +1554,30 @@ const showAudio = tab === "free-audio";
   // ✅ active index for animated slider
   const activeIndex = useMemo(() => TABS_ORDER.indexOf(tab), [tab]);
 
-  useEffect(() => {
-  if (!isMobile) return;
-
-  const container = tabsScrollRef.current;
-  const activeBtn = tabBtnRefs.current[tab];
-  if (!container || !activeBtn) return;
-
-  const containerWidth = container.clientWidth;
-  const targetLeft = activeBtn.offsetLeft + activeBtn.offsetWidth / 2 - containerWidth / 2;
-
-  container.scrollTo({
-    left: Math.max(0, targetLeft),
-    behavior: "smooth",
-  });
-}, [tab, isMobile]);
-
+      useEffect(() => {
+        if (!isMobile) return;
+      
+        const container = tabsScrollRef.current;
+        const activeBtn = tabBtnRefs.current[tab];
+        if (!container || !activeBtn) return;
+      
+        const containerWidth = container.clientWidth;
+        const scrollWidth = container.scrollWidth;
+      
+        const targetLeft =
+          activeBtn.offsetLeft + activeBtn.offsetWidth / 2 - containerWidth / 2;
+      
+        const maxScroll = Math.max(0, scrollWidth - containerWidth);
+        const clamped = Math.max(0, Math.min(targetLeft, maxScroll));
+      
+        requestAnimationFrame(() => {
+          container.scrollTo({
+            left: clamped,
+            behavior: "smooth",
+          });
+        });
+      }, [tab, isMobile]);
+  
   // ================== PPPlata ==================
 const [clubA2, setClubA2] = useState(null);
 const [clubB1B2, setClubB1B2] = useState(null);
@@ -1605,6 +1626,9 @@ const clubB1B2PriceBadge =
 }, []);
 
   // ================== EASTER EGG STATE ==================
+  const [showSwipeHint, setShowSwipeHint] = useState(false);
+  const swipeHintTimerRef = useRef(null);
+  
   const [eggText, setEggText] = useState("");
   const [eggVisible, setEggVisible] = useState(false);
 
@@ -1623,6 +1647,20 @@ const clubB1B2PriceBadge =
     setEggVisible(false);
   }, []);
 
+  const triggerSwipeHint = useCallback(() => {
+  if (!isMobile) return;
+
+  setShowSwipeHint(true);
+
+  if (swipeHintTimerRef.current) {
+    clearTimeout(swipeHintTimerRef.current);
+  }
+
+  swipeHintTimerRef.current = setTimeout(() => {
+    setShowSwipeHint(false);
+  }, 2200);
+}, [isMobile]);
+
   // PP Helper (PP Button)
   useEffect(() => {
   const existing = document.getElementById("paypal-sdk");
@@ -1639,6 +1677,12 @@ const clubB1B2PriceBadge =
   document.body.appendChild(script);
 
   return () => {};
+}, []);
+
+  useEffect(() => {
+  return () => {
+    if (swipeHintTimerRef.current) clearTimeout(swipeHintTimerRef.current);
+  };
 }, []);
 
 // Render of the PP Button A2
@@ -2269,10 +2313,18 @@ const TAB_FROM_PATH = (p) => {
                 />
               </button>
 
-              <div className="min-w-0">
-                <p className="font-semibold leading-tight truncate">{t("name")}</p>
-                <p className="text-xs opacity-70 truncate">{t("tagline")}</p>
-              </div>
+                <div className="min-w-0">
+                  <p className="font-semibold leading-tight truncate">{t("name")}</p>
+                
+                  {isMobile && showSwipeHint ? (
+                    <p className="text-[11px] text-blue-600 dark:text-blue-400 leading-tight mt-0.5">
+                      {lang === "ru" ? "Свайпай влево и вправо" : "Swipe left and right"}
+                    </p>
+                  ) : (
+                    <p className="text-xs opacity-70 truncate">{t("tagline")}</p>
+                  )}
+                </div>
+              
             </div>
 
             {/* Desktop toast: BETWEEN name and language buttons */}
@@ -2320,99 +2372,84 @@ const TAB_FROM_PATH = (p) => {
             </div>
       
             {/* MOBILE */}
-            <div className="md:hidden flex items-center gap-2 min-w-0">
-              {activeIndex > 0 ? (
-                <button
-                  type="button"
-                  onClick={goPrevTab}
-                  aria-label="Previous tab"
-                  className={[
-                    "shrink-0 inline-flex items-center justify-center",
-                    "w-7 h-7 rounded-full border",
-                    "border-slate-200 bg-white text-slate-700 hover:bg-slate-50",
-                    "dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800/70",
-                    "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
-                    "dark:focus-visible:ring-blue-500/40 dark:focus-visible:ring-offset-slate-950",
-                  ].join(" ")}
-                >
-                  <ChevronLeft className="w-3.5 h-3.5" />
-                </button>
-              ) : (
-                <div className="w-7 h-7 shrink-0" />
-              )}
+            <div className="md:hidden relative flex items-center min-w-0">
+                {activeIndex > 0 ? (
+                  <div className="pointer-events-none absolute left-1 top-1/2 -translate-y-1/2 z-10 md:hidden">
+                    <ChevronLeft className="w-4 h-4 text-slate-400 dark:text-slate-500" />
+                  </div>
+                ) : null}
       
-              <div
-                ref={tabsScrollRef}
-                className="flex-1 min-w-0 overflow-x-auto no-scrollbar scroll-smooth"
-              >
-                <div className="flex items-center gap-2 w-max mx-auto px-1">
-                  <NavPill
-                    active={showAbout}
-                    onClick={() => navigate("/about")}
-                    className="flex-none text-center"
-                    ref={(el) => {
-                      tabBtnRefs.current.about = el;
-                    }}
+                  <div
+                    ref={tabsScrollRef}
+                    className="flex-1 min-w-0 overflow-x-auto no-scrollbar scroll-smooth px-5"
                   >
-                    {t("nav_about")}
-                  </NavPill>
-      
-                  <NavPill
-                    active={showLitClub}
-                    onClick={() => navigate("/literature-club")}
-                    className="flex-none text-center"
-                    ref={(el) => {
-                      tabBtnRefs.current["lit-club"] = el;
-                    }}
-                  >
-                    {t("nav_lit_club")}
-                  </NavPill>
-      
-                  <NavPill
-                    active={showProducts}
-                    onClick={() => navigate("/store")}
-                    className="flex-none text-center"
-                    ref={(el) => {
-                      tabBtnRefs.current.products = el;
-                    }}
-                  >
-                    {t("nav_products")}
-                  </NavPill>
-      
-                  <NavPill
-                    active={showAudio}
-                    onMouseEnter={prefetchAudiobooksOnce}
-                    onFocus={prefetchAudiobooksOnce}
-                    onClick={() => navigate("/audio")}
-                    className="flex-none text-center"
-                    ref={(el) => {
-                      tabBtnRefs.current["free-audio"] = el;
-                    }}
-                  >
-                    {t("nav_audio")}
-                  </NavPill>
-                </div>
-              </div>
-      
-              {activeIndex < TABS_ORDER.length - 1 ? (
-                <button
-                  type="button"
-                  onClick={goNextTab}
-                  aria-label="Next tab"
-                  className={[
-                    "shrink-0 inline-flex items-center justify-center",
-                    "w-7 h-7 rounded-full border",
-                    "border-slate-200 bg-white text-slate-700 hover:bg-slate-50",
-                    "dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800/70",
-                    "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
-                    "dark:focus-visible:ring-blue-500/40 dark:focus-visible:ring-offset-slate-950",
-                  ].join(" ")}
-                >
-                  <ChevronRight className="w-3.5 h-3.5" />
-                </button>
-              ) : (
-                <div className="w-7 h-7 shrink-0" />
-              )}
+                    <div className="flex items-center gap-2 w-max mx-auto py-1">
+                      <NavPill
+                        ref={(el) => {
+                          tabBtnRefs.current.about = el;
+                        }}
+                        active={showAbout}
+                        onClick={() => {
+                          navigate("/about");
+                          triggerSwipeHint();
+                        }}
+                        className={mobileTabClass("about")}
+                      >
+                        {t("nav_about")}
+                      </NavPill>
+                  
+                      <NavPill
+                        ref={(el) => {
+                          tabBtnRefs.current["lit-club"] = el;
+                        }}
+                        active={showLitClub}
+                        onClick={() => {
+                          navigate("/literature-club");
+                          triggerSwipeHint();
+                        }}
+                        className={mobileTabClass("lit-club")}
+                      >
+                        {t("nav_lit_club")}
+                      </NavPill>
+                  
+                      <NavPill
+                        ref={(el) => {
+                          tabBtnRefs.current.products = el;
+                        }}
+                        active={showProducts}
+                        onClick={() => {
+                          navigate("/store");
+                          triggerSwipeHint();
+                        }}
+                        className={mobileTabClass("products")}
+                      >
+                        {t("nav_products")}
+                      </NavPill>
+                  
+                      <NavPill
+                        ref={(el) => {
+                          tabBtnRefs.current["free-audio"] = el;
+                        }}
+                        active={showAudio}
+                        onMouseEnter={prefetchAudiobooksOnce}
+                        onFocus={prefetchAudiobooksOnce}
+                        onClick={() => {
+                          navigate("/audio");
+                          triggerSwipeHint();
+                        }}
+                        className={mobileTabClass("free-audio")}
+                      >
+                        {t("nav_audio")}
+                      </NavPill>
+                    </div>
+                  </div>
+
+                {activeIndex < TABS_ORDER.length - 1 ? (
+                  <div className="pointer-events-none absolute right-1 top-1/2 -translate-y-1/2 z-10 md:hidden">
+                    <ChevronRight className="w-4 h-4 text-slate-400 dark:text-slate-500" />
+                  </div>
+                ) : null}
+              
             </div>
           </div>
         </div>
