@@ -2291,7 +2291,6 @@ const TAB_FROM_PATH = (p) => {
           </div>
         </div>
 
-        //=== мобильный/десктопный nav ===
       <nav className="border-t border-slate-200 dark:border-slate-800">
         <div className="w-full">
           <div className={`${CONTAINER} py-3`}>
