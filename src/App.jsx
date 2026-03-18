@@ -2500,7 +2500,7 @@ const TAB_FROM_PATH = (p) => {
               <li>{t("lit_club_1_point_4")}</li>
             </ul>
               
-              <div className="pt-3 mt-2">
+              <div className="pt-1 mt-1 sm:pt-3 sm:mt-2">
                 {clubA2?.is_payable ? (
                   <div
                     className={`paypal-shell ${theme === "dark" ? "paypal-shell-dark" : "paypal-shell-light"}`}
@@ -2528,7 +2528,7 @@ const TAB_FROM_PATH = (p) => {
               
                     {/* Видимое сообщение поверх */}
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 px-4 py-4 text-center text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed">
+                      <div className="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 px-4 py-2 sm:py-4 text-center text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed">
                         <span>{t("lit_club_sold_out_1")}</span>
                         <br />
                         <span>{t("lit_club_sold_out_2")}</span>
@@ -2606,12 +2606,17 @@ const TAB_FROM_PATH = (p) => {
           <div className="p-4 flex flex-col divide-y divide-slate-200 dark:divide-slate-800">
             <div className="pt-0 pb-0">
               <div className="text-center">
-                <p className="text-lg sm:text-xl text-blue-600 font-medium flex items-center justify-center gap-2">
-                  <Clock className="w-4 h-4 opacity-70" />
+
+                <p className="text-lg sm:text-xl text-blue-600 font-medium flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 text-center sm:text-left leading-tight sm:leading-normal">
+                  <span className="flex items-center gap-2">
+                    <Clock className="w-4 h-4 opacity-70" />
                 
-                  {lang === "ru"
-                    ? `Ближайший клуб: ${club2DateText}`
-                    : `Next club: ${club2DateText}`}
+                    <span>
+                      {lang === "ru" ? "Ближайший клуб:" : "Next club:"}
+                    </span>
+                  </span>
+                
+                  <span>{club2DateText}</span>
                 </p>
               
                 <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
@@ -2627,7 +2632,7 @@ const TAB_FROM_PATH = (p) => {
               <li>{t("lit_club_2_point_4")}</li>
             </ul>
 
-              <div className="pt-3 mt-2">
+              <div className="pt-1 mt-1 sm:pt-3 sm:mt-2">
               {clubB1B2?.is_payable ? (
                 <div
                   className={`paypal-shell ${theme === "dark" ? "paypal-shell-dark" : "paypal-shell-light"}`}
@@ -2655,7 +2660,7 @@ const TAB_FROM_PATH = (p) => {
             
                   {/* Видимое сообщение поверх */}
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 px-4 py-4 text-center text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed">
+                    <div className="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 px-4 py-2 sm:py-4 text-center text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed">
                       <span>{t("lit_club_sold_out_1")}</span>
                       <br />
                       <span>{t("lit_club_sold_out_2")}</span>
