@@ -2514,7 +2514,7 @@ const TAB_FROM_PATH = (p) => {
                 ) : (
                   <div className="relative">
                     {/* Невидимый PayPal-layout для сохранения ТОЧНОЙ высоты */}
-                    <div className="opacity-0 pointer-events-none select-none">
+                    <div className="opacity-0 pointer-events-none select-none hidden sm:block">
                       <div className="max-w-[420px] mx-auto">
                         <div className="rounded-md h-[39px] bg-yellow-400" />
                         <div className="h-5" />
@@ -2646,7 +2646,7 @@ const TAB_FROM_PATH = (p) => {
               ) : (
                 <div className="relative">
                   {/* Невидимый PayPal-layout для сохранения ТОЧНОЙ высоты */}
-                  <div className="opacity-0 pointer-events-none select-none">
+                  <div className="opacity-0 pointer-events-none select-none hidden sm:block">
                     <div className="max-w-[420px] mx-auto">
                       <div className="rounded-md h-[39px] bg-yellow-400" />
                       <div className="h-5" />
