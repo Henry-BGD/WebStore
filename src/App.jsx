@@ -2464,12 +2464,26 @@ const TAB_FROM_PATH = (p) => {
             <div className="p-4 flex flex-col divide-y divide-slate-200 dark:divide-slate-800">
               <div className="pt-0 pb-0">
                 <div className="text-center">
-                  <p className="text-lg sm:text-xl text-blue-600 font-medium flex items-center justify-center gap-2">
-                    <Clock className="w-4 h-4 opacity-70" />
-          
-                    {lang === "ru"
-                      ? `Ближайший клуб: ${club1DateText}`
-                      : `Next club: ${club1DateText}`}
+
+                  <p className="text-lg sm:text-xl text-blue-600 font-medium flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 text-center sm:text-left">
+                    <span className="flex items-center gap-2">
+                      <Clock className="w-4 h-4 opacity-70" />
+                  
+                      {/* строка 1 (mobile) */}
+                      <span className="sm:hidden">
+                        {lang === "ru" ? "Ближайший клуб:" : "Next club:"}
+                      </span>
+                  
+                      {/* строка 1 (desktop) */}
+                      <span className="hidden sm:inline">
+                        {lang === "ru" ? "Ближайший клуб:" : "Next club:"}
+                      </span>
+                    </span>
+                  
+                    {/* строка 2 */}
+                    <span>
+                      {club1DateText}
+                    </span>
                   </p>
           
                   <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
