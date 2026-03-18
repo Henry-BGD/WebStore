@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/Card.j
 import { Button } from "./components/ui/Button.jsx";
 import { Input } from "./components/ui/Input.jsx";
 import { Badge } from "./components/ui/Badge.jsx";
-import { ExternalLink, Download, Play, Pause, X, Search, Sun, Moon, ChevronDown, Clock, Send } from "lucide-react";
+import { ExternalLink, Download, Play, Pause, X, Search, Sun, Moon, ChevronDown, Clock, Send, ChevronLeft, ChevronRight } from "lucide-react";
 import { Analytics } from "@vercel/analytics/react";
 import PaymentSuccess from "./PaymentSuccess.jsx";
 
@@ -553,11 +553,15 @@ function applyThemeToHtml(theme) {
 }
 
 // ================== UI HELPERS ==================
-function NavPill({ active, onClick, children, size = "md", className = "", ...props }) {
+const NavPill = React.forwardRef(function NavPill(
+  { active, onClick, children, size = "md", className = "", ...props },
+  ref
+) {
   const padding = size === "sm" ? "px-3 py-1.5 text-xs" : "px-5 py-2.5 text-sm";
 
   return (
     <button
+      ref={ref}
       onClick={onClick}
       type="button"
       {...props}
@@ -577,7 +581,7 @@ function NavPill({ active, onClick, children, size = "md", className = "", ...pr
       {children}
     </button>
   );
-}
+});
 
 // Link that looks like a button (no <button> inside <a>)
 function LinkButton({ href, children, className = "", disabled = false, title, "aria-label": ariaLabel }) {
@@ -1256,6 +1260,9 @@ const club2DateText = useMemo(() => {
   };
 
   // ---- tabs ----
+  const tabsScrollRef = useRef(null);
+  const tabBtnRefs = useRef({});
+  
  const detectTab = () => {
   try {
     const saved = localStorage.getItem("tab");
@@ -1533,6 +1540,22 @@ const showAudio = tab === "free-audio";
 
   // ✅ active index for animated slider
   const activeIndex = useMemo(() => TABS_ORDER.indexOf(tab), [tab]);
+
+  useEffect(() => {
+  if (!isMobile) return;
+
+  const container = tabsScrollRef.current;
+  const activeBtn = tabBtnRefs.current[tab];
+  if (!container || !activeBtn) return;
+
+  const containerWidth = container.clientWidth;
+  const targetLeft = activeBtn.offsetLeft + activeBtn.offsetWidth / 2 - containerWidth / 2;
+
+  container.scrollTo({
+    left: Math.max(0, targetLeft),
+    behavior: "smooth",
+  });
+}, [tab, isMobile]);
 
   // ================== PPPlata ==================
 const [clubA2, setClubA2] = useState(null);
@@ -2268,35 +2291,134 @@ const TAB_FROM_PATH = (p) => {
           </div>
         </div>
 
-        <nav className="border-t border-slate-200 dark:border-slate-800">
-          <div className="w-full">
-            <div className={`${CONTAINER} py-3`}>
-              <div className="flex w-full items-center gap-2 sm:gap-3 overflow-x-hidden sm:overflow-x-auto no-scrollbar">
-                <NavPill active={showAbout} onClick={() => navigate("/about")} className="flex-1 text-center sm:flex-none">
-                  {t("nav_about")}
-                </NavPill>
-
-                <NavPill active={showLitClub} onClick={() => navigate("/literature-club")} className="flex-1 text-center sm:flex-none">
+        //=== мобильный/десктопный nav ===
+      <nav className="border-t border-slate-200 dark:border-slate-800">
+        <div className="w-full">
+          <div className={`${CONTAINER} py-3`}>
+            {/* DESKTOP */}
+            <div className="hidden md:flex w-full items-center gap-3 overflow-x-auto no-scrollbar">
+              <NavPill active={showAbout} onClick={() => navigate("/about")} className="flex-none text-center">
+                {t("nav_about")}
+              </NavPill>
+      
+              <NavPill active={showLitClub} onClick={() => navigate("/literature-club")} className="flex-none text-center">
                 {t("nav_lit_club")}
-                </NavPill>
-
-                <NavPill active={showProducts} onClick={() => navigate("/store")} className="flex-1 text-center sm:flex-none">
-                  {t("nav_products")}
-                </NavPill>
-
-                <NavPill
-                  active={showAudio}
-                  onMouseEnter={prefetchAudiobooksOnce}
-                  onFocus={prefetchAudiobooksOnce}
-                  onClick={() => navigate("/audio")}
-                  className="flex-1 text-center sm:flex-none"
+              </NavPill>
+      
+              <NavPill active={showProducts} onClick={() => navigate("/store")} className="flex-none text-center">
+                {t("nav_products")}
+              </NavPill>
+      
+              <NavPill
+                active={showAudio}
+                onMouseEnter={prefetchAudiobooksOnce}
+                onFocus={prefetchAudiobooksOnce}
+                onClick={() => navigate("/audio")}
+                className="flex-none text-center"
+              >
+                {t("nav_audio")}
+              </NavPill>
+            </div>
+      
+            {/* MOBILE */}
+            <div className="md:hidden flex items-center gap-2 min-w-0">
+              {activeIndex > 0 ? (
+                <button
+                  type="button"
+                  onClick={goPrevTab}
+                  aria-label="Previous tab"
+                  className={[
+                    "shrink-0 inline-flex items-center justify-center",
+                    "w-7 h-7 rounded-full border",
+                    "border-slate-200 bg-white text-slate-700 hover:bg-slate-50",
+                    "dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800/70",
+                    "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
+                    "dark:focus-visible:ring-blue-500/40 dark:focus-visible:ring-offset-slate-950",
+                  ].join(" ")}
                 >
-                  {t("nav_audio")}
-                </NavPill>
+                  <ChevronLeft className="w-3.5 h-3.5" />
+                </button>
+              ) : (
+                <div className="w-7 h-7 shrink-0" />
+              )}
+      
+              <div
+                ref={tabsScrollRef}
+                className="flex-1 min-w-0 overflow-x-auto no-scrollbar scroll-smooth"
+              >
+                <div className="flex items-center gap-2 w-max mx-auto px-1">
+                  <NavPill
+                    active={showAbout}
+                    onClick={() => navigate("/about")}
+                    className="flex-none text-center"
+                    ref={(el) => {
+                      tabBtnRefs.current.about = el;
+                    }}
+                  >
+                    {t("nav_about")}
+                  </NavPill>
+      
+                  <NavPill
+                    active={showLitClub}
+                    onClick={() => navigate("/literature-club")}
+                    className="flex-none text-center"
+                    ref={(el) => {
+                      tabBtnRefs.current["lit-club"] = el;
+                    }}
+                  >
+                    {t("nav_lit_club")}
+                  </NavPill>
+      
+                  <NavPill
+                    active={showProducts}
+                    onClick={() => navigate("/store")}
+                    className="flex-none text-center"
+                    ref={(el) => {
+                      tabBtnRefs.current.products = el;
+                    }}
+                  >
+                    {t("nav_products")}
+                  </NavPill>
+      
+                  <NavPill
+                    active={showAudio}
+                    onMouseEnter={prefetchAudiobooksOnce}
+                    onFocus={prefetchAudiobooksOnce}
+                    onClick={() => navigate("/audio")}
+                    className="flex-none text-center"
+                    ref={(el) => {
+                      tabBtnRefs.current["free-audio"] = el;
+                    }}
+                  >
+                    {t("nav_audio")}
+                  </NavPill>
+                </div>
               </div>
+      
+              {activeIndex < TABS_ORDER.length - 1 ? (
+                <button
+                  type="button"
+                  onClick={goNextTab}
+                  aria-label="Next tab"
+                  className={[
+                    "shrink-0 inline-flex items-center justify-center",
+                    "w-7 h-7 rounded-full border",
+                    "border-slate-200 bg-white text-slate-700 hover:bg-slate-50",
+                    "dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800/70",
+                    "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
+                    "dark:focus-visible:ring-blue-500/40 dark:focus-visible:ring-offset-slate-950",
+                  ].join(" ")}
+                >
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+              ) : (
+                <div className="w-7 h-7 shrink-0" />
+              )}
             </div>
           </div>
-        </nav>
+        </div>
+      </nav>
+        
       </header>
 
       {/* ✅ Mobile toast: moved DOWN to center of screen, auto-sized, centered text */}
