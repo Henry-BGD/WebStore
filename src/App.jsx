@@ -223,7 +223,7 @@ const PRODUCTS = [
     externalUrl: "https://www.amazon.com/dp/B0GMCCFMQQ",
     marketplace: "amazon",
     badges: ["RU-EN", "Paper Book", "Audio"],
-    description: "Word-by-word translation, stress marks, grammar explanations, exercises, audio included.",
+    description: "Word-by-word translation, stress marks, grammar explanations, exercises, audio included",
     keywords: [
       "лев",
       "толстой",
@@ -265,7 +265,7 @@ const PRODUCTS = [
     externalUrl: "",
     marketplace: "amazon",
     badges: ["RU-EN", "Paper Book", "Audio"],
-    description: "Coming soon.",
+    description: "Coming soon",
     disabled: true,
     keywords: [
       "антон",
@@ -2351,16 +2351,6 @@ const TAB_FROM_PATH = (p) => {
                 <CardTitle className="mb-2">{t("contacts")}</CardTitle>
                 <div className="text-sm space-y-1 text-slate-700 dark:text-slate-300">
                   <p>E-mail: genndybogdanov@gmail.com</p>
-                  <p>
-                    <a
-                      className="underline hover:text-slate-900 dark:hover:text-white break-all"
-                      href="https://substack.com/@gbogdanov"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Substack
-                    </a>
-                  </p>
                 </div>
               </Card>
 
