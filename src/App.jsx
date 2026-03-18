@@ -1058,14 +1058,26 @@ function formatUtcForViewer(isoString, locale = "en-US") {
 // ---LitClub---
 const [showPaymentSuccess, setShowPaymentSuccess] = useState(false);
   
- function ClubExtraInfo({ title, children }) {
+function ClubExtraInfo({ title, children }) {
   const [open, setOpen] = useState(false);
 
+  const toggleOpen = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setOpen((v) => !v);
+  };
+
   return (
-    <div className="pt-2 mt-2 border-t border-slate-200 dark:border-slate-800">
+    <div
+      className="pt-2 mt-2 border-t border-slate-200 dark:border-slate-800"
+      data-no-swipe="true"
+      onClick={(e) => e.stopPropagation()}
+      onPointerDown={(e) => e.stopPropagation()}
+    >
       <button
         type="button"
-        onClick={() => setOpen((v) => !v)}
+        onClick={toggleOpen}
+        onPointerDown={(e) => e.stopPropagation()}
         data-no-swipe="true"
         aria-expanded={open}
         className={[
@@ -1091,6 +1103,8 @@ const [showPaymentSuccess, setShowPaymentSuccess] = useState(false);
       </button>
 
       <div
+        onClick={(e) => e.stopPropagation()}
+        onPointerDown={(e) => e.stopPropagation()}
         className={[
           "grid transition-all duration-300 ease-in-out",
           open ? "grid-rows-[1fr] opacity-100 mt-2" : "grid-rows-[0fr] opacity-0 mt-0",
@@ -2386,18 +2400,24 @@ const TAB_FROM_PATH = (p) => {
   <div className="grid md:grid-cols-3 gap-x-4 gap-y-2 sm:gap-x-4 sm:gap-y-2 items-start">
     
       <div className="md:col-span-3 space-y-1.5">
-        <div className="flex items-center gap-2 flex-nowrap min-w-0">
-            <h1 className="text-[24px] sm:text-3xl md:text-4xl font-extrabold tracking-tight leading-[1.12] truncate pb-1">
+
+        <div className="flex items-start gap-2 min-w-0">
+          <h1 className="min-w-0 flex-1 text-[24px] sm:text-3xl md:text-4xl font-extrabold tracking-tight leading-[1.12] pb-1">
             {t("lit_club_title")}
           </h1>
-      
+        
           <a
             href="https://t.me/your_link_here"
             target="_blank"
             rel="noopener noreferrer"
+            aria-label={t("lit_club_telegram")}
+            title={t("lit_club_telegram")}
             className={[
-              "inline-flex items-center justify-center gap-1.5 shrink-0",
-              "rounded-full border px-2.5 py-1.5",
+              "inline-flex items-center justify-center shrink-0",
+              "rounded-full border",
+              lang === "ru"
+                ? "px-2.5 py-2 sm:px-2.5 sm:py-1.5"
+                : "gap-1.5 px-2.5 py-1.5",
               "text-[11px] sm:text-sm font-medium whitespace-nowrap",
               "border-slate-200 bg-white text-slate-800 hover:bg-slate-50",
               "dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800/70",
@@ -2407,7 +2427,9 @@ const TAB_FROM_PATH = (p) => {
             ].join(" ")}
           >
             <Send className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-            <span>{t("lit_club_telegram")}</span>
+            <span className={lang === "ru" ? "hidden sm:inline" : ""}>
+              {t("lit_club_telegram")}
+            </span>
           </a>
         </div>
       
