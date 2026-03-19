@@ -1,5 +1,5 @@
 import React, { useMemo, useRef, useState, useEffect, useCallback } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/Card.jsx";
+import { Card, CardContent, CardTitle } from "./components/ui/Card.jsx";
 import { Button } from "./components/ui/Button.jsx";
 import { Input } from "./components/ui/Input.jsx";
 import { Badge } from "./components/ui/Badge.jsx";
@@ -20,7 +20,6 @@ function useSwipeTabs({
   thresholdPx = 60,
   lockPx = 10,
   restraintPx = 40,
-  tapSlopPx = 8,         // движение, которое всё ещё считается "тапом"
   cancelClickDxPx = 14,  // если сдвиг больше — клики гасим
 }) {
   const startX = useRef(0);
@@ -301,12 +300,6 @@ const PRODUCTS = [
     ],
   },
 ];
-
-const AUDIO_ROUTE_MAP = {
-  tolstoy: "tolstoy-short-stories",
-  // chekhov: "chekhov-short-stories",
-  // добавить новое
-};
 
 const AUDIO_BOOKS = [
   {
@@ -1494,19 +1487,6 @@ const TAB_TO_PATH = {
   "free-audio": "/audio",
 };
 
-function pathToTab(pathname) {
-  if (/^\/(about)?\/?$/i.test(pathname)) return "about";
-  if (/^\/(literature-club|lit-club)\/?$/i.test(pathname)) return "lit-club";
-  if (/^\/(store|products)\/?$/i.test(pathname)) return "products";
-  if (/^\/audio(\/.*)?$/i.test(pathname)) return "free-audio";
-  return "about";
-}
-
-  function parseAudioSlug(pathname) {
-    const m = pathname.match(/^\/audio(?:\/([^\/?#]+))?\/?$/i);
-    return m ? (m[1] || "").toLowerCase() : null; // null => не audio
-  }
-
   const findBookIdBySlug = useCallback((slug) => {
     if (!slug) return null;
     const found = AUDIO_BOOKS.find((b) => (b.slug || "").toLowerCase() === slug.toLowerCase() && !b.disabled);
@@ -1575,7 +1555,6 @@ const showAudio = tab === "free-audio";
   // ================== PPPlata ==================
 const [clubA2, setClubA2] = useState(null);
 const [clubB1B2, setClubB1B2] = useState(null);
-const [clubsLoading, setClubsLoading] = useState(true);
 
 const paypalA2Rendered = useRef(false);
 const paypalB1B2Rendered = useRef(false);
