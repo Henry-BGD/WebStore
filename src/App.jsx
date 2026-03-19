@@ -36,9 +36,10 @@ function useSwipeTabs({
   const [isDragging, setIsDragging] = useState(false);
 
   const shouldIgnoreTarget = (target) => {
-    // ВАЖНО: НЕ игнорим [data-no-swipe] — иначе кнопки снова станут "не-свайпабельны"
     try {
-      return !!target?.closest?.('input, textarea, select, [role="slider"], input[type="range"]');
+      return !!target?.closest?.(
+        'button, a, input, textarea, select, [role="slider"], input[type="range"], [data-no-swipe]'
+      );
     } catch {
       return false;
     }
@@ -1080,10 +1081,10 @@ function ClubExtraInfo({ title, children }) {
     >
       <button
         type="button"
-        onClick={toggleOpen}
-        onPointerDown={(e) => e.stopPropagation()}
         data-no-swipe="true"
         aria-expanded={open}
+        onClick={toggleOpen}
+        onPointerDown={(e) => e.stopPropagation()}
         className={[
           "w-full flex items-center justify-between gap-3",
           "rounded-xl px-4 py-1.5 min-h-[34px]",
@@ -1107,6 +1108,7 @@ function ClubExtraInfo({ title, children }) {
       </button>
 
       <div
+        data-no-swipe="true"
         onClick={(e) => e.stopPropagation()}
         onPointerDown={(e) => e.stopPropagation()}
         className={[
@@ -2383,8 +2385,8 @@ const TAB_FROM_PATH = (p) => {
       
             {/* MOBILE */}
             <div className="md:hidden relative flex items-center min-w-0">
-              <div className="pointer-events-none absolute left-0 top-0 bottom-0 z-20 w-20 bg-gradient-to-r from-white to-transparent dark:from-slate-950 dark:to-transparent" />
-              <div className="pointer-events-none absolute right-0 top-0 bottom-0 z-20 w-20 bg-gradient-to-l from-white to-transparent dark:from-slate-950 dark:to-transparent" />
+              <div className="pointer-events-none absolute left-0 top-0 bottom-0 z-20 w-26 bg-gradient-to-r from-white to-transparent dark:from-slate-950 dark:to-transparent" />
+              <div className="pointer-events-none absolute right-0 top-0 bottom-0 z-20 w-26 bg-gradient-to-l from-white to-transparent dark:from-slate-950 dark:to-transparent" />
 
                   {activeIndex > 0 ? (
                     <div className="pointer-events-none absolute left-0 top-1/2 -translate-y-1/2 z-30 md:hidden">
@@ -2396,7 +2398,7 @@ const TAB_FROM_PATH = (p) => {
                           ref={tabsScrollRef}
                           className="flex-1 min-w-0 overflow-x-auto no-scrollbar scroll-smooth"
                         >
-                          <div className="flex items-center gap-[3px] w-max py-1 px-[22vw]">
+                          <div className="flex items-center gap-[4px] w-max py-1 px-[22vw]">
                           
                       <NavPill
                         ref={(el) => {
