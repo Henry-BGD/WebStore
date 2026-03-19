@@ -1464,8 +1464,8 @@ const mobileTabClass = useCallback(
       "flex-none text-center origin-center",
       "transition-all duration-300 ease-out",
       tab === tabKey
-        ? "scale-100 opacity-100"
-        : "scale-[0.88] opacity-70",
+        ? "scale-100 opacity-100 px-5"
+        : "scale-[0.84] opacity-72 px-4",
       extra,
     ].join(" "),
   [tab]
@@ -2291,7 +2291,7 @@ const TAB_FROM_PATH = (p) => {
 
       <audio ref={audioRef} preload="none" />
 
-      <header className="sticky top-0 z-50 bg-white/80 dark:bg-slate-950/75 backdrop-blur border-b border-slate-200 dark:border-slate-800">
+      <header className="sticky top-0 z-50 relative bg-white/80 dark:bg-slate-950/75 backdrop-blur border-b border-slate-200 dark:border-slate-800">
         <div className="w-full">
           <div className={`${CONTAINER} py-3 flex items-center justify-between gap-4 ${TOPBAR_H}`}>
             <div className="flex items-center gap-3 min-w-0">
@@ -2313,17 +2313,10 @@ const TAB_FROM_PATH = (p) => {
                 />
               </button>
 
-                <div className="min-w-0">
-                  <p className="font-semibold leading-tight truncate">{t("name")}</p>
-                
-                  {isMobile && showSwipeHint ? (
-                    <p className="text-[11px] text-blue-600 dark:text-blue-400 leading-tight mt-0.5">
-                      {lang === "ru" ? "Свайпай влево и вправо" : "Swipe left and right"}
-                    </p>
-                  ) : (
-                    <p className="text-xs opacity-70 truncate">{t("tagline")}</p>
-                  )}
-                </div>
+              <div className="min-w-0">
+                <p className="font-semibold leading-tight truncate">{t("name")}</p>
+                <p className="text-xs opacity-70 truncate">{t("tagline")}</p>
+              </div>
               
             </div>
 
@@ -2331,6 +2324,23 @@ const TAB_FROM_PATH = (p) => {
             <div className="flex-1 hidden md:flex justify-center min-w-0">
               {eggText ? <Toast variant="desktop" /> : null}
             </div>
+
+                          {isMobile && showSwipeHint ? (
+                <div className="absolute left-1/2 top-1/2 z-[70] -translate-x-1/2 -translate-y-1/2 pointer-events-none md:hidden">
+                  <div
+                    className={[
+                      "rounded-full px-3 py-1.5",
+                      "text-[11px] font-medium whitespace-nowrap",
+                      "bg-white/95 text-slate-900 border border-slate-200 shadow-md",
+                      "dark:bg-slate-900/95 dark:text-slate-100 dark:border-slate-700",
+                      "backdrop-blur",
+                      "transition-all duration-200",
+                    ].join(" ")}
+                  >
+                    {lang === "ru" ? "Свайпай влево и вправо" : "Swipe left and right"}
+                  </div>
+                </div>
+              ) : null}
 
             <div className="flex items-center gap-2 shrink-0">
               <NavPill size="sm" active={lang === "ru"} onClick={() => switchLang("ru")}>
@@ -2374,16 +2384,21 @@ const TAB_FROM_PATH = (p) => {
             {/* MOBILE */}
             <div className="md:hidden relative flex items-center min-w-0">
                 {activeIndex > 0 ? (
-                  <div className="pointer-events-none absolute left-1 top-1/2 -translate-y-1/2 z-10 md:hidden">
+      
+                      <div className="pointer-events-none absolute left-[1px] top-1/2 -translate-y-1/2 z-20 md:hidden">
+                        <ChevronLeft className="w-4 h-4 text-slate-400 dark:text-slate-500" />
+                      </div>
+      
                     <ChevronLeft className="w-4 h-4 text-slate-400 dark:text-slate-500" />
                   </div>
                 ) : null}
       
-                  <div
-                    ref={tabsScrollRef}
-                    className="flex-1 min-w-0 overflow-x-auto no-scrollbar scroll-smooth px-5"
-                  >
-                    <div className="flex items-center gap-2 w-max mx-auto py-1">
+                      <div
+                        ref={tabsScrollRef}
+                        className="flex-1 min-w-0 overflow-x-auto no-scrollbar scroll-smooth"
+                      >
+                        <div className="flex items-center gap-1.5 w-max py-1 px-[22vw]">
+                          
                       <NavPill
                         ref={(el) => {
                           tabBtnRefs.current.about = el;
@@ -2445,7 +2460,11 @@ const TAB_FROM_PATH = (p) => {
                   </div>
 
                 {activeIndex < TABS_ORDER.length - 1 ? (
-                  <div className="pointer-events-none absolute right-1 top-1/2 -translate-y-1/2 z-10 md:hidden">
+                    
+                    <div className="pointer-events-none absolute right-[1px] top-1/2 -translate-y-1/2 z-20 md:hidden">
+                      <ChevronRight className="w-4 h-4 text-slate-400 dark:text-slate-500" />
+                    </div>
+                    
                     <ChevronRight className="w-4 h-4 text-slate-400 dark:text-slate-500" />
                   </div>
                 ) : null}
