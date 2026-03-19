@@ -1579,8 +1579,6 @@ const [clubsLoading, setClubsLoading] = useState(true);
 
 const paypalA2Rendered = useRef(false);
 const paypalB1B2Rendered = useRef(false);
-const paypalA2RenderToken = useRef(0);
-const paypalB1B2RenderToken = useRef(0);
 
 const clubA2PriceBadge =
   clubA2?.price_usd != null ? `$${clubA2.price_usd}` : "";
@@ -1688,33 +1686,22 @@ useEffect(() => {
   const containerId = "paypal-button-container-a2";
   const shellId = "paypal-shell-a2";
 
-  paypalA2Rendered.current = false;
-  paypalA2RenderToken.current += 1;
-  const token = paypalA2RenderToken.current;
-
-  let retryTimer = null;
-  let readyTimer = null;
-
   const markReadyWhenIframeLoads = () => {
     const shell = document.getElementById(shellId);
     const container = document.getElementById(containerId);
     if (!shell || !container) return;
-    if (token !== paypalA2RenderToken.current) return;
 
     const iframe = container.querySelector("iframe");
     if (!iframe) return;
 
-    const show = () => {
-      if (token !== paypalA2RenderToken.current) return;
-      shell.classList.add("paypal-ready");
-    };
+    const show = () => shell.classList.add("paypal-ready");
 
     if (iframe.dataset.readyBound === "1") return;
     iframe.dataset.readyBound = "1";
 
     iframe.addEventListener("load", show, { once: true });
 
-    readyTimer = setTimeout(show, 250);
+    setTimeout(show, 250);
   };
 
   const renderA2 = () => {
@@ -1723,10 +1710,13 @@ useEffect(() => {
 
     if (!container || !shell) return;
     if (!window.paypal) return;
-    if (token !== paypalA2RenderToken.current) return;
 
-    // Полностью очищаем старый render
-    container.innerHTML = "";
+    if (container.childElementCount > 0) {
+      paypalA2Rendered.current = true;
+      markReadyWhenIframeLoads();
+      return;
+    }
+
     shell.classList.remove("paypal-ready");
 
     window.paypal
@@ -1796,57 +1786,61 @@ useEffect(() => {
           }
         },
 
-        onCancel: () => {
-          console.log("PayPal popup was closed by user");
-        },
+onCancel: () => {
+  // Пользователь просто закрыл окно PayPal — ничего страшного
+  console.log("PayPal popup was closed by user");
+},
 
-        onError: (err) => {
-          console.error("PayPal error:", err);
+onError: (err) => {
+  console.error("PayPal error:", err);
 
-          const text = String(err?.message || err || "").toLowerCase();
+  const text = String(err?.message || err || "").toLowerCase();
 
-          const looksLikeUserClosed =
-            text.includes("popup") ||
-            text.includes("closed") ||
-            text.includes("window closed") ||
-            text.includes("cancel") ||
-            text.includes("user closed") ||
-            text.includes("zoid destroyed before props");
+  const looksLikeUserClosed =
+    text.includes("popup") ||
+    text.includes("closed") ||
+    text.includes("window closed") ||
+    text.includes("cancel") ||
+    text.includes("user closed") ||
+    text.includes("zoid destroyed before props");
 
-          if (looksLikeUserClosed) return;
+  if (looksLikeUserClosed) {
+    return;
+  }
 
-          const message =
-            lang === "ru"
-              ? "Не удалось завершить оплату PayPal. Попробуйте ещё раз."
-              : "PayPal could not complete the payment. Please try again.";
+  const message =
+    lang === "ru"
+      ? "Не удалось завершить оплату PayPal. Попробуйте ещё раз."
+      : "PayPal could not complete the payment. Please try again.";
 
-          alert(message);
-        },
+  alert(message);
+},
+        
       })
       .render(`#${containerId}`)
       .then(() => {
-        if (token !== paypalA2RenderToken.current) return;
         paypalA2Rendered.current = true;
         markReadyWhenIframeLoads();
       })
       .catch((err) => {
-        if (token !== paypalA2RenderToken.current) return;
         console.error("PayPal render A2 failed:", err);
       });
   };
 
   const ensureA2Rendered = () => {
-    if (token !== paypalA2RenderToken.current) return;
-
     const container = document.getElementById(containerId);
     if (!container) return;
 
     if (!window.paypal) {
-      retryTimer = setTimeout(ensureA2Rendered, 300);
+      setTimeout(ensureA2Rendered, 300);
       return;
     }
 
-    renderA2();
+    if (!paypalA2Rendered.current || container.childElementCount === 0) {
+      renderA2();
+    } else {
+      markReadyWhenIframeLoads();
+    }
   };
 
   ensureA2Rendered();
@@ -1860,22 +1854,11 @@ useEffect(() => {
   document.addEventListener("visibilitychange", onVisibility);
 
   return () => {
-    paypalA2RenderToken.current += 1;
-
-    if (retryTimer) clearTimeout(retryTimer);
-    if (readyTimer) clearTimeout(readyTimer);
-
-    const container = document.getElementById(containerId);
-    const shell = document.getElementById(shellId);
-
-    if (container) container.innerHTML = "";
-    if (shell) shell.classList.remove("paypal-ready");
-
     window.removeEventListener("pageshow", onPageShow);
     document.removeEventListener("visibilitychange", onVisibility);
   };
-}, [clubA2, lang, navigate, theme]);
-  
+}, [clubA2, lang, navigate]);
+
 // Render of the PP Button B1-B2
 useEffect(() => {
   if (!clubB1B2?.id || !clubB1B2?.is_payable) return;
@@ -1883,33 +1866,22 @@ useEffect(() => {
   const containerId = "paypal-button-container-b1b2";
   const shellId = "paypal-shell-b1b2";
 
-  paypalB1B2Rendered.current = false;
-  paypalB1B2RenderToken.current += 1;
-  const token = paypalB1B2RenderToken.current;
-
-  let retryTimer = null;
-  let readyTimer = null;
-
   const markReadyWhenIframeLoads = () => {
     const shell = document.getElementById(shellId);
     const container = document.getElementById(containerId);
     if (!shell || !container) return;
-    if (token !== paypalB1B2RenderToken.current) return;
 
     const iframe = container.querySelector("iframe");
     if (!iframe) return;
 
-    const show = () => {
-      if (token !== paypalB1B2RenderToken.current) return;
-      shell.classList.add("paypal-ready");
-    };
+    const show = () => shell.classList.add("paypal-ready");
 
     if (iframe.dataset.readyBound === "1") return;
     iframe.dataset.readyBound = "1";
 
     iframe.addEventListener("load", show, { once: true });
 
-    readyTimer = setTimeout(show, 250);
+    setTimeout(show, 250);
   };
 
   const renderB1B2 = () => {
@@ -1918,9 +1890,13 @@ useEffect(() => {
 
     if (!container || !shell) return;
     if (!window.paypal) return;
-    if (token !== paypalB1B2RenderToken.current) return;
 
-    container.innerHTML = "";
+    if (container.childElementCount > 0) {
+      paypalB1B2Rendered.current = true;
+      markReadyWhenIframeLoads();
+      return;
+    }
+
     shell.classList.remove("paypal-ready");
 
     window.paypal
@@ -1990,57 +1966,61 @@ useEffect(() => {
           }
         },
 
-        onCancel: () => {
-          console.log("PayPal popup was closed by user");
-        },
+onCancel: () => {
+  // Пользователь просто закрыл окно PayPal — ничего страшного
+  console.log("PayPal popup was closed by user");
+},
 
-        onError: (err) => {
-          console.error("PayPal error:", err);
+onError: (err) => {
+  console.error("PayPal error:", err);
 
-          const text = String(err?.message || err || "").toLowerCase();
+  const text = String(err?.message || err || "").toLowerCase();
 
-          const looksLikeUserClosed =
-            text.includes("popup") ||
-            text.includes("closed") ||
-            text.includes("window closed") ||
-            text.includes("cancel") ||
-            text.includes("user closed") ||
-            text.includes("zoid destroyed before props");
+  const looksLikeUserClosed =
+    text.includes("popup") ||
+    text.includes("closed") ||
+    text.includes("window closed") ||
+    text.includes("cancel") ||
+    text.includes("user closed") ||
+    text.includes("zoid destroyed before props");
 
-          if (looksLikeUserClosed) return;
+  if (looksLikeUserClosed) {
+    return;
+  }
 
-          const message =
-            lang === "ru"
-              ? "Не удалось завершить оплату PayPal. Попробуйте ещё раз."
-              : "PayPal could not complete the payment. Please try again.";
+  const message =
+    lang === "ru"
+      ? "Не удалось завершить оплату PayPal. Попробуйте ещё раз."
+      : "PayPal could not complete the payment. Please try again.";
 
-          alert(message);
-        },
+  alert(message);
+},
+        
       })
       .render(`#${containerId}`)
       .then(() => {
-        if (token !== paypalB1B2RenderToken.current) return;
         paypalB1B2Rendered.current = true;
         markReadyWhenIframeLoads();
       })
       .catch((err) => {
-        if (token !== paypalB1B2RenderToken.current) return;
         console.error("PayPal render B1-B2 failed:", err);
       });
   };
 
   const ensureB1B2Rendered = () => {
-    if (token !== paypalB1B2RenderToken.current) return;
-
     const container = document.getElementById(containerId);
     if (!container) return;
 
     if (!window.paypal) {
-      retryTimer = setTimeout(ensureB1B2Rendered, 300);
+      setTimeout(ensureB1B2Rendered, 300);
       return;
     }
 
-    renderB1B2();
+    if (!paypalB1B2Rendered.current || container.childElementCount === 0) {
+      renderB1B2();
+    } else {
+      markReadyWhenIframeLoads();
+    }
   };
 
   ensureB1B2Rendered();
@@ -2054,21 +2034,11 @@ useEffect(() => {
   document.addEventListener("visibilitychange", onVisibility);
 
   return () => {
-    paypalB1B2RenderToken.current += 1;
-
-    if (retryTimer) clearTimeout(retryTimer);
-    if (readyTimer) clearTimeout(readyTimer);
-
-    const container = document.getElementById(containerId);
-    const shell = document.getElementById(shellId);
-
-    if (container) container.innerHTML = "";
-    if (shell) shell.classList.remove("paypal-ready");
-
     window.removeEventListener("pageshow", onPageShow);
     document.removeEventListener("visibilitychange", onVisibility);
   };
-}, [clubB1B2, lang, navigate, theme]);
+}, [clubB1B2, lang, navigate]);
+
 
   useEffect(() => {
   if (typeof window === "undefined") return;
@@ -2688,16 +2658,14 @@ const TAB_FROM_PATH = (p) => {
               
               <div className="pt-1 mt-1 sm:pt-3 sm:mt-2">
                 {clubA2?.is_payable ? (
-                  <div key={`paypal-wrap-a2-${theme}`}>
+                  <div
+                    className={`paypal-shell ${theme === "dark" ? "paypal-shell-dark" : "paypal-shell-light"}`}
+                    id="paypal-shell-a2"
+                  >
                     <div
-                      className="paypal-shell paypal-shell-light"
-                      id="paypal-shell-a2"
-                    >
-                      <div
-                        id="paypal-button-container-a2"
-                        className="max-w-[420px] mx-auto"
-                      />
-                    </div>
+                      id="paypal-button-container-a2"
+                      className="max-w-[420px] mx-auto"
+                    />
                   </div>
                 ) : (
                   <div className="relative">
@@ -2821,19 +2789,17 @@ const TAB_FROM_PATH = (p) => {
             </ul>
 
               <div className="pt-1 mt-1 sm:pt-3 sm:mt-2">
-                {clubB1B2?.is_payable ? (
-                  <div key={`paypal-wrap-b1b2-${theme}`}>
-                    <div
-                      className="paypal-shell paypal-shell-light"
-                      id="paypal-shell-b1b2"
-                    >
-                      <div
-                        id="paypal-button-container-b1b2"
-                        className="max-w-[420px] mx-auto"
-                      />
-                    </div>
-                  </div>
-                ) : (
+              {clubB1B2?.is_payable ? (
+                <div
+                  className={`paypal-shell ${theme === "dark" ? "paypal-shell-dark" : "paypal-shell-light"}`}
+                  id="paypal-shell-b1b2"
+                >
+                  <div
+                    id="paypal-button-container-b1b2"
+                    className="max-w-[420px] mx-auto"
+                  />
+                </div>
+              ) : (
                 <div className="relative">
                   {/* Невидимый PayPal-layout для сохранения ТОЧНОЙ высоты */}
                   <div className="opacity-0 pointer-events-none select-none hidden sm:block">
