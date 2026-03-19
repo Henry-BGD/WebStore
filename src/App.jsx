@@ -1089,10 +1089,6 @@ function ClubExtraInfo({ title, children }) {
 
 export default function App() {
 
-const clubCardA2Ref = useRef(null);
-const clubCardB1B2Ref = useRef(null);
-const [clubCardsMinHeight, setClubCardsMinHeight] = useState(null);
-
 // ---TimeZone---
   function getTimeZoneLabel(date, locale = "en-US") {
   try {
@@ -2060,43 +2056,6 @@ onError: (err) => {
   };
 }, []);
 
-      useEffect(() => {
-      const measure = () => {
-        const a = clubCardA2Ref.current;
-        const b = clubCardB1B2Ref.current;
-        if (!a || !b) return;
-    
-        // сначала сбрасываем, чтобы померить натуральную высоту
-        a.style.minHeight = "0px";
-        b.style.minHeight = "0px";
-    
-        const ah = a.offsetHeight;
-        const bh = b.offsetHeight;
-        const next = Math.max(ah, bh);
-    
-        setClubCardsMinHeight(next);
-      };
-    
-      const raf = requestAnimationFrame(() => {
-        requestAnimationFrame(measure);
-      });
-    
-      window.addEventListener("resize", measure);
-    
-      return () => {
-        cancelAnimationFrame(raf);
-        window.removeEventListener("resize", measure);
-      };
-    }, [
-      theme,
-      lang,
-      clubA2?.is_payable,
-      clubB1B2?.is_payable,
-      clubA2PriceBadge,
-      clubB1B2PriceBadge,
-      showLitClub,
-    ]);
-
   // auto-hide timer
   const eggTimerRef = useRef(null);
   useEffect(() => {
@@ -2657,11 +2616,7 @@ const TAB_FROM_PATH = (p) => {
             </span>
           </div>
         </div>
-                    <Card
-                      ref={clubCardA2Ref}
-                      style={!isMobile && clubCardsMinHeight ? { minHeight: `${clubCardsMinHeight}px` } : undefined}
-                      className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl"
-                    >
+          <Card className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl">
             <div className="p-4 flex flex-col divide-y divide-slate-200 dark:divide-slate-800">
               <div className="pt-0 pb-0">
                 <div className="text-center">
@@ -2802,11 +2757,8 @@ const TAB_FROM_PATH = (p) => {
             </span>
           </div>
         </div>
-            <Card
-              ref={clubCardB1B2Ref}
-              style={!isMobile && clubCardsMinHeight ? { minHeight: `${clubCardsMinHeight}px` } : undefined}
-              className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl"
-            >
+
+        <Card className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl">
           <div className="p-4 flex flex-col divide-y divide-slate-200 dark:divide-slate-800">
             <div className="pt-0 pb-0">
               <div className="text-center">
