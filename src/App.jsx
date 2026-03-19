@@ -2325,12 +2325,12 @@ const TAB_FROM_PATH = (p) => {
               {eggText ? <Toast variant="desktop" /> : null}
             </div>
 
-                          {isMobile && showSwipeHint ? (
-                <div className="absolute left-1/2 top-1/2 z-[70] -translate-x-1/2 -translate-y-1/2 pointer-events-none md:hidden">
+              {isMobile && showSwipeHint ? (
+                <div className="absolute left-1/2 top-[34%] z-[70] -translate-x-1/2 -translate-y-1/2 pointer-events-none md:hidden">
                   <div
                     className={[
-                      "rounded-full px-3 py-1.5",
-                      "text-[11px] font-medium whitespace-nowrap",
+                      "rounded-full px-4 py-2",
+                      "text-[20px] font-semibold whitespace-nowrap",
                       "bg-white/95 text-slate-900 border border-slate-200 shadow-md",
                       "dark:bg-slate-900/95 dark:text-slate-100 dark:border-slate-700",
                       "backdrop-blur",
@@ -2383,18 +2383,20 @@ const TAB_FROM_PATH = (p) => {
       
             {/* MOBILE */}
             <div className="md:hidden relative flex items-center min-w-0">
+              <div className="pointer-events-none absolute left-0 top-0 bottom-0 z-20 w-8 bg-gradient-to-r from-white to-transparent dark:from-slate-950 dark:to-transparent" />
+              <div className="pointer-events-none absolute right-0 top-0 bottom-0 z-20 w-8 bg-gradient-to-l from-white to-transparent dark:from-slate-950 dark:to-transparent" />
 
                   {activeIndex > 0 ? (
-                    <div className="pointer-events-none absolute left-[2px] top-1/2 -translate-y-1/2 z-20 md:hidden">
+                    <div className="pointer-events-none absolute left-0 top-1/2 -translate-y-1/2 z-30 md:hidden">
                       <ChevronLeft className="w-4 h-4 text-slate-400 dark:text-slate-500" />
                     </div>
                   ) : null}     
       
-                      <div
-                        ref={tabsScrollRef}
-                        className="flex-1 min-w-0 overflow-x-auto no-scrollbar scroll-smooth"
-                      >
-                        <div className="flex items-center gap-1.5 w-max py-1 px-[22vw]">
+                        <div
+                          ref={tabsScrollRef}
+                          className="flex-1 min-w-0 overflow-x-auto no-scrollbar scroll-smooth"
+                        >
+                          <div className="flex items-center gap-[1px] w-max py-1 px-[22vw]">
                           
                       <NavPill
                         ref={(el) => {
@@ -2457,7 +2459,7 @@ const TAB_FROM_PATH = (p) => {
                   </div>
 
                 {activeIndex < TABS_ORDER.length - 1 ? (
-                  <div className="pointer-events-none absolute right-[2px] top-1/2 -translate-y-1/2 z-20 md:hidden">
+                  <div className="pointer-events-none absolute right-0 top-1/2 -translate-y-1/2 z-30 md:hidden">
                     <ChevronRight className="w-4 h-4 text-slate-400 dark:text-slate-500" />
                   </div>
                 ) : null}
