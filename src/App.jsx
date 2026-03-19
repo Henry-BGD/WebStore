@@ -1463,9 +1463,9 @@ const mobileTabClass = useCallback(
     [
       "flex-none text-center origin-center",
       "transition-all duration-300 ease-out",
-      tab === tabKey
-        ? "scale-100 opacity-100 px-5"
-        : "scale-[0.84] opacity-72 px-4",
+          tab === tabKey
+            ? "opacity-100 px-3"
+            : "opacity-60 px-3"
       extra,
     ].join(" "),
   [tab]
@@ -2326,7 +2326,7 @@ const TAB_FROM_PATH = (p) => {
             </div>
 
               {isMobile && showSwipeHint ? (
-                <div className="absolute left-1/2 top-10 z-[70] -translate-x-1/2 -translate-y-1/2 pointer-events-none md:hidden">
+                <div className="absolute left-1/2 top-8 z-[70] -translate-x-1/2 -translate-y-1/2 pointer-events-none md:hidden">
                   <div
                     className={[
                       "rounded-full px-4 py-1.5",
@@ -2383,8 +2383,8 @@ const TAB_FROM_PATH = (p) => {
       
             {/* MOBILE */}
             <div className="md:hidden relative flex items-center min-w-0">
-              <div className="pointer-events-none absolute left-0 top-0 bottom-0 z-20 w-12 bg-gradient-to-r from-white to-transparent dark:from-slate-950 dark:to-transparent" />
-              <div className="pointer-events-none absolute right-0 top-0 bottom-0 z-20 w-12 bg-gradient-to-l from-white to-transparent dark:from-slate-950 dark:to-transparent" />
+              <div className="pointer-events-none absolute left-0 top-0 bottom-0 z-20 w-20 bg-gradient-to-r from-white to-transparent dark:from-slate-950 dark:to-transparent" />
+              <div className="pointer-events-none absolute right-0 top-0 bottom-0 z-20 w-20 bg-gradient-to-l from-white to-transparent dark:from-slate-950 dark:to-transparent" />
 
                   {activeIndex > 0 ? (
                     <div className="pointer-events-none absolute left-0 top-1/2 -translate-y-1/2 z-30 md:hidden">
@@ -2407,7 +2407,7 @@ const TAB_FROM_PATH = (p) => {
                           navigate("/about");
                           triggerSwipeHint();
                         }}
-                        className={mobileTabClass("about")}
+                        className={mobileTabClass("about", "px-3 py-1.5 text-[13px]")}
                       >
                         {t("nav_about")}
                       </NavPill>
@@ -2421,7 +2421,7 @@ const TAB_FROM_PATH = (p) => {
                           navigate("/literature-club");
                           triggerSwipeHint();
                         }}
-                        className={mobileTabClass("lit-club")}
+                        className={mobileTabClass("lit-club", "px-3 py-1.5 text-[13px]")}
                       >
                         {t("nav_lit_club")}
                       </NavPill>
@@ -2435,7 +2435,7 @@ const TAB_FROM_PATH = (p) => {
                           navigate("/store");
                           triggerSwipeHint();
                         }}
-                        className={mobileTabClass("products")}
+                        className={mobileTabClass("products", "px-3 py-1.5 text-[13px]")}
                       >
                         {t("nav_products")}
                       </NavPill>
@@ -2451,7 +2451,7 @@ const TAB_FROM_PATH = (p) => {
                           navigate("/audio");
                           triggerSwipeHint();
                         }}
-                        className={mobileTabClass("free-audio")}
+                        className={mobileTabClass("free-audio", "px-3 py-1.5 text-[13px]")}
                       >
                         {t("nav_audio")}
                       </NavPill>
