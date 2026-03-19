@@ -38,7 +38,7 @@ function useSwipeTabs({
   const shouldIgnoreTarget = (target) => {
     try {
       return !!target?.closest?.(
-        'input, textarea, select, [role="slider"], input[type="range"], [data-no-swipe]'
+        'input, textarea, select, [role="slider"], input[type="range"]'
       );
     } catch {
       return false;
@@ -2376,11 +2376,11 @@ const TAB_FROM_PATH = (p) => {
       
             {/* MOBILE */}
             <div className="md:hidden relative flex items-center min-w-0">
-              <div className="pointer-events-none absolute left-0 top-0 bottom-0 z-26 w-20 bg-gradient-to-r from-white to-transparent dark:from-slate-950 dark:to-transparent" />
-              <div className="pointer-events-none absolute right-0 top-0 bottom-0 z-26 w-20 bg-gradient-to-l from-white to-transparent dark:from-slate-950 dark:to-transparent" />
-
-                  {activeIndex > 0 ? (
-                    <div className="pointer-events-none absolute left-0 top-1/2 -translate-y-1/2 z-30 md:hidden">
+              <div className="pointer-events-none absolute left-0 top-0 bottom-0 z-[26] w-20 bg-gradient-to-r from-white to-transparent dark:from-slate-950 dark:to-transparent" />
+              <div className="pointer-events-none absolute right-0 top-0 bottom-0 z-[26] w-20 bg-gradient-to-l from-white to-transparent dark:from-slate-950 dark:to-transparent" />
+                 
+              {activeIndex > 0 ? (
+                    <div className="pointer-events-none absolute left-0 top-1/2 -translate-y-1/2 z-[40] md:hidden">
                       <ChevronLeft className="w-4 h-4 text-slate-400 dark:text-slate-500" />
                     </div>
                   ) : null}     
@@ -2452,7 +2452,7 @@ const TAB_FROM_PATH = (p) => {
                   </div>
 
                 {activeIndex < TABS_ORDER.length - 1 ? (
-                  <div className="pointer-events-none absolute right-0 top-1/2 -translate-y-1/2 z-30 md:hidden">
+                  <div className="pointer-events-none absolute right-0 top-1/2 -translate-y-1/2 z-[40] md:hidden">
                     <ChevronRight className="w-4 h-4 text-slate-400 dark:text-slate-500" />
                   </div>
                 ) : null}
