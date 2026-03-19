@@ -2,6 +2,37 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ===== PayPal fix ===== */
+
+.paypal-shell {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1rem;
+}
+
+.paypal-shell-dark {
+  background: #020817; /* твой dark bg */
+}
+
+.paypal-shell-light {
+  background: #ffffff;
+}
+
+.paypal-shell #paypal-button-container-a2,
+.paypal-shell #paypal-button-container-b1b2 {
+  position: relative;
+  z-index: 2;
+}
+
+.paypal-shell-dark::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: #020817;
+  z-index: 1;
+  pointer-events: none;
+}
+
 /* ================================
    ROOT / COLOR SCHEME
 ================================ */
