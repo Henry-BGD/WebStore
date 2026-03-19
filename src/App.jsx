@@ -11,10 +11,6 @@ import PaymentSuccess from "./PaymentSuccess.jsx";
 const CONTAINER = "w-full max-w-6xl mx-auto px-4 sm:px-8";
 const TOPBAR_H = "min-h-[64px]";
 
-const clubCardA2Ref = useRef(null);
-const clubCardB1B2Ref = useRef(null);
-const [clubCardsMinHeight, setClubCardsMinHeight] = useState(null);
-
 // ================== SWIPE TABS HOOK ==================
 // ✅ upgraded: returns dragX + isDragging for smooth swipe animations
 function useSwipeTabs({
@@ -1092,6 +1088,10 @@ function ClubExtraInfo({ title, children }) {
 }
 
 export default function App() {
+
+const clubCardA2Ref = useRef(null);
+const clubCardB1B2Ref = useRef(null);
+const [clubCardsMinHeight, setClubCardsMinHeight] = useState(null);
 
 // ---TimeZone---
   function getTimeZoneLabel(date, locale = "en-US") {
