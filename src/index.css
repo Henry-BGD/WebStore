@@ -2,6 +2,44 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ===== PayPal embedded panel ===== */
+
+.paypal-shell {
+  position: relative;
+  overflow: hidden;
+  border-radius: 18px;
+}
+
+/* Светлая встроенная checkout-панель на любой теме */
+.paypal-shell-embedded {
+  background: #ffffff;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    0 1px 2px rgba(15, 23, 42, 0.06);
+  padding: 10px;
+}
+
+/* Чуть мягче на мобилке */
+@media (max-width: 768px) {
+  .paypal-shell-embedded {
+    padding: 8px;
+    border-radius: 16px;
+  }
+}
+
+/* Контейнеры кнопок */
+#paypal-button-container-a2,
+#paypal-button-container-b1b2 {
+  position: relative;
+  z-index: 1;
+}
+
+/* Пока iframe не готов — не даём белой вспышке выглядеть резко */
+.paypal-shell-embedded:not(.paypal-ready) {
+  opacity: 0.98;
+}
+
 /* ================================
    ROOT / COLOR SCHEME
 ================================ */
