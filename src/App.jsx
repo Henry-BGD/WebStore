@@ -2688,18 +2688,17 @@ const TAB_FROM_PATH = (p) => {
               
               <div className="pt-1 mt-1 sm:pt-3 sm:mt-2">
                 {clubA2?.is_payable ? (
-
-                  <div
-                    key={`paypal-a2-${theme}`}
-                    className={`paypal-shell ${theme === "dark" ? "paypal-shell-dark" : "paypal-shell-light"}`}
-                    id="paypal-shell-a2"
-                  >
+                  <div key={`paypal-wrap-a2-${theme}`}>
                     <div
-                      id="paypal-button-container-a2"
-                      className="max-w-[420px] mx-auto"
-                    />
+                      className={`paypal-shell ${theme === "dark" ? "paypal-shell-dark" : "paypal-shell-light"}`}
+                      id="paypal-shell-a2"
+                    >
+                      <div
+                        id="paypal-button-container-a2"
+                        className="max-w-[420px] mx-auto"
+                      />
+                    </div>
                   </div>
-  
                 ) : (
                   <div className="relative">
                     {/* Невидимый PayPal-layout для сохранения ТОЧНОЙ высоты */}
@@ -2822,20 +2821,19 @@ const TAB_FROM_PATH = (p) => {
             </ul>
 
               <div className="pt-1 mt-1 sm:pt-3 sm:mt-2">
-              {clubB1B2?.is_payable ? (
-
-                <div
-                  key={`paypal-b1b2-${theme}`}
-                  className={`paypal-shell ${theme === "dark" ? "paypal-shell-dark" : "paypal-shell-light"}`}
-                  id="paypal-shell-b1b2"
-                >
-                  <div
-                    id="paypal-button-container-b1b2"
-                    className="max-w-[420px] mx-auto"
-                  />
-                </div>
-  
-              ) : (
+                {clubB1B2?.is_payable ? (
+                  <div key={`paypal-wrap-b1b2-${theme}`}>
+                    <div
+                      className={`paypal-shell ${theme === "dark" ? "paypal-shell-dark" : "paypal-shell-light"}`}
+                      id="paypal-shell-b1b2"
+                    >
+                      <div
+                        id="paypal-button-container-b1b2"
+                        className="max-w-[420px] mx-auto"
+                      />
+                    </div>
+                  </div>
+                ) : (
                 <div className="relative">
                   {/* Невидимый PayPal-layout для сохранения ТОЧНОЙ высоты */}
                   <div className="opacity-0 pointer-events-none select-none hidden sm:block">
