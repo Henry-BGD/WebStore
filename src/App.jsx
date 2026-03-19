@@ -2658,10 +2658,10 @@ const TAB_FROM_PATH = (p) => {
               
               <div className="pt-1 mt-1 sm:pt-3 sm:mt-2">
                 {clubA2?.is_payable ? (
-                  <div
-                    className={`paypal-shell ${theme === "dark" ? "paypal-shell-dark" : "paypal-shell-light"}`}
-                    id="paypal-shell-a2"
-                  >
+                    <div
+                      className="paypal-shell paypal-shell-embedded"
+                      id="paypal-shell-a2"
+                    >
                     <div
                       id="paypal-button-container-a2"
                       className="max-w-[420px] mx-auto"
@@ -2791,7 +2791,7 @@ const TAB_FROM_PATH = (p) => {
               <div className="pt-1 mt-1 sm:pt-3 sm:mt-2">
               {clubB1B2?.is_payable ? (
                 <div
-                  className={`paypal-shell ${theme === "dark" ? "paypal-shell-dark" : "paypal-shell-light"}`}
+                  className="paypal-shell paypal-shell-embedded"
                   id="paypal-shell-b1b2"
                 >
                   <div
