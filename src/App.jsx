@@ -2337,7 +2337,7 @@ const TAB_FROM_PATH = (p) => {
                       "transition-all duration-200",
                     ].join(" ")}
                   >
-                    {lang === "ru" ? "Свайпай влево и вправо" : "Swipe left and right"}
+                    {lang === "ru" ? "Свайпайте влево и вправо" : "Swipe left and right"}
                   </div>
                 </div>
               ) : null}
@@ -2396,7 +2396,7 @@ const TAB_FROM_PATH = (p) => {
                           ref={tabsScrollRef}
                           className="flex-1 min-w-0 overflow-x-auto no-scrollbar scroll-smooth"
                         >
-                          <div className="flex items-center gap-[1px] w-max py-1 px-[22vw]">
+                          <div className="flex items-center gap-[3px] w-max py-1 px-[22vw]">
                           
                       <NavPill
                         ref={(el) => {
