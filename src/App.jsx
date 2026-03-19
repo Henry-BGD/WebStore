@@ -36,14 +36,15 @@ function useSwipeTabs({
   const [isDragging, setIsDragging] = useState(false);
 
   const shouldIgnoreTarget = (target) => {
-    // ВАЖНО: НЕ игнорим [data-no-swipe] — иначе кнопки снова станут "не-свайпабельны"
     try {
-      return !!target?.closest?.('input, textarea, select, [role="slider"], input[type="range"]');
+      return !!target?.closest?.(
+        'input, textarea, select, [role="slider"], input[type="range"], [data-no-swipe]'
+      );
     } catch {
       return false;
     }
   };
-
+  
   const stopTracking = useCallback(() => {
     tracking.current = false;
     axisLock.current = null;
@@ -1032,6 +1033,60 @@ function TabsSlider({ isMobile, activeIndex, dragX, isDragging, children }) {
 }
 
 // ================== APP ==================
+function ClubExtraInfo({ title, children }) {
+  const [open, setOpen] = useState(false);
+
+  const toggleOpen = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setOpen((v) => !v);
+  };
+
+  return (
+    <div className="pt-2 mt-2 border-t border-slate-200 dark:border-slate-800">
+      <button
+        type="button"
+        data-no-swipe="true"
+        aria-expanded={open}
+        onClick={toggleOpen}
+        className={[
+          "w-full flex items-center justify-between gap-3",
+          "rounded-xl px-4 py-1.5 min-h-[34px]",
+          "bg-slate-200 text-slate-700 hover:bg-slate-300",
+          "dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700",
+          "transition",
+          "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
+          "dark:focus-visible:ring-blue-500/40 dark:focus-visible:ring-offset-slate-950",
+        ].join(" ")}
+      >
+        <span className="text-xs sm:text-sm font-medium text-center flex-1 leading-none">
+          {title}
+        </span>
+
+        <ChevronDown
+          className={[
+            "w-4 h-4 flex-none transition-transform duration-200",
+            open ? "rotate-180" : "rotate-0",
+          ].join(" ")}
+        />
+      </button>
+
+      <div
+        className={[
+          "grid transition-all duration-300 ease-in-out",
+          open ? "grid-rows-[1fr] opacity-100 mt-2" : "grid-rows-[0fr] opacity-0 mt-0",
+        ].join(" ")}
+      >
+        <div className="overflow-hidden">
+          <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 px-4 py-4 text-sm sm:text-[15px] leading-relaxed text-slate-700 dark:text-slate-300 space-y-4">
+            {children}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
 
 // ---TimeZone---
@@ -1061,68 +1116,6 @@ function formatUtcForViewer(isoString, locale = "en-US") {
 
 // ---LitClub---
 const [showPaymentSuccess, setShowPaymentSuccess] = useState(false);
-  
-function ClubExtraInfo({ title, children }) {
-  const [open, setOpen] = useState(false);
-
-  const toggleOpen = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setOpen((v) => !v);
-  };
-
-  return (
-    <div
-      className="pt-2 mt-2 border-t border-slate-200 dark:border-slate-800"
-      data-no-swipe="true"
-      onClick={(e) => e.stopPropagation()}
-      onPointerDown={(e) => e.stopPropagation()}
-    >
-      <button
-        type="button"
-        onClick={toggleOpen}
-        onPointerDown={(e) => e.stopPropagation()}
-        data-no-swipe="true"
-        aria-expanded={open}
-        className={[
-          "w-full flex items-center justify-between gap-3",
-          "rounded-xl px-4 py-1.5 min-h-[34px]",
-          "bg-slate-200 text-slate-700 hover:bg-slate-300",
-          "dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700",
-          "transition",
-          "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
-          "dark:focus-visible:ring-blue-500/40 dark:focus-visible:ring-offset-slate-950",
-        ].join(" ")}
-      >
-        <span className="text-xs sm:text-sm font-medium text-center flex-1 leading-none">
-          {title}
-        </span>
-
-        <ChevronDown
-          className={[
-            "w-4 h-4 flex-none transition-transform duration-200",
-            open ? "rotate-180" : "rotate-0",
-          ].join(" ")}
-        />
-      </button>
-
-      <div
-        onClick={(e) => e.stopPropagation()}
-        onPointerDown={(e) => e.stopPropagation()}
-        className={[
-          "grid transition-all duration-300 ease-in-out",
-          open ? "grid-rows-[1fr] opacity-100 mt-2" : "grid-rows-[0fr] opacity-0 mt-0",
-        ].join(" ")}
-      >
-        <div className="overflow-hidden">
-          <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 px-4 py-4 text-sm sm:text-[15px] leading-relaxed text-slate-700 dark:text-slate-300 space-y-4">
-            {children}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
 
   const LIT_CLUB_A2_SAMPLE = (
   <div className="mt-2 space-y-3 text-[9px] sm:text-[10px] leading-snug text-slate-800 dark:text-slate-200">
@@ -2383,8 +2376,8 @@ const TAB_FROM_PATH = (p) => {
       
             {/* MOBILE */}
             <div className="md:hidden relative flex items-center min-w-0">
-              <div className="pointer-events-none absolute left-0 top-0 bottom-0 z-20 w-26 bg-gradient-to-r from-white to-transparent dark:from-slate-950 dark:to-transparent" />
-              <div className="pointer-events-none absolute right-0 top-0 bottom-0 z-20 w-26 bg-gradient-to-l from-white to-transparent dark:from-slate-950 dark:to-transparent" />
+              <div className="pointer-events-none absolute left-0 top-0 bottom-0 z-26 w-20 bg-gradient-to-r from-white to-transparent dark:from-slate-950 dark:to-transparent" />
+              <div className="pointer-events-none absolute right-0 top-0 bottom-0 z-26 w-20 bg-gradient-to-l from-white to-transparent dark:from-slate-950 dark:to-transparent" />
 
                   {activeIndex > 0 ? (
                     <div className="pointer-events-none absolute left-0 top-1/2 -translate-y-1/2 z-30 md:hidden">
