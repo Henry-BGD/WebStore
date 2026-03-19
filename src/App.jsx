@@ -1576,7 +1576,7 @@ const showAudio = tab === "free-audio";
             behavior: "smooth",
           });
         });
-      }, [tab, isMobile]);
+      }, [tab, isMobile, lang]);
   
   // ================== PPPlata ==================
 const [clubA2, setClubA2] = useState(null);
@@ -2326,11 +2326,11 @@ const TAB_FROM_PATH = (p) => {
             </div>
 
               {isMobile && showSwipeHint ? (
-                <div className="absolute left-1/2 top-[34%] z-[70] -translate-x-1/2 -translate-y-1/2 pointer-events-none md:hidden">
+                <div className="absolute left-1/2 top-10 z-[70] -translate-x-1/2 -translate-y-1/2 pointer-events-none md:hidden">
                   <div
                     className={[
-                      "rounded-full px-4 py-2",
-                      "text-[20px] font-semibold whitespace-nowrap",
+                      "rounded-full px-4 py-1.5",
+                      "text-[13px] font-semibold whitespace-nowrap",
                       "bg-white/95 text-slate-900 border border-slate-200 shadow-md",
                       "dark:bg-slate-900/95 dark:text-slate-100 dark:border-slate-700",
                       "backdrop-blur",
@@ -2383,8 +2383,8 @@ const TAB_FROM_PATH = (p) => {
       
             {/* MOBILE */}
             <div className="md:hidden relative flex items-center min-w-0">
-              <div className="pointer-events-none absolute left-0 top-0 bottom-0 z-20 w-8 bg-gradient-to-r from-white to-transparent dark:from-slate-950 dark:to-transparent" />
-              <div className="pointer-events-none absolute right-0 top-0 bottom-0 z-20 w-8 bg-gradient-to-l from-white to-transparent dark:from-slate-950 dark:to-transparent" />
+              <div className="pointer-events-none absolute left-0 top-0 bottom-0 z-20 w-12 bg-gradient-to-r from-white to-transparent dark:from-slate-950 dark:to-transparent" />
+              <div className="pointer-events-none absolute right-0 top-0 bottom-0 z-20 w-12 bg-gradient-to-l from-white to-transparent dark:from-slate-950 dark:to-transparent" />
 
                   {activeIndex > 0 ? (
                     <div className="pointer-events-none absolute left-0 top-1/2 -translate-y-1/2 z-30 md:hidden">
