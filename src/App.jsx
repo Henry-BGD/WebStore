@@ -1464,8 +1464,8 @@ const mobileTabClass = useCallback(
       "flex-none text-center origin-center",
       "transition-all duration-300 ease-out",
           tab === tabKey
-            ? "opacity-100 px-3"
-            : "opacity-60 px-3"
+        ? "opacity-100 px-3"
+        : "opacity-60 px-3",
       extra,
     ].join(" "),
   [tab]
