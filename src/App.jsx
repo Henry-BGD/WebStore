@@ -36,10 +36,9 @@ function useSwipeTabs({
   const [isDragging, setIsDragging] = useState(false);
 
   const shouldIgnoreTarget = (target) => {
+    // ВАЖНО: НЕ игнорим [data-no-swipe] — иначе кнопки снова станут "не-свайпабельны"
     try {
-      return !!target?.closest?.(
-        'button, a, input, textarea, select, [role="slider"], input[type="range"], [data-no-swipe]'
-      );
+      return !!target?.closest?.('input, textarea, select, [role="slider"], input[type="range"]');
     } catch {
       return false;
     }
@@ -1081,10 +1080,10 @@ function ClubExtraInfo({ title, children }) {
     >
       <button
         type="button"
-        data-no-swipe="true"
-        aria-expanded={open}
         onClick={toggleOpen}
         onPointerDown={(e) => e.stopPropagation()}
+        data-no-swipe="true"
+        aria-expanded={open}
         className={[
           "w-full flex items-center justify-between gap-3",
           "rounded-xl px-4 py-1.5 min-h-[34px]",
@@ -1108,7 +1107,6 @@ function ClubExtraInfo({ title, children }) {
       </button>
 
       <div
-        data-no-swipe="true"
         onClick={(e) => e.stopPropagation()}
         onPointerDown={(e) => e.stopPropagation()}
         className={[
