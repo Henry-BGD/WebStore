@@ -8,46 +8,24 @@
   position: relative;
   overflow: hidden;
   border-radius: 18px;
+  line-height: 0;
 }
 
+/* ☀️ СВЕТЛАЯ ТЕМА — максимально чисто */
 .paypal-shell-embedded {
   background: #ffffff;
-
-  /* ❌ полностью убрали всё лишнее */
   border: none;
   box-shadow: none;
 
-  padding: 10px;
+  /* ВРОВЕНЬ С КНОПКАМИ */
+  padding: 0;
+  border-radius: 18px;
 }
 
-/* 🌙 в тёмной теме оставляем лёгкую рамку */
+/* 🌙 ТЁМНАЯ ТЕМА — добавляем аккуратную рамку и чуть воздуха */
 .dark .paypal-shell-embedded {
   border: 1px solid rgba(148, 163, 184, 0.22);
-}
-
-/* 🌙 только для тёмной темы оставляем рамку */
-.dark .paypal-shell-embedded {
-  border: 1px solid rgba(148, 163, 184, 0.22);
-}
-
-/* Чуть мягче на мобилке */
-@media (max-width: 768px) {
-  .paypal-shell-embedded {
-    padding: 8px;
-    border-radius: 16px;
-  }
-}
-
-/* Контейнеры кнопок */
-#paypal-button-container-a2,
-#paypal-button-container-b1b2 {
-  position: relative;
-  z-index: 1;
-}
-
-/* Пока iframe не готов — не даём белой вспышке выглядеть резко */
-.paypal-shell-embedded:not(.paypal-ready) {
-  opacity: 0.98;
+  padding: 4px 6px;
 }
 
 /* ================================
