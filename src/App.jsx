@@ -1683,6 +1683,8 @@ const clubB1B2PriceBadge =
 useEffect(() => {
   if (!clubA2?.id || !clubA2?.is_payable) return;
 
+  paypalA2Rendered.current = false;
+
   const containerId = "paypal-button-container-a2";
   const shellId = "paypal-shell-a2";
 
@@ -1708,16 +1710,11 @@ useEffect(() => {
     const container = document.getElementById(containerId);
     const shell = document.getElementById(shellId);
 
-    if (!container || !shell) return;
-    if (!window.paypal) return;
+if (!container || !shell) return;
+if (!window.paypal) return;
 
-    if (container.childElementCount > 0) {
-      paypalA2Rendered.current = true;
-      markReadyWhenIframeLoads();
-      return;
-    }
-
-    shell.classList.remove("paypal-ready");
+container.innerHTML = "";
+shell.classList.remove("paypal-ready");
 
     window.paypal
       .Buttons({
@@ -1857,11 +1854,13 @@ onError: (err) => {
     window.removeEventListener("pageshow", onPageShow);
     document.removeEventListener("visibilitychange", onVisibility);
   };
-}, [clubA2, lang, navigate]);
+}, [clubA2, lang, navigate, theme]);
 
 // Render of the PP Button B1-B2
 useEffect(() => {
   if (!clubB1B2?.id || !clubB1B2?.is_payable) return;
+
+  paypalB1B2Rendered.current = false;
 
   const containerId = "paypal-button-container-b1b2";
   const shellId = "paypal-shell-b1b2";
@@ -1890,13 +1889,8 @@ useEffect(() => {
 
     if (!container || !shell) return;
     if (!window.paypal) return;
-
-    if (container.childElementCount > 0) {
-      paypalB1B2Rendered.current = true;
-      markReadyWhenIframeLoads();
-      return;
-    }
-
+    
+    container.innerHTML = "";
     shell.classList.remove("paypal-ready");
 
     window.paypal
@@ -2037,7 +2031,7 @@ onError: (err) => {
     window.removeEventListener("pageshow", onPageShow);
     document.removeEventListener("visibilitychange", onVisibility);
   };
-}, [clubB1B2, lang, navigate]);
+}, [clubB1B2, lang, navigate, theme]);
 
 
   useEffect(() => {
@@ -2658,7 +2652,9 @@ const TAB_FROM_PATH = (p) => {
               
               <div className="pt-1 mt-1 sm:pt-3 sm:mt-2">
                 {clubA2?.is_payable ? (
+
                   <div
+                    key={`paypal-a2-${theme}`}
                     className={`paypal-shell ${theme === "dark" ? "paypal-shell-dark" : "paypal-shell-light"}`}
                     id="paypal-shell-a2"
                   >
@@ -2667,6 +2663,7 @@ const TAB_FROM_PATH = (p) => {
                       className="max-w-[420px] mx-auto"
                     />
                   </div>
+  
                 ) : (
                   <div className="relative">
                     {/* Невидимый PayPal-layout для сохранения ТОЧНОЙ высоты */}
@@ -2790,7 +2787,9 @@ const TAB_FROM_PATH = (p) => {
 
               <div className="pt-1 mt-1 sm:pt-3 sm:mt-2">
               {clubB1B2?.is_payable ? (
+
                 <div
+                  key={`paypal-b1b2-${theme}`}
                   className={`paypal-shell ${theme === "dark" ? "paypal-shell-dark" : "paypal-shell-light"}`}
                   id="paypal-shell-b1b2"
                 >
@@ -2799,6 +2798,7 @@ const TAB_FROM_PATH = (p) => {
                     className="max-w-[420px] mx-auto"
                   />
                 </div>
+  
               ) : (
                 <div className="relative">
                   {/* Невидимый PayPal-layout для сохранения ТОЧНОЙ высоты */}
