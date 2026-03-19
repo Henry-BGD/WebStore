@@ -13,14 +13,16 @@
 .paypal-shell-embedded {
   background: #ffffff;
 
-  /* ❌ убрали рамку в светлой теме */
+  /* ❌ полностью убрали всё лишнее */
   border: none;
-
-  /* чуть усилили тень, чтобы не выглядело плоско */
-  box-shadow:
-    0 2px 6px rgba(15, 23, 42, 0.08);
+  box-shadow: none;
 
   padding: 10px;
+}
+
+/* 🌙 в тёмной теме оставляем лёгкую рамку */
+.dark .paypal-shell-embedded {
+  border: 1px solid rgba(148, 163, 184, 0.22);
 }
 
 /* 🌙 только для тёмной темы оставляем рамку */
