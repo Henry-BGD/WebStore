@@ -1273,11 +1273,12 @@ const club2DateText = useMemo(() => {
 
   const [tab, setTab] = useState(() => detectTab());
 
-  useEffect(() => {
+    useEffect(() => {
     try {
       localStorage.setItem("tab", tab);
     } catch {}
-    window.scrollTo({ top: 0, behavior: "smooth" });
+  
+    window.scrollTo(0, 0);
   }, [tab]);
 
   useEffect(() => {
