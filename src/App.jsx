@@ -2383,15 +2383,12 @@ const TAB_FROM_PATH = (p) => {
       
             {/* MOBILE */}
             <div className="md:hidden relative flex items-center min-w-0">
-                {activeIndex > 0 ? (
-      
-                      <div className="pointer-events-none absolute left-[1px] top-1/2 -translate-y-1/2 z-20 md:hidden">
-                        <ChevronLeft className="w-4 h-4 text-slate-400 dark:text-slate-500" />
-                      </div>
-      
-                    <ChevronLeft className="w-4 h-4 text-slate-400 dark:text-slate-500" />
-                  </div>
-                ) : null}
+
+                  {activeIndex > 0 ? (
+                    <div className="pointer-events-none absolute left-[2px] top-1/2 -translate-y-1/2 z-20 md:hidden">
+                      <ChevronLeft className="w-4 h-4 text-slate-400 dark:text-slate-500" />
+                    </div>
+                  ) : null}     
       
                       <div
                         ref={tabsScrollRef}
@@ -2460,11 +2457,7 @@ const TAB_FROM_PATH = (p) => {
                   </div>
 
                 {activeIndex < TABS_ORDER.length - 1 ? (
-                    
-                    <div className="pointer-events-none absolute right-[1px] top-1/2 -translate-y-1/2 z-20 md:hidden">
-                      <ChevronRight className="w-4 h-4 text-slate-400 dark:text-slate-500" />
-                    </div>
-                    
+                  <div className="pointer-events-none absolute right-[2px] top-1/2 -translate-y-1/2 z-20 md:hidden">
                     <ChevronRight className="w-4 h-4 text-slate-400 dark:text-slate-500" />
                   </div>
                 ) : null}
