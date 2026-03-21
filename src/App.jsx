@@ -1116,20 +1116,7 @@ function formatUtcForViewer(isoString, locale = "en-US") {
 
 // ---LitClub---
 const [showPaymentSuccess, setShowPaymentSuccess] = useState(false);
-
-const getSoldOutMessage = useCallback(() => {
-  return lang === "ru"
-    ? "К сожалению, все места уже заняты. Пожалуйста, подождите следующую встречу клуба."
-    : "Unfortunately, all spots are already taken. Please wait for the next club meeting.";
-}, [lang]);
-
-  const handleClubSoldOut = useCallback(async () => {
-  alert(getSoldOutMessage());
-
-  // Перезагружаем актуальные данные, чтобы UI сразу убрал PayPal-кнопки
-  await loadClubs();
-}, [getSoldOutMessage, loadClubs]);
-
+  
   async function safeReadJson(response) {
   try {
     return await response.json();
@@ -1616,8 +1603,8 @@ const loadClubs = useCallback(async () => {
       fetch("/api/club/current?level=b1b2", { cache: "no-store" }),
     ]);
 
-    const a2Data = await a2Res.json();
-    const b1b2Data = await b1b2Res.json();
+    const a2Data = await safeReadJson(a2Res);
+    const b1b2Data = await safeReadJson(b1b2Res);
 
     if (a2Res.ok) setClubA2(a2Data);
     if (b1b2Res.ok) setClubB1B2(b1b2Data);
@@ -1627,6 +1614,20 @@ const loadClubs = useCallback(async () => {
     setClubsLoading(false);
   }
 }, []);
+
+  const getSoldOutMessage = useCallback(() => {
+  return lang === "ru"
+    ? "К сожалению, все места уже заняты. Пожалуйста, подождите следующую встречу клуба."
+    : "Unfortunately, all spots are already taken. Please wait for the next club meeting.";
+}, [lang]);
+
+  const handleClubSoldOut = useCallback(async () => {
+  alert(getSoldOutMessage());
+
+  // Перезагружаем актуальные данные, чтобы UI сразу убрал PayPal-кнопки
+  await loadClubs();
+}, [getSoldOutMessage, loadClubs]);
+  
 
 useEffect(() => {
   let cancelled = false;
