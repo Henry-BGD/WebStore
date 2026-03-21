@@ -45,10 +45,10 @@ function buildEmailContent({ language, clubTitle, clubTimeText, zoomLink, payerN
           <p><strong>Время:</strong> ${clubTimeText}</p>
           <p><strong>Ссылка Zoom:</strong><br /><a href="${zoomLink}">${zoomLink}</a></p>
           <p>До встречи в клубе!</p>
-            <p>
-              Если у вас возникнут вопросы, напишите мне на 
-              <a href="mailto:genndybogdanov@gmail.com">genndybogdanov@gmail.com</a>
-            </p>
+          <p>
+            Если у вас возникнут вопросы, напишите мне на 
+            <a href="mailto:genndybogdanov@gmail.com">genndybogdanov@gmail.com</a>
+          </p>
         </div>
       `,
     };
@@ -65,10 +65,10 @@ function buildEmailContent({ language, clubTitle, clubTimeText, zoomLink, payerN
         <p><strong>Time:</strong> ${clubTimeText}</p>
         <p><strong>Your Zoom link:</strong><br /><a href="${zoomLink}">${zoomLink}</a></p>
         <p>See you in the club!</p>
-          <p>
-            If you have any questions, feel free to email me at 
-            <a href="mailto:genndybogdanov@gmail.com">genndybogdanov@gmail.com</a>
-          </p>
+        <p>
+          If you have any questions, feel free to email me at 
+          <a href="mailto:genndybogdanov@gmail.com">genndybogdanov@gmail.com</a>
+        </p>
       </div>
     `,
   };
@@ -115,22 +115,21 @@ export default async function handler(req, res) {
     }
 
     if (club.status !== "open") {
-      return res.status(400).json({
-        error: "Club is not open",
+      return res.status(409).json({
+        error: "CLUB_NOT_OPEN",
       });
     }
 
     if (club.booked_count >= club.capacity) {
-      return res.status(400).json({
-        error: "No spots left",
+      return res.status(409).json({
+        error: "CLUB_SOLD_OUT",
       });
     }
 
     const capture = await capturePayPalOrder(orderID);
 
     const purchaseUnit = capture.purchase_units?.[0];
-    const paymentCapture =
-      purchaseUnit?.payments?.captures?.[0];
+    const paymentCapture = purchaseUnit?.payments?.captures?.[0];
 
     if (!paymentCapture || paymentCapture.status !== "COMPLETED") {
       return res.status(400).json({
@@ -138,8 +137,7 @@ export default async function handler(req, res) {
       });
     }
 
-    const payerEmail =
-      capture.payer?.email_address || null;
+    const payerEmail = capture.payer?.email_address || null;
 
     const payerName =
       capture.payer?.name
@@ -166,6 +164,19 @@ export default async function handler(req, res) {
       .single();
 
     if (bookingError) {
+      const msg = bookingError.message || "";
+      const lower = msg.toLowerCase();
+
+      const isDuplicate =
+        lower.includes("duplicate") ||
+        lower.includes("unique");
+
+      if (isDuplicate) {
+        return res.status(409).json({
+          error: "BOOKING_ALREADY_EXISTS",
+        });
+      }
+
       return res.status(500).json({
         error: "Failed to create booking",
         details: bookingError.message,
