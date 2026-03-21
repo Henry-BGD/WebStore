@@ -35,14 +35,14 @@ export default async function handler(req, res) {
     }
 
     if (club.status !== "open") {
-      return res.status(400).json({
-        error: "Club is not open",
+      return res.status(409).json({
+        error: "CLUB_NOT_OPEN",
       });
     }
 
     if (club.booked_count >= club.capacity) {
-      return res.status(400).json({
-        error: "No spots left",
+      return res.status(409).json({
+        error: "CLUB_SOLD_OUT",
       });
     }
 
