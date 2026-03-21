@@ -225,18 +225,19 @@ export default async function handler(req, res) {
       });
     }
 
-    return res.status(200).json({
-      success: true,
-      booking_id: booking.id,
-      zoom_link: club.zoom_link,
-      club_title: club.title,
-      club_time_text: clubTimeText,
-      payer_email: payerEmail,
-      message:
-        lang === "ru"
-          ? "Оплата подтверждена 🎉 Ссылка Zoom также отправлена на вашу почту."
-          : "Payment successful 🎉 Your Zoom link has also been sent to your email.",
-    });
+return res.status(200).json({
+  success: true,
+  booking_id: booking.id,
+  club_id: club.id,
+  zoom_link: club.zoom_link,
+  club_title: club.title,
+  club_time_text: clubTimeText,
+  payer_email: payerEmail,
+  message:
+    lang === "ru"
+      ? "Оплата подтверждена 🎉 Ссылка Zoom также отправлена на вашу почту."
+      : "Payment successful 🎉 Your Zoom link has also been sent to your email.",
+});
   } catch (err) {
     return res.status(500).json({
       error: "Unexpected server error",
