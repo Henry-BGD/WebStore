@@ -1090,7 +1090,7 @@ function ClubExtraInfo({ title, children }) {
 export default function App() {
 
 // ---TimeZone---
-  function getTimeZoneLabel(date, locale = "en-US") {
+function getTimeZoneLabel(date, locale = "en-US") {
   try {
     const parts = new Intl.DateTimeFormat(locale, {
       timeZoneName: "short",
@@ -1114,10 +1114,7 @@ function formatUtcForViewer(isoString, locale = "en-US") {
   return tzLabel ? `${formatter.format(date)} (${tzLabel})` : formatter.format(date);
 }
 
-// ---LitClub---
-const [showPaymentSuccess, setShowPaymentSuccess] = useState(false);
-  
-  async function safeReadJson(response) {
+async function safeReadJson(response) {
   try {
     return await response.json();
   } catch {
@@ -1125,7 +1122,90 @@ const [showPaymentSuccess, setShowPaymentSuccess] = useState(false);
   }
 }
 
-  const LIT_CLUB_A2_SAMPLE = (
+function savePaidClubToStorage(data) {
+  try {
+    const raw = localStorage.getItem("paid_clubs");
+    const parsed = raw ? JSON.parse(raw) : {};
+
+    if (!data?.club_id) return;
+
+    parsed[data.club_id] = data;
+    localStorage.setItem("paid_clubs", JSON.stringify(parsed));
+  } catch (error) {
+    console.error("Failed to save paid club to localStorage:", error);
+  }
+}
+
+function ClubZoomLinkBox({ lang, zoomLink }) {
+  if (!zoomLink) return null;
+
+  return (
+    <div className="mt-2 flex items-center justify-center">
+      <div className="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 px-4 py-4 text-center text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed">
+        <p className="font-semibold mb-2">
+          {lang === "ru" ? "Ссылка на встречу клуба:" : "Club meeting link:"}
+        </p>
+
+        <a
+          href={zoomLink}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-600 dark:text-blue-400 underline break-all"
+        >
+          {zoomLink}
+        </a>
+      </div>
+    </div>
+  );
+}
+
+// ---LitClub---
+const [showPaymentSuccess, setShowPaymentSuccess] = useState(false);
+
+const [clubA2, setClubA2] = useState(null);
+const [clubB1B2, setClubB1B2] = useState(null);
+const [clubsLoading, setClubsLoading] = useState(true);
+
+const [paidClubs, setPaidClubs] = useState({});
+
+const paypalA2Rendered = useRef(false);
+const paypalB1B2Rendered = useRef(false);
+
+const paidA2Data = clubA2?.id ? paidClubs[clubA2.id] : null;
+const hasPaidA2 = !!paidA2Data?.zoom_link;
+
+const paidB1B2Data = clubB1B2?.id ? paidClubs[clubB1B2.id] : null;
+const hasPaidB1B2 = !!paidB1B2Data?.zoom_link;
+
+const clubA2PriceBadge =
+  clubA2?.price_usd != null ? `$${clubA2.price_usd}` : "";
+
+const clubB1B2PriceBadge =
+  clubB1B2?.price_usd != null ? `$${clubB1B2.price_usd}` : "";
+
+useEffect(() => {
+  try {
+    const raw = localStorage.getItem("paid_clubs");
+    const parsed = raw ? JSON.parse(raw) : {};
+
+    const activeClubIds = [clubA2?.id, clubB1B2?.id].filter(Boolean);
+    const cleaned = {};
+
+    for (const clubId of activeClubIds) {
+      if (parsed[clubId]) {
+        cleaned[clubId] = parsed[clubId];
+      }
+    }
+
+    localStorage.setItem("paid_clubs", JSON.stringify(cleaned));
+    setPaidClubs(cleaned);
+  } catch (error) {
+    console.error("Failed to clean paid clubs:", error);
+    setPaidClubs({});
+  }
+}, [clubA2, clubB1B2]);
+
+const LIT_CLUB_A2_SAMPLE = (
   <div className="mt-2 space-y-3 text-[9px] sm:text-[10px] leading-snug text-slate-800 dark:text-slate-200">
     <p>
       Бы́ли брат и сестра́ — Ва́ся и Ка́тя; и у них была́ ко́шка. Весно́й ко́шка пропа́ла.
@@ -1615,30 +1695,27 @@ const loadClubs = useCallback(async () => {
   }
 }, []);
 
-  const getSoldOutMessage = useCallback(() => {
+const getSoldOutMessage = useCallback(() => {
   return lang === "ru"
     ? "К сожалению, все места уже заняты. Пожалуйста, подождите следующую встречу клуба."
     : "Unfortunately, all spots are already taken. Please wait for the next club meeting.";
 }, [lang]);
 
-  const handleClubSoldOut = useCallback(async () => {
+const handleClubSoldOut = useCallback(async () => {
   alert(getSoldOutMessage());
-
-  // Перезагружаем актуальные данные, чтобы UI сразу убрал PayPal-кнопки
   await loadClubs();
 }, [getSoldOutMessage, loadClubs]);
 
-  const getClubClosedMessage = useCallback(() => {
+const getClubClosedMessage = useCallback(() => {
   return lang === "ru"
-    ? "К сожалению, все места уже заняты. Пожалуйста, подождите следующую встречу клуба."
-    : "Unfortunately, all spots are already taken. Please wait for the next club meeting.";
+    ? "Запись в этот клуб уже закрыта."
+    : "Booking for this club is already closed.";
 }, [lang]);
 
-  const handleClubNotOpen = useCallback(async () => {
+const handleClubNotOpen = useCallback(async () => {
   alert(getClubClosedMessage());
   await loadClubs();
 }, [getClubClosedMessage, loadClubs]);
-  
 
 useEffect(() => {
   let cancelled = false;
@@ -1832,11 +1909,12 @@ onApprove: async (data) => {
       throw new Error(result?.error || "Capture failed");
     }
 
-    try {
-      sessionStorage.setItem("payment_success_data", JSON.stringify(result));
-    } catch (error) {
-      console.error("Failed to save payment success data:", error);
-    }
+    savePaidClubToStorage(result);
+
+    setPaidClubs((prev) => ({
+      ...prev,
+      [result.club_id]: result,
+    }));
 
     setShowPaymentSuccess(true);
     navigate("/payment-success");
@@ -2050,11 +2128,12 @@ onApprove: async (data) => {
       throw new Error(result?.error || "Capture failed");
     }
 
-    try {
-      sessionStorage.setItem("payment_success_data", JSON.stringify(result));
-    } catch (error) {
-      console.error("Failed to save payment success data:", error);
-    }
+    savePaidClubToStorage(result);
+
+    setPaidClubs((prev) => ({
+      ...prev,
+      [result.club_id]: result,
+    }));
 
     setShowPaymentSuccess(true);
     navigate("/payment-success");
@@ -2601,13 +2680,12 @@ const TAB_FROM_PATH = (p) => {
             {showPaymentSuccess ? (
               <PaymentSuccess
                 lang={lang}
-                onBack={() => {
-                  setShowPaymentSuccess(false);
-                  try {
-                    sessionStorage.removeItem("payment_success_data");
-                  } catch {}
-                  navigate("/literature-club");
-                }}
+
+              onBack={() => {
+                setShowPaymentSuccess(false);
+                navigate("/literature-club");
+              }}
+                
               />
             ) : (
               <TabsSlider
@@ -2769,41 +2847,41 @@ const TAB_FROM_PATH = (p) => {
             </ul>
               
               <div className="pt-1 mt-1 sm:pt-3 sm:mt-2">
-                {clubA2?.is_payable ? (
+                  {hasPaidA2 ? (
+                    <ClubZoomLinkBox lang={lang} zoomLink={paidA2Data.zoom_link} />
+                  ) : clubA2?.is_payable ? (
                     <div
                       className="paypal-shell paypal-shell-embedded"
                       id="paypal-shell-a2"
                     >
-                    <div
-                      id="paypal-button-container-a2"
-                      className="max-w-[420px] mx-auto"
-                    />
-                  </div>
-                ) : (
-                  <div className="relative">
-                    {/* Невидимый PayPal-layout для сохранения ТОЧНОЙ высоты */}
-                    <div className="opacity-0 pointer-events-none select-none hidden sm:block">
-                      <div className="max-w-[420px] mx-auto">
-                        <div className="rounded-md h-[39px] bg-yellow-400" />
-                        <div className="h-5" />
-                        <div className="rounded-md h-[39px] bg-slate-800" />
-                        <div className="h-5" />
-                        <div className="h-5 flex items-center justify-center">
-                          <span className="text-sm">Powered by PayPal</span>
+                      <div
+                        id="paypal-button-container-a2"
+                        className="max-w-[420px] mx-auto"
+                      />
+                    </div>
+                  ) : (
+                    <div className="relative">
+                      <div className="opacity-0 pointer-events-none select-none hidden sm:block">
+                        <div className="max-w-[420px] mx-auto">
+                          <div className="rounded-md h-[39px] bg-yellow-400" />
+                          <div className="h-5" />
+                          <div className="rounded-md h-[39px] bg-slate-800" />
+                          <div className="h-5" />
+                          <div className="h-5 flex items-center justify-center">
+                            <span className="text-sm">Powered by PayPal</span>
+                          </div>
+                        </div>
+                      </div>
+                  
+                      <div className="mt-2 flex items-center justify-center sm:mt-0 sm:absolute sm:inset-0">
+                        <div className="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 px-4 py-2 sm:py-4 text-center text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed">
+                          <span>{t("lit_club_sold_out_1")}</span>
+                          <br />
+                          <span>{t("lit_club_sold_out_2")}</span>
                         </div>
                       </div>
                     </div>
-              
-                    {/* Видимое сообщение поверх */}
-                    <div className="mt-2 flex items-center justify-center sm:mt-0 sm:absolute sm:inset-0">
-                      <div className="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 px-4 py-2 sm:py-4 text-center text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed">
-                        <span>{t("lit_club_sold_out_1")}</span>
-                        <br />
-                        <span>{t("lit_club_sold_out_2")}</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
+                  )}
               </div>
 
               <ClubExtraInfo title={t("lit_club_more_info")}>
@@ -2901,41 +2979,41 @@ const TAB_FROM_PATH = (p) => {
             </ul>
 
               <div className="pt-1 mt-1 sm:pt-3 sm:mt-2">
-              {clubB1B2?.is_payable ? (
-                <div
-                  className="paypal-shell paypal-shell-embedded"
-                  id="paypal-shell-b1b2"
-                >
-                  <div
-                    id="paypal-button-container-b1b2"
-                    className="max-w-[420px] mx-auto"
-                  />
-                </div>
-              ) : (
-                <div className="relative">
-                  {/* Невидимый PayPal-layout для сохранения ТОЧНОЙ высоты */}
-                  <div className="opacity-0 pointer-events-none select-none hidden sm:block">
-                    <div className="max-w-[420px] mx-auto">
-                      <div className="rounded-md h-[39px] bg-yellow-400" />
-                      <div className="h-5" />
-                      <div className="rounded-md h-[39px] bg-slate-800" />
-                      <div className="h-5" />
-                      <div className="h-5 flex items-center justify-center">
-                        <span className="text-sm">Powered by PayPal</span>
+                  {hasPaidB1B2 ? (
+                    <ClubZoomLinkBox lang={lang} zoomLink={paidB1B2Data.zoom_link} />
+                  ) : clubB1B2?.is_payable ? (
+                    <div
+                      className="paypal-shell paypal-shell-embedded"
+                      id="paypal-shell-b1b2"
+                    >
+                      <div
+                        id="paypal-button-container-b1b2"
+                        className="max-w-[420px] mx-auto"
+                      />
+                    </div>
+                  ) : (
+                    <div className="relative">
+                      <div className="opacity-0 pointer-events-none select-none hidden sm:block">
+                        <div className="max-w-[420px] mx-auto">
+                          <div className="rounded-md h-[39px] bg-yellow-400" />
+                          <div className="h-5" />
+                          <div className="rounded-md h-[39px] bg-slate-800" />
+                          <div className="h-5" />
+                          <div className="h-5 flex items-center justify-center">
+                            <span className="text-sm">Powered by PayPal</span>
+                          </div>
+                        </div>
+                      </div>
+                  
+                      <div className="mt-2 flex items-center justify-center sm:mt-0 sm:absolute sm:inset-0">
+                        <div className="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 px-4 py-2 sm:py-4 text-center text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed">
+                          <span>{t("lit_club_sold_out_1")}</span>
+                          <br />
+                          <span>{t("lit_club_sold_out_2")}</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-            
-                  {/* Видимое сообщение поверх */}
-                  <div className="mt-2 flex items-center justify-center sm:mt-0 sm:absolute sm:inset-0">
-                    <div className="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 px-4 py-2 sm:py-4 text-center text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed">
-                      <span>{t("lit_club_sold_out_1")}</span>
-                      <br />
-                      <span>{t("lit_club_sold_out_2")}</span>
-                    </div>
-                  </div>
-                </div>
-              )}
+                  )}
             </div>
 
                 <ClubExtraInfo title={t("lit_club_more_info")}>
