@@ -1117,6 +1117,27 @@ function formatUtcForViewer(isoString, locale = "en-US") {
 // ---LitClub---
 const [showPaymentSuccess, setShowPaymentSuccess] = useState(false);
 
+const getSoldOutMessage = useCallback(() => {
+  return lang === "ru"
+    ? "К сожалению, все места уже заняты. Пожалуйста, подождите следующую встречу клуба."
+    : "Unfortunately, all spots are already taken. Please wait for the next club meeting.";
+}, [lang]);
+
+  const handleClubSoldOut = useCallback(async () => {
+  alert(getSoldOutMessage());
+
+  // Перезагружаем актуальные данные, чтобы UI сразу убрал PayPal-кнопки
+  await loadClubs();
+}, [getSoldOutMessage, loadClubs]);
+
+  async function safeReadJson(response) {
+  try {
+    return await response.json();
+  } catch {
+    return null;
+  }
+}
+
   const LIT_CLUB_A2_SAMPLE = (
   <div className="mt-2 space-y-3 text-[9px] sm:text-[10px] leading-snug text-slate-800 dark:text-slate-200">
     <p>
@@ -1586,39 +1607,42 @@ const clubA2PriceBadge =
 const clubB1B2PriceBadge =
   clubB1B2?.price_usd != null ? `$${clubB1B2.price_usd}` : "";
 
-  useEffect(() => {
-  let isMounted = true;
+const loadClubs = useCallback(async () => {
+  try {
+    setClubsLoading(true);
 
-  async function loadClubs() {
-    try {
-      setClubsLoading(true);
+    const [a2Res, b1b2Res] = await Promise.all([
+      fetch("/api/club/current?level=a2", { cache: "no-store" }),
+      fetch("/api/club/current?level=b1b2", { cache: "no-store" }),
+    ]);
 
-      const [a2Res, b1b2Res] = await Promise.all([
-        fetch("/api/club/current?level=a2"),
-        fetch("/api/club/current?level=b1b2"),
-      ]);
+    const a2Data = await a2Res.json();
+    const b1b2Data = await b1b2Res.json();
 
-      const a2Data = await a2Res.json();
-      const b1b2Data = await b1b2Res.json();
-
-      if (!isMounted) return;
-
-      if (a2Res.ok) setClubA2(a2Data);
-      if (b1b2Res.ok) setClubB1B2(b1b2Data);
-    } catch (error) {
-      console.error("Failed to load clubs:", error);
-    } finally {
-      if (isMounted) setClubsLoading(false);
-    }
+    if (a2Res.ok) setClubA2(a2Data);
+    if (b1b2Res.ok) setClubB1B2(b1b2Data);
+  } catch (error) {
+    console.error("Failed to load clubs:", error);
+  } finally {
+    setClubsLoading(false);
   }
-
-  loadClubs();
-
-  return () => {
-    isMounted = false;
-  };
 }, []);
 
+useEffect(() => {
+  let cancelled = false;
+
+  const run = async () => {
+    if (cancelled) return;
+    await loadClubs();
+  };
+
+  run();
+
+  return () => {
+    cancelled = true;
+  };
+}, [loadClubs]);
+  
   // ================== EASTER EGG STATE ==================
   const [showSwipeHint, setShowSwipeHint] = useState(false);
   const swipeHintTimerRef = useRef(null);
@@ -1729,62 +1753,81 @@ useEffect(() => {
           tagline: false,
         },
 
-        createOrder: async () => {
-          const response = await fetch("/api/paypal/create-order", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              clubId: clubA2.id,
-            }),
-          });
+createOrder: async () => {
+  const response = await fetch("/api/paypal/create-order", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      clubId: clubA2.id,
+    }),
+  });
 
-          const data = await response.json();
+  const data = await safeReadJson(response);
 
-          if (!response.ok) {
-            throw new Error(data.error || "Failed to create PayPal order");
-          }
+  if (!response.ok) {
+    if (data?.error === "CLUB_SOLD_OUT") {
+      await handleClubSoldOut();
+      throw new Error("CLUB_SOLD_OUT");
+    }
 
-          return data.orderID;
-        },
+    throw new Error(data?.error || "Failed to create PayPal order");
+  }
 
-        onApprove: async (data) => {
-          try {
-            const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  if (!data?.orderID) {
+    throw new Error("Missing PayPal order ID");
+  }
 
-            const response = await fetch("/api/paypal/capture-order", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                orderID: data.orderID,
-                clubId: clubA2.id,
-                language: lang === "ru" ? "ru" : "en",
-                timeZone,
-              }),
-            });
+  return data.orderID;
+},
 
-            const result = await response.json();
+onApprove: async (data) => {
+  try {
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-            if (!response.ok) {
-              throw new Error(result.error || "Capture failed");
-            }
+    const response = await fetch("/api/paypal/capture-order", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        orderID: data.orderID,
+        clubId: clubA2.id,
+        language: lang === "ru" ? "ru" : "en",
+        timeZone,
+      }),
+    });
 
-            try {
-              sessionStorage.setItem("payment_success_data", JSON.stringify(result));
-            } catch (error) {
-              console.error("Failed to save payment success data:", error);
-            }
+    const result = await safeReadJson(response);
 
-            setShowPaymentSuccess(true);
-            navigate("/payment-success");
-          } catch (error) {
-            console.error("Capture error:", error);
-            alert(lang === "ru" ? "Ошибка после оплаты" : "Error after payment");
-          }
-        },
+    if (!response.ok) {
+      if (result?.error === "CLUB_SOLD_OUT") {
+        await handleClubSoldOut();
+        return;
+      }
+
+      throw new Error(result?.error || "Capture failed");
+    }
+
+    try {
+      sessionStorage.setItem("payment_success_data", JSON.stringify(result));
+    } catch (error) {
+      console.error("Failed to save payment success data:", error);
+    }
+
+    setShowPaymentSuccess(true);
+    navigate("/payment-success");
+  } catch (error) {
+    console.error("Capture error:", error);
+
+    if (String(error?.message) === "CLUB_SOLD_OUT") {
+      return;
+    }
+
+    alert(lang === "ru" ? "Ошибка после оплаты" : "Error after payment");
+  }
+},
 
 onCancel: () => {
   // Пользователь просто закрыл окно PayPal — ничего страшного
@@ -1804,7 +1847,12 @@ onError: (err) => {
     text.includes("user closed") ||
     text.includes("zoid destroyed before props");
 
-  if (looksLikeUserClosed) {
+  const isSoldOut =
+    text.includes("club_sold_out") ||
+    text.includes("sold_out") ||
+    text.includes("sold out");
+
+  if (looksLikeUserClosed || isSoldOut) {
     return;
   }
 
@@ -1909,62 +1957,81 @@ useEffect(() => {
           tagline: false,
         },
 
-        createOrder: async () => {
-          const response = await fetch("/api/paypal/create-order", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              clubId: clubB1B2.id,
-            }),
-          });
+  createOrder: async () => {
+  const response = await fetch("/api/paypal/create-order", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      clubId: clubB1B2.id,
+    }),
+  });
 
-          const data = await response.json();
+  const data = await safeReadJson(response);
 
-          if (!response.ok) {
-            throw new Error(data.error || "Failed to create PayPal order");
-          }
+  if (!response.ok) {
+    if (data?.error === "CLUB_SOLD_OUT") {
+      await handleClubSoldOut();
+      throw new Error("CLUB_SOLD_OUT");
+    }
 
-          return data.orderID;
-        },
+    throw new Error(data?.error || "Failed to create PayPal order");
+  }
 
-        onApprove: async (data) => {
-          try {
-            const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  if (!data?.orderID) {
+    throw new Error("Missing PayPal order ID");
+  }
 
-            const response = await fetch("/api/paypal/capture-order", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                orderID: data.orderID,
-                clubId: clubB1B2.id,
-                language: lang === "ru" ? "ru" : "en",
-                timeZone,
-              }),
-            });
+  return data.orderID;
+},
 
-            const result = await response.json();
+onApprove: async (data) => {
+  try {
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-            if (!response.ok) {
-              throw new Error(result.error || "Capture failed");
-            }
+    const response = await fetch("/api/paypal/capture-order", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        orderID: data.orderID,
+        clubId: clubB1B2.id,
+        language: lang === "ru" ? "ru" : "en",
+        timeZone,
+      }),
+    });
 
-            try {
-              sessionStorage.setItem("payment_success_data", JSON.stringify(result));
-            } catch (error) {
-              console.error("Failed to save payment success data:", error);
-            }
+    const result = await safeReadJson(response);
 
-            setShowPaymentSuccess(true);
-            navigate("/payment-success");
-          } catch (error) {
-            console.error("Capture error:", error);
-            alert(lang === "ru" ? "Ошибка после оплаты" : "Error after payment");
-          }
-        },
+    if (!response.ok) {
+      if (result?.error === "CLUB_SOLD_OUT") {
+        await handleClubSoldOut();
+        return;
+      }
+
+      throw new Error(result?.error || "Capture failed");
+    }
+
+    try {
+      sessionStorage.setItem("payment_success_data", JSON.stringify(result));
+    } catch (error) {
+      console.error("Failed to save payment success data:", error);
+    }
+
+    setShowPaymentSuccess(true);
+    navigate("/payment-success");
+  } catch (error) {
+    console.error("Capture error:", error);
+
+    if (String(error?.message) === "CLUB_SOLD_OUT") {
+      return;
+    }
+
+    alert(lang === "ru" ? "Ошибка после оплаты" : "Error after payment");
+  }
+},
 
 onCancel: () => {
   // Пользователь просто закрыл окно PayPal — ничего страшного
@@ -1984,7 +2051,12 @@ onError: (err) => {
     text.includes("user closed") ||
     text.includes("zoid destroyed before props");
 
-  if (looksLikeUserClosed) {
+  const isSoldOut =
+    text.includes("club_sold_out") ||
+    text.includes("sold_out") ||
+    text.includes("sold out");
+
+  if (looksLikeUserClosed || isSoldOut) {
     return;
   }
 
@@ -2563,7 +2635,7 @@ const TAB_FROM_PATH = (p) => {
   </h1>
 
   <a
-    href="https://t.me/your_link_here"
+    href="https://t.me/russianlitclub"
     target="_blank"
     rel="noopener noreferrer"
     aria-label={t("lit_club_telegram")}
