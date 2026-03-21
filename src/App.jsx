@@ -1627,6 +1627,17 @@ const loadClubs = useCallback(async () => {
   // Перезагружаем актуальные данные, чтобы UI сразу убрал PayPal-кнопки
   await loadClubs();
 }, [getSoldOutMessage, loadClubs]);
+
+  const getClubClosedMessage = useCallback(() => {
+  return lang === "ru"
+    ? "К сожалению, все места уже заняты. Пожалуйста, подождите следующую встречу клуба."
+    : "Unfortunately, all spots are already taken. Please wait for the next club meeting.";
+}, [lang]);
+
+  const handleClubNotOpen = useCallback(async () => {
+  alert(getClubClosedMessage());
+  await loadClubs();
+}, [getClubClosedMessage, loadClubs]);
   
 
 useEffect(() => {
@@ -1767,14 +1778,19 @@ createOrder: async () => {
 
   const data = await safeReadJson(response);
 
-  if (!response.ok) {
-    if (data?.error === "CLUB_SOLD_OUT") {
-      await handleClubSoldOut();
-      throw new Error("CLUB_SOLD_OUT");
-    }
-
-    throw new Error(data?.error || "Failed to create PayPal order");
+if (!response.ok) {
+  if (data?.error === "CLUB_SOLD_OUT") {
+    await handleClubSoldOut();
+    throw new Error("CLUB_SOLD_OUT");
   }
+
+  if (data?.error === "CLUB_NOT_OPEN") {
+    await handleClubNotOpen();
+    throw new Error("CLUB_NOT_OPEN");
+  }
+
+  throw new Error(data?.error || "Failed to create PayPal order");
+}
 
   if (!data?.orderID) {
     throw new Error("Missing PayPal order ID");
@@ -1808,6 +1824,11 @@ onApprove: async (data) => {
         return;
       }
 
+      if (result?.error === "CLUB_NOT_OPEN") {
+        await handleClubNotOpen();
+        return;
+      }
+
       throw new Error(result?.error || "Capture failed");
     }
 
@@ -1822,7 +1843,10 @@ onApprove: async (data) => {
   } catch (error) {
     console.error("Capture error:", error);
 
-    if (String(error?.message) === "CLUB_SOLD_OUT") {
+    if (
+      String(error?.message) === "CLUB_SOLD_OUT" ||
+      String(error?.message) === "CLUB_NOT_OPEN"
+    ) {
       return;
     }
 
@@ -1848,12 +1872,13 @@ onError: (err) => {
     text.includes("user closed") ||
     text.includes("zoid destroyed before props");
 
-  const isSoldOut =
+  const isKnownClubState =
     text.includes("club_sold_out") ||
+    text.includes("club_not_open") ||
     text.includes("sold_out") ||
     text.includes("sold out");
 
-  if (looksLikeUserClosed || isSoldOut) {
+  if (looksLikeUserClosed || isKnownClubState) {
     return;
   }
 
@@ -1906,7 +1931,7 @@ onError: (err) => {
     window.removeEventListener("pageshow", onPageShow);
     document.removeEventListener("visibilitychange", onVisibility);
   };
-}, [clubA2, lang, navigate]);
+}, [clubA2, lang, navigate, handleClubSoldOut, handleClubNotOpen]);
 
 // Render of the PP Button B1-B2
 useEffect(() => {
@@ -1971,14 +1996,19 @@ useEffect(() => {
 
   const data = await safeReadJson(response);
 
-  if (!response.ok) {
-    if (data?.error === "CLUB_SOLD_OUT") {
-      await handleClubSoldOut();
-      throw new Error("CLUB_SOLD_OUT");
-    }
-
-    throw new Error(data?.error || "Failed to create PayPal order");
+if (!response.ok) {
+  if (data?.error === "CLUB_SOLD_OUT") {
+    await handleClubSoldOut();
+    throw new Error("CLUB_SOLD_OUT");
   }
+
+  if (data?.error === "CLUB_NOT_OPEN") {
+    await handleClubNotOpen();
+    throw new Error("CLUB_NOT_OPEN");
+  }
+
+  throw new Error(data?.error || "Failed to create PayPal order");
+}
 
   if (!data?.orderID) {
     throw new Error("Missing PayPal order ID");
@@ -2012,6 +2042,11 @@ onApprove: async (data) => {
         return;
       }
 
+      if (result?.error === "CLUB_NOT_OPEN") {
+        await handleClubNotOpen();
+        return;
+      }
+
       throw new Error(result?.error || "Capture failed");
     }
 
@@ -2026,7 +2061,10 @@ onApprove: async (data) => {
   } catch (error) {
     console.error("Capture error:", error);
 
-    if (String(error?.message) === "CLUB_SOLD_OUT") {
+    if (
+      String(error?.message) === "CLUB_SOLD_OUT" ||
+      String(error?.message) === "CLUB_NOT_OPEN"
+    ) {
       return;
     }
 
@@ -2052,12 +2090,13 @@ onError: (err) => {
     text.includes("user closed") ||
     text.includes("zoid destroyed before props");
 
-  const isSoldOut =
+  const isKnownClubState =
     text.includes("club_sold_out") ||
+    text.includes("club_not_open") ||
     text.includes("sold_out") ||
     text.includes("sold out");
 
-  if (looksLikeUserClosed || isSoldOut) {
+  if (looksLikeUserClosed || isKnownClubState) {
     return;
   }
 
@@ -2110,7 +2149,7 @@ onError: (err) => {
     window.removeEventListener("pageshow", onPageShow);
     document.removeEventListener("visibilitychange", onVisibility);
   };
-}, [clubB1B2, lang, navigate]);
+}, [clubB1B2, lang, navigate, handleClubSoldOut, handleClubNotOpen]);
 
 
   useEffect(() => {
