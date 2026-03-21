@@ -401,7 +401,7 @@ lit_club_more_1_b_q: "How does the club work?",
 lit_club_more_1_b_a: "First, we introduce ourselves (~20 min), then we read by roles (~45 min), and after that we discuss the text (~55 min).",
 
 lit_club_more_15_q: "What materials will I receive after the club meeting?",
-lit_club_more_15_a: "During the reading and discussion, your mistakes will be written down in a document. After the club meeting, you will receive this document (with corrected mistakes) and the text we read with stress marks.",
+lit_club_more_15_a: "After the club, you will receive a document with the text in Russian with stress marks and its English translation.",
 
 lit_club_more_2_q: "Please check the date and time carefully.",
 lit_club_more_2_a: "Payments are non-refundable after booking. ⚠️",
@@ -493,7 +493,7 @@ lit_club_more_1_b_q: "Как проходит клуб?",
 lit_club_more_1_b_a: "Сначала мы знакомимся (~20 минут), потом читаем по ролям (~45 минут), а потом обсуждаем текст (~55 минут).",
 
 lit_club_more_15_q: "Какие материалы я получу после встречи клуба?",
-lit_club_more_15_a: "Во время чтения и ответов на вопросы ваши ошибки будут записаны в документ. После встречи клуба вы получите этот документ (с исправленными ошибками) и текст с ударениями, который мы читали.",
+lit_club_more_15_a: "ППосле клуба вы получите документ с русским текстом с ударениями и его переводом на английский язык.",
 
 lit_club_more_2_q: "Пожалуйста, внимательно посмотрите на дату и время.",
 lit_club_more_2_a: "После оплаты деньги не возвращаются. ⚠️",
