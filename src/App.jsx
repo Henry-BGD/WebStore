@@ -1661,19 +1661,6 @@ const showAudio = tab === "free-audio";
       }, [tab, isMobile, lang]);
   
   // ================== PPPlata ==================
-const [clubA2, setClubA2] = useState(null);
-const [clubB1B2, setClubB1B2] = useState(null);
-const [clubsLoading, setClubsLoading] = useState(true);
-
-const paypalA2Rendered = useRef(false);
-const paypalB1B2Rendered = useRef(false);
-
-const clubA2PriceBadge =
-  clubA2?.price_usd != null ? `$${clubA2.price_usd}` : "";
-
-const clubB1B2PriceBadge =
-  clubB1B2?.price_usd != null ? `$${clubB1B2.price_usd}` : "";
-
 const loadClubs = useCallback(async () => {
   try {
     setClubsLoading(true);
