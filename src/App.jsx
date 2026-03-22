@@ -1973,10 +1973,10 @@ onApprove: async (data) => {
 
     savePaidClubToStorage(result);
 
-    try {
-  localStorage.setItem("last_payment", JSON.stringify(result));
+try {
+  sessionStorage.setItem("payment_success_data", JSON.stringify(result));
 } catch (error) {
-  console.error("Failed to save last payment:", error);
+  console.error("Failed to save payment success data:", error);
 }
 
     setPaidClubs((prev) => ({
@@ -2227,10 +2227,10 @@ onApprove: async (data) => {
 
     savePaidClubToStorage(result);
 
-    try {
-  localStorage.setItem("last_payment", JSON.stringify(result));
+try {
+  sessionStorage.setItem("payment_success_data", JSON.stringify(result));
 } catch (error) {
-  console.error("Failed to save last payment:", error);
+  console.error("Failed to save payment success data:", error);
 }
 
     setPaidClubs((prev) => ({
