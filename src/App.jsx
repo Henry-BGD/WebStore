@@ -2952,44 +2952,47 @@ const TAB_FROM_PATH = (p) => {
             </ul>
               
               <div className="pt-1 mt-1 sm:pt-3 sm:mt-2">
-                  {hasPaidA2 ? (
-                    <ClubZoomLinkBox lang={lang} zoomLink={paidA2Data.zoom_link} />
-                  ) : clubA2?.is_payable ? (
-<div
-  className="paypal-shell paypal-shell-embedded"
-  id="paypal-shell-a2"
-  style={{ colorScheme: "none" }}
->
-  <div
-    id="paypal-button-container-a2"
-    className="max-w-[420px] mx-auto"
-  />
-</div>
-                  ) : (
-                    <div className="relative">
-                      <div className="opacity-0 pointer-events-none select-none hidden sm:block">
-                        <div className="max-w-[420px] mx-auto">
-                          <div className="rounded-md h-[39px] bg-yellow-400" />
-                          <div className="h-5" />
-                          <div className="rounded-md h-[39px] bg-slate-800" />
-                          <div className="h-5" />
-                          <div className="h-5 flex items-center justify-center">
-                            <span className="text-sm">Powered by PayPal</span>
-                          </div>
-                        </div>
-                      </div>
-                  
-                      <div className="mt-2 flex items-center justify-center sm:mt-0 sm:absolute sm:inset-0">
-                        <div className="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 px-4 py-2 sm:py-4 text-center text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed">
-                          <span>{t("lit_club_sold_out_1")}</span>
-                          <br />
-                          <span>{t("lit_club_sold_out_2")}</span>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-              </div>
 
+{hasPaidA2 ? (
+  <ClubZoomLinkBox lang={lang} zoomLink={paidA2Data.zoom_link} />
+) : clubsLoading ? (
+  <div className="h-[110px]" />
+) : clubA2?.is_payable ? (
+  <div
+    className="paypal-shell paypal-shell-embedded"
+    id="paypal-shell-a2"
+    style={{ colorScheme: "none" }}
+  >
+    <div
+      id="paypal-button-container-a2"
+      className="max-w-[420px] mx-auto"
+    />
+  </div>
+) : (
+  <div className="relative">
+    <div className="opacity-0 pointer-events-none select-none hidden sm:block">
+      <div className="max-w-[420px] mx-auto">
+        <div className="rounded-md h-[39px] bg-yellow-400" />
+        <div className="h-5" />
+        <div className="rounded-md h-[39px] bg-slate-800" />
+        <div className="h-5" />
+        <div className="h-5 flex items-center justify-center">
+          <span className="text-sm">Powered by PayPal</span>
+        </div>
+      </div>
+    </div>
+
+    <div className="mt-2 flex items-center justify-center sm:mt-0 sm:absolute sm:inset-0">
+      <div className="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 px-4 py-2 sm:py-4 text-center text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed">
+        <span>{t("lit_club_sold_out_1")}</span>
+        <br />
+        <span>{t("lit_club_sold_out_2")}</span>
+      </div>
+    </div>
+  </div>
+)}
+
+            </div>
               <ClubExtraInfo title={t("lit_club_more_info")}>
                 <div>
                   <p className="font-semibold">{t("lit_club_what_read_q")}</p>
@@ -3085,44 +3088,47 @@ const TAB_FROM_PATH = (p) => {
             </ul>
 
               <div className="pt-1 mt-1 sm:pt-3 sm:mt-2">
-                  {hasPaidB1B2 ? (
-                    <ClubZoomLinkBox lang={lang} zoomLink={paidB1B2Data.zoom_link} />
-                  ) : clubB1B2?.is_payable ? (
-<div
-  className="paypal-shell paypal-shell-embedded"
-  id="paypal-shell-b1b2"
-  style={{ colorScheme: "none" }}
->
-  <div
-    id="paypal-button-container-b1b2"
-    className="max-w-[420px] mx-auto"
-  />
-</div>
-                  ) : (
-                    <div className="relative">
-                      <div className="opacity-0 pointer-events-none select-none hidden sm:block">
-                        <div className="max-w-[420px] mx-auto">
-                          <div className="rounded-md h-[39px] bg-yellow-400" />
-                          <div className="h-5" />
-                          <div className="rounded-md h-[39px] bg-slate-800" />
-                          <div className="h-5" />
-                          <div className="h-5 flex items-center justify-center">
-                            <span className="text-sm">Powered by PayPal</span>
-                          </div>
-                        </div>
-                      </div>
-                  
-                      <div className="mt-2 flex items-center justify-center sm:mt-0 sm:absolute sm:inset-0">
-                        <div className="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 px-4 py-2 sm:py-4 text-center text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed">
-                          <span>{t("lit_club_sold_out_1")}</span>
-                          <br />
-                          <span>{t("lit_club_sold_out_2")}</span>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-            </div>
 
+{hasPaidB1B2 ? (
+  <ClubZoomLinkBox lang={lang} zoomLink={paidB1B2Data.zoom_link} />
+) : clubsLoading ? (
+  <div className="h-[110px]" />
+) : clubB1B2?.is_payable ? (
+  <div
+    className="paypal-shell paypal-shell-embedded"
+    id="paypal-shell-b1b2"
+    style={{ colorScheme: "none" }}
+  >
+    <div
+      id="paypal-button-container-b1b2"
+      className="max-w-[420px] mx-auto"
+    />
+  </div>
+) : (
+  <div className="relative">
+    <div className="opacity-0 pointer-events-none select-none hidden sm:block">
+      <div className="max-w-[420px] mx-auto">
+        <div className="rounded-md h-[39px] bg-yellow-400" />
+        <div className="h-5" />
+        <div className="rounded-md h-[39px] bg-slate-800" />
+        <div className="h-5" />
+        <div className="h-5 flex items-center justify-center">
+          <span className="text-sm">Powered by PayPal</span>
+        </div>
+      </div>
+    </div>
+
+    <div className="mt-2 flex items-center justify-center sm:mt-0 sm:absolute sm:inset-0">
+      <div className="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 px-4 py-2 sm:py-4 text-center text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed">
+        <span>{t("lit_club_sold_out_1")}</span>
+        <br />
+        <span>{t("lit_club_sold_out_2")}</span>
+      </div>
+    </div>
+  </div>
+)}
+                
+            </div>
                 <ClubExtraInfo title={t("lit_club_more_info")}>
                   <div>
                     <p className="font-semibold">{t("lit_club_what_read_q")}</p>
