@@ -1166,6 +1166,11 @@ const [clubA2, setClubA2] = useState(null);
 const [clubB1B2, setClubB1B2] = useState(null);
 const [clubsLoading, setClubsLoading] = useState(true);
 
+const [paypalSdkReady, setPaypalSdkReady] = useState(() => {
+  if (typeof window === "undefined") return false;
+  return !!window.paypal;
+});
+
 const [paidClubs, setPaidClubs] = useState({});
 
 const paypalA2Rendered = useRef(false);
@@ -1756,22 +1761,65 @@ useEffect(() => {
 }, [isMobile]);
 
   // PP Helper (PP Button)
-  useEffect(() => {
+useEffect(() => {
+  if (tab !== "lit-club") return;
+
+  if (typeof window === "undefined") return;
+
+  if (window.paypal) {
+    setPaypalSdkReady(true);
+    return;
+  }
+
   const existing = document.getElementById("paypal-sdk");
-  if (existing) return;
+
+  if (existing) {
+    const handleLoad = () => setPaypalSdkReady(true);
+    const handleError = () => {
+      console.error("Failed to load PayPal SDK");
+      setPaypalSdkReady(false);
+    };
+
+    existing.addEventListener("load", handleLoad, { once: true });
+    existing.addEventListener("error", handleError, { once: true });
+
+    return () => {
+      existing.removeEventListener("load", handleLoad);
+      existing.removeEventListener("error", handleError);
+    };
+  }
 
   const clientId = import.meta.env.VITE_PAYPAL_CLIENT_ID;
-  if (!clientId) return;
+  if (!clientId) {
+    console.error("Missing VITE_PAYPAL_CLIENT_ID");
+    return;
+  }
 
   const script = document.createElement("script");
   script.id = "paypal-sdk";
-  script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}&currency=USD`;
+  script.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(clientId)}&currency=USD&components=buttons`;
   script.async = true;
+  script.defer = true;
 
-  document.body.appendChild(script);
+  const handleLoad = () => {
+    setPaypalSdkReady(true);
+  };
 
-  return () => {};
-}, []);
+  const handleError = () => {
+    console.error("Failed to load PayPal SDK");
+    setPaypalSdkReady(false);
+  };
+
+  script.addEventListener("load", handleLoad, { once: true });
+  script.addEventListener("error", handleError, { once: true });
+
+  document.head.appendChild(script);
+
+  return () => {
+    script.removeEventListener("load", handleLoad);
+    script.removeEventListener("error", handleError);
+  };
+}, [tab]);
 
   useEffect(() => {
   return () => {
@@ -1966,21 +2014,20 @@ onError: (err) => {
       });
   };
 
-  const ensureA2Rendered = () => {
-    const container = document.getElementById(containerId);
-    if (!container) return;
+const ensureA2Rendered = () => {
+  const container = document.getElementById(containerId);
+  if (!container) return;
 
-    if (!window.paypal) {
-      setTimeout(ensureA2Rendered, 300);
-      return;
-    }
+  if (!paypalSdkReady || !window.paypal) {
+    return;
+  }
 
-    if (!paypalA2Rendered.current || container.childElementCount === 0) {
-      renderA2();
-    } else {
-      markReadyWhenIframeLoads();
-    }
-  };
+  if (!paypalA2Rendered.current || container.childElementCount === 0) {
+    renderA2();
+  } else {
+    markReadyWhenIframeLoads();
+  }
+};
 
   ensureA2Rendered();
 
@@ -1996,7 +2043,7 @@ onError: (err) => {
     window.removeEventListener("pageshow", onPageShow);
     document.removeEventListener("visibilitychange", onVisibility);
   };
-}, [clubA2, lang, navigate, handleClubSoldOut, handleClubNotOpen]);
+}, [clubA2, lang, navigate, handleClubSoldOut, handleClubNotOpen, paypalSdkReady]);
 
 // Render of the PP Button B1-B2
 useEffect(() => {
@@ -2185,21 +2232,20 @@ onError: (err) => {
       });
   };
 
-  const ensureB1B2Rendered = () => {
-    const container = document.getElementById(containerId);
-    if (!container) return;
+const ensureB1B2Rendered = () => {
+  const container = document.getElementById(containerId);
+  if (!container) return;
 
-    if (!window.paypal) {
-      setTimeout(ensureB1B2Rendered, 300);
-      return;
-    }
+  if (!paypalSdkReady || !window.paypal) {
+    return;
+  }
 
-    if (!paypalB1B2Rendered.current || container.childElementCount === 0) {
-      renderB1B2();
-    } else {
-      markReadyWhenIframeLoads();
-    }
-  };
+  if (!paypalB1B2Rendered.current || container.childElementCount === 0) {
+    renderB1B2();
+  } else {
+    markReadyWhenIframeLoads();
+  }
+};
 
   ensureB1B2Rendered();
 
@@ -2215,7 +2261,7 @@ onError: (err) => {
     window.removeEventListener("pageshow", onPageShow);
     document.removeEventListener("visibilitychange", onVisibility);
   };
-}, [clubB1B2, lang, navigate, handleClubSoldOut, handleClubNotOpen]);
+}, [clubB1B2, lang, navigate, handleClubSoldOut, handleClubNotOpen, paypalSdkReady]);
 
 
   useEffect(() => {
