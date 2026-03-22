@@ -1801,7 +1801,7 @@ useEffect(() => {
     };
   }
 
-  const clientId = import.meta.env.VITE_PAYPAL_CLIENT_ID;
+  const clientId = import.meta.env.VITE_PAYPAL_SANDBOX_CLIENT_ID;
   if (!clientId) {
     console.error("Missing VITE_PAYPAL_CLIENT_ID");
     return;
