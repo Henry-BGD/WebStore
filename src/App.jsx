@@ -1846,6 +1846,21 @@ useEffect(() => {
   const containerId = "paypal-button-container-a2";
   const shellId = "paypal-shell-a2";
 
+  const resetA2Buttons = () => {
+  const container = document.getElementById(containerId);
+  const shell = document.getElementById(shellId);
+
+  if (container) {
+    container.innerHTML = "";
+  }
+
+  if (shell) {
+    shell.classList.remove("paypal-ready");
+  }
+
+  paypalA2Rendered.current = false;
+};
+
   const markReadyWhenIframeLoads = () => {
     const shell = document.getElementById(shellId);
     const container = document.getElementById(containerId);
@@ -1980,8 +1995,13 @@ onApprove: async (data) => {
 },
 
 onCancel: () => {
-  // Пользователь просто закрыл окно PayPal — ничего страшного
   console.log("PayPal popup was closed by user");
+
+  resetA2Buttons();
+
+  setTimeout(() => {
+    ensureA2Rendered();
+  }, 0);
 },
 
 onError: (err) => {
@@ -2003,9 +2023,19 @@ onError: (err) => {
     text.includes("sold_out") ||
     text.includes("sold out");
 
-  if (looksLikeUserClosed || isKnownClubState) {
-    return;
-  }
+if (looksLikeUserClosed) {
+  resetA2Buttons();
+
+  setTimeout(() => {
+    ensureA2Rendered();
+  }, 0);
+
+  return;
+}
+
+if (isKnownClubState) {
+  return;
+}
 
   const message =
     lang === "ru"
@@ -2063,6 +2093,21 @@ useEffect(() => {
 
   const containerId = "paypal-button-container-b1b2";
   const shellId = "paypal-shell-b1b2";
+
+    const resetB1B2Buttons = () => {
+    const container = document.getElementById(containerId);
+    const shell = document.getElementById(shellId);
+
+    if (container) {
+      container.innerHTML = "";
+    }
+
+    if (shell) {
+      shell.classList.remove("paypal-ready");
+    }
+
+    paypalB1B2Rendered.current = false;
+  };
 
   const markReadyWhenIframeLoads = () => {
     const shell = document.getElementById(shellId);
@@ -2198,8 +2243,13 @@ onApprove: async (data) => {
 },
 
 onCancel: () => {
-  // Пользователь просто закрыл окно PayPal — ничего страшного
   console.log("PayPal popup was closed by user");
+
+  resetB1B2Buttons();
+
+  setTimeout(() => {
+    ensureB1B2Rendered();
+  }, 0);
 },
 
 onError: (err) => {
@@ -2221,9 +2271,19 @@ onError: (err) => {
     text.includes("sold_out") ||
     text.includes("sold out");
 
-  if (looksLikeUserClosed || isKnownClubState) {
-    return;
-  }
+if (looksLikeUserClosed) {
+  resetB1B2Buttons();
+
+  setTimeout(() => {
+    ensureB1B2Rendered();
+  }, 0);
+
+  return;
+}
+
+if (isKnownClubState) {
+  return;
+}
 
   const message =
     lang === "ru"
