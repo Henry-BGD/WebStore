@@ -215,14 +215,18 @@ export default async function handler(req, res) {
         zoomLink: club.zoom_link,
         payerName,
       });
-
-      await resend.emails.send({
-        from: "Russian Literature Club <orders@litclub.genndybogdanov.com>",
-        to: payerEmail,
-        subject: emailContent.subject,
-        html: emailContent.html,
-        replyTo: "genndybogdanov@gmail.com",
-      });
+    
+      try {
+        await resend.emails.send({
+          from: "Russian Literature Club <orders@litclub.genndybogdanov.com>",
+          to: payerEmail,
+          subject: emailContent.subject,
+          html: emailContent.html,
+          replyTo: "genndybogdanov@gmail.com",
+        });
+      } catch (emailError) {
+        console.error("Failed to send booking email:", emailError);
+      }
     }
 
 return res.status(200).json({
