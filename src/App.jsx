@@ -1973,6 +1973,12 @@ onApprove: async (data) => {
 
     savePaidClubToStorage(result);
 
+    try {
+  localStorage.setItem("last_payment", JSON.stringify(result));
+} catch (error) {
+  console.error("Failed to save last payment:", error);
+}
+
     setPaidClubs((prev) => ({
       ...prev,
       [result.club_id]: result,
@@ -2220,6 +2226,12 @@ onApprove: async (data) => {
     }
 
     savePaidClubToStorage(result);
+
+    try {
+  localStorage.setItem("last_payment", JSON.stringify(result));
+} catch (error) {
+  console.error("Failed to save last payment:", error);
+}
 
     setPaidClubs((prev) => ({
       ...prev,
