@@ -2955,15 +2955,16 @@ const TAB_FROM_PATH = (p) => {
                   {hasPaidA2 ? (
                     <ClubZoomLinkBox lang={lang} zoomLink={paidA2Data.zoom_link} />
                   ) : clubA2?.is_payable ? (
-                    <div
-                      className="paypal-shell paypal-shell-embedded"
-                      id="paypal-shell-a2"
-                    >
-                      <div
-                        id="paypal-button-container-a2"
-                        className="max-w-[420px] mx-auto"
-                      />
-                    </div>
+<div
+  className="paypal-shell paypal-shell-embedded"
+  id="paypal-shell-a2"
+  style={{ colorScheme: "none" }}
+>
+  <div
+    id="paypal-button-container-a2"
+    className="max-w-[420px] mx-auto"
+  />
+</div>
                   ) : (
                     <div className="relative">
                       <div className="opacity-0 pointer-events-none select-none hidden sm:block">
@@ -3087,15 +3088,16 @@ const TAB_FROM_PATH = (p) => {
                   {hasPaidB1B2 ? (
                     <ClubZoomLinkBox lang={lang} zoomLink={paidB1B2Data.zoom_link} />
                   ) : clubB1B2?.is_payable ? (
-                    <div
-                      className="paypal-shell paypal-shell-embedded"
-                      id="paypal-shell-b1b2"
-                    >
-                      <div
-                        id="paypal-button-container-b1b2"
-                        className="max-w-[420px] mx-auto"
-                      />
-                    </div>
+<div
+  className="paypal-shell paypal-shell-embedded"
+  id="paypal-shell-b1b2"
+  style={{ colorScheme: "none" }}
+>
+  <div
+    id="paypal-button-container-b1b2"
+    className="max-w-[420px] mx-auto"
+  />
+</div>
                   ) : (
                     <div className="relative">
                       <div className="opacity-0 pointer-events-none select-none hidden sm:block">
