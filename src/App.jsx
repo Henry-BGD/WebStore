@@ -1219,7 +1219,12 @@ useEffect(() => {
     const parsed = raw ? JSON.parse(raw) : {};
 
     const activeClubIds = [clubA2?.id, clubB1B2?.id].filter(Boolean);
-    if (activeClubIds.length === 0) return;
+
+    // если active ids ещё не готовы — просто показываем то, что уже есть
+    if (activeClubIds.length === 0) {
+      setPaidClubs(parsed);
+      return;
+    }
 
     const cleaned = {};
 
@@ -1233,6 +1238,7 @@ useEffect(() => {
     setPaidClubs(cleaned);
   } catch (error) {
     console.error("Failed to clean paid clubs:", error);
+    setPaidClubs({});
   }
 }, [clubA2, clubB1B2, clubsLoading]);
 
