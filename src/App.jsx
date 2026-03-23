@@ -1178,6 +1178,17 @@ const [clubA2, setClubA2] = useState(null);
 const [clubB1B2, setClubB1B2] = useState(null);
 const [clubsLoading, setClubsLoading] = useState(true);
 
+    useEffect(() => {
+    try {
+      const raw = localStorage.getItem("paid_clubs");
+      const parsed = raw ? JSON.parse(raw) : {};
+      setPaidClubs(parsed);
+    } catch (error) {
+      console.error("Failed to load paid clubs from localStorage:", error);
+      setPaidClubs({});
+    }
+  }, []);
+
 const [paypalSdkReady, setPaypalSdkReady] = useState(() => {
   if (typeof window === "undefined") return false;
   return !!window.paypal;
@@ -1201,11 +1212,15 @@ const clubB1B2PriceBadge =
   clubB1B2?.price_usd != null ? `$${clubB1B2.price_usd}` : "";
 
 useEffect(() => {
+  if (clubsLoading) return;
+
   try {
     const raw = localStorage.getItem("paid_clubs");
     const parsed = raw ? JSON.parse(raw) : {};
 
     const activeClubIds = [clubA2?.id, clubB1B2?.id].filter(Boolean);
+    if (activeClubIds.length === 0) return;
+
     const cleaned = {};
 
     for (const clubId of activeClubIds) {
@@ -1218,9 +1233,8 @@ useEffect(() => {
     setPaidClubs(cleaned);
   } catch (error) {
     console.error("Failed to clean paid clubs:", error);
-    setPaidClubs({});
   }
-}, [clubA2, clubB1B2]);
+}, [clubA2, clubB1B2, clubsLoading]);
 
 const LIT_CLUB_A2_SAMPLE = (
   <div className="mt-2 space-y-3 text-[9px] sm:text-[10px] leading-snug text-slate-800 dark:text-slate-200">
