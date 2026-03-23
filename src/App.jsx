@@ -1134,14 +1134,14 @@ async function safeReadJson(response) {
   }
 }
 
-function savePaidClubToStorage(data) {
+function savePaidClubToStorage(level, data) {
   try {
     const raw = localStorage.getItem("paid_clubs");
     const parsed = raw ? JSON.parse(raw) : {};
 
-    if (!data?.club_id) return;
+    if (!level || !data?.club_id) return;
 
-    parsed[data.club_id] = data;
+    parsed[level] = data;
     localStorage.setItem("paid_clubs", JSON.stringify(parsed));
   } catch (error) {
     console.error("Failed to save paid club to localStorage:", error);
@@ -1178,32 +1178,35 @@ const [clubA2, setClubA2] = useState(null);
 const [clubB1B2, setClubB1B2] = useState(null);
 const [clubsLoading, setClubsLoading] = useState(true);
 
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem("paid_clubs");
-      const parsed = raw ? JSON.parse(raw) : {};
-      setPaidClubs(parsed);
-    } catch (error) {
-      console.error("Failed to load paid clubs from localStorage:", error);
-      setPaidClubs({});
-    }
-  }, []);
-
 const [paypalSdkReady, setPaypalSdkReady] = useState(() => {
   if (typeof window === "undefined") return false;
   return !!window.paypal;
 });
 
-const [paidClubs, setPaidClubs] = useState({});
+const [paidClubs, setPaidClubs] = useState(() => {
+  try {
+    const raw = localStorage.getItem("paid_clubs");
+    return raw ? JSON.parse(raw) : {};
+  } catch (error) {
+    console.error("Failed to load paid clubs from localStorage:", error);
+    return {};
+  }
+});
 
 const paypalA2Rendered = useRef(false);
 const paypalB1B2Rendered = useRef(false);
 
-const paidA2Data = clubA2?.id ? paidClubs[clubA2.id] : null;
-const hasPaidA2 = !!paidA2Data?.zoom_link;
+const paidA2Data =
+  clubA2?.id && String(paidClubs?.a2?.club_id) === String(clubA2.id)
+    ? paidClubs.a2
+    : null;
+const hasPaidA2 = Boolean(paidA2Data?.zoom_link);
 
-const paidB1B2Data = clubB1B2?.id ? paidClubs[clubB1B2.id] : null;
-const hasPaidB1B2 = !!paidB1B2Data?.zoom_link;
+const paidB1B2Data =
+  clubB1B2?.id && String(paidClubs?.b1b2?.club_id) === String(clubB1B2.id)
+    ? paidClubs.b1b2
+    : null;
+const hasPaidB1B2 = Boolean(paidB1B2Data?.zoom_link);
 
 const clubA2PriceBadge =
   clubA2?.price_usd != null ? `$${clubA2.price_usd}` : "";
@@ -1214,33 +1217,32 @@ const clubB1B2PriceBadge =
 useEffect(() => {
   if (clubsLoading) return;
 
-  try {
-    const raw = localStorage.getItem("paid_clubs");
-    const parsed = raw ? JSON.parse(raw) : {};
+  setPaidClubs((prev) => {
+    const next = { ...prev };
 
-    const activeClubIds = [clubA2?.id, clubB1B2?.id].filter(Boolean);
-
-    // если active ids ещё не готовы — просто показываем то, что уже есть
-    if (activeClubIds.length === 0) {
-      setPaidClubs(parsed);
-      return;
+    if (
+      next.a2 &&
+      (!clubA2?.id || String(next.a2.club_id) !== String(clubA2.id))
+    ) {
+      delete next.a2;
     }
 
-    const cleaned = {};
-
-    for (const clubId of activeClubIds) {
-      if (parsed[clubId]) {
-        cleaned[clubId] = parsed[clubId];
-      }
+    if (
+      next.b1b2 &&
+      (!clubB1B2?.id || String(next.b1b2.club_id) !== String(clubB1B2.id))
+    ) {
+      delete next.b1b2;
     }
 
-    localStorage.setItem("paid_clubs", JSON.stringify(cleaned));
-    setPaidClubs(cleaned);
-  } catch (error) {
-    console.error("Failed to clean paid clubs:", error);
-    setPaidClubs({});
-  }
-}, [clubA2, clubB1B2, clubsLoading]);
+    try {
+      localStorage.setItem("paid_clubs", JSON.stringify(next));
+    } catch (error) {
+      console.error("Failed to sync paid clubs:", error);
+    }
+
+    return next;
+  });
+}, [clubA2?.id, clubB1B2?.id, clubsLoading]);
 
 const LIT_CLUB_A2_SAMPLE = (
   <div className="mt-2 space-y-3 text-[9px] sm:text-[10px] leading-snug text-slate-800 dark:text-slate-200">
@@ -1991,7 +1993,7 @@ onApprove: async (data) => {
       throw new Error(result?.error || "Capture failed");
     }
 
-    savePaidClubToStorage(result);
+savePaidClubToStorage("a2", result);
 
 try {
   sessionStorage.setItem("payment_success_data", JSON.stringify(result));
@@ -1999,10 +2001,10 @@ try {
   console.error("Failed to save payment success data:", error);
 }
 
-    setPaidClubs((prev) => ({
-      ...prev,
-      [result.club_id]: result,
-    }));
+setPaidClubs((prev) => ({
+  ...prev,
+  a2: result,
+}));
 
     setShowPaymentSuccess(true);
     navigate("/payment-success");
@@ -2245,7 +2247,7 @@ onApprove: async (data) => {
       throw new Error(result?.error || "Capture failed");
     }
 
-    savePaidClubToStorage(result);
+savePaidClubToStorage("b1b2", result);
 
 try {
   sessionStorage.setItem("payment_success_data", JSON.stringify(result));
@@ -2253,10 +2255,10 @@ try {
   console.error("Failed to save payment success data:", error);
 }
 
-    setPaidClubs((prev) => ({
-      ...prev,
-      [result.club_id]: result,
-    }));
+setPaidClubs((prev) => ({
+  ...prev,
+  b1b2: result,
+}));
 
     setShowPaymentSuccess(true);
     navigate("/payment-success");
