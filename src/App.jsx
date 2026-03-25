@@ -456,7 +456,7 @@ lit_club_desc: "Это литературный клуб для взрослых
 lit_club_1_title: "Уровень A2 (1,5 часа)",
 
 lit_club_1_books_prefix: "Читаем рассказ",
-lit_club_1_books_title: "«Акула» и «Лебеди»",
+lit_club_1_books_title: "«Акула», «Лебеди»",
 lit_club_1_books_author: "(Лев Толстой)",
 lit_club_2_books_prefix: "Читаем рассказ",
 lit_club_2_books_title: "«Зелёная лампа»",
