@@ -1134,20 +1134,24 @@ async function safeReadJson(response) {
   }
 }
 
-function savePaidClubToStorage(data) {
+function savePaidClubToStorage(data, level) {
   try {
     const raw = localStorage.getItem("paid_clubs");
     const parsed = raw ? JSON.parse(raw) : {};
 
     if (!data?.club_id) return;
 
-    parsed[data.club_id] = data;
+    parsed[data.club_id] = {
+      ...data,
+      level,
+    };
+
     localStorage.setItem("paid_clubs", JSON.stringify(parsed));
   } catch (error) {
     console.error("Failed to save paid club to localStorage:", error);
   }
 }
-
+  
 function ClubZoomLinkBox({ lang, zoomLink }) {
   if (!zoomLink) return null;
 
@@ -1199,10 +1203,30 @@ const [paidClubs, setPaidClubs] = useState({});
 const paypalA2Rendered = useRef(false);
 const paypalB1B2Rendered = useRef(false);
 
-const paidA2Data = clubA2?.id ? paidClubs[clubA2.id] : null;
+const findPaidClubByLevel = useCallback(
+  (level, currentClubId) => {
+    if (!paidClubs || typeof paidClubs !== "object") return null;
+
+    if (currentClubId) {
+      const exact = paidClubs[currentClubId];
+      if (exact?.zoom_link) return exact;
+    }
+
+    const entries = Object.values(paidClubs);
+
+    const fallback = entries.find(
+      (item) => item?.level === level && typeof item?.zoom_link === "string" && item.zoom_link.trim()
+    );
+
+    return fallback || null;
+  },
+  [paidClubs]
+);
+
+const paidA2Data = findPaidClubByLevel("a2", clubA2?.id);
 const hasPaidA2 = !!paidA2Data?.zoom_link;
 
-const paidB1B2Data = clubB1B2?.id ? paidClubs[clubB1B2.id] : null;
+const paidB1B2Data = findPaidClubByLevel("b1b2", clubB1B2?.id);
 const hasPaidB1B2 = !!paidB1B2Data?.zoom_link;
 
 const clubA2PriceBadge =
@@ -1210,31 +1234,6 @@ const clubA2PriceBadge =
 
 const clubB1B2PriceBadge =
   clubB1B2?.price_usd != null ? `$${clubB1B2.price_usd}` : "";
-
-useEffect(() => {
-  if (clubsLoading) return;
-
-  try {
-    const raw = localStorage.getItem("paid_clubs");
-    const parsed = raw ? JSON.parse(raw) : {};
-
-    const activeClubIds = [clubA2?.id, clubB1B2?.id].filter(Boolean);
-    if (activeClubIds.length === 0) return;
-
-    const cleaned = {};
-
-    for (const clubId of activeClubIds) {
-      if (parsed[clubId]) {
-        cleaned[clubId] = parsed[clubId];
-      }
-    }
-
-    localStorage.setItem("paid_clubs", JSON.stringify(cleaned));
-    setPaidClubs(cleaned);
-  } catch (error) {
-    console.error("Failed to clean paid clubs:", error);
-  }
-}, [clubA2, clubB1B2, clubsLoading]);
 
 const LIT_CLUB_A2_SAMPLE = (
   <div className="mt-2 space-y-3 text-[9px] sm:text-[10px] leading-snug text-slate-800 dark:text-slate-200">
@@ -1312,19 +1311,22 @@ const LIT_CLUB_B1B2_SAMPLE = (
 
   const [lang, setLang] = useState(() => detectLanguage());
   const t = (key) => I18N[lang]?.[key] ?? I18N.en[key] ?? key;
-  const club1DateText = useMemo(() => {
+ 
+const club1DateText = useMemo(() => {
+  if (!clubA2?.starts_at_utc) return "";
   return formatUtcForViewer(
-    "2026-03-25T11:00:00Z", // 2026-03-25T11:00:00Z = 15:00 (Tbilisi Time) - 4 (UTC)
+    clubA2.starts_at_utc,
     lang === "ru" ? "ru-RU" : "en-US"
   );
-}, [lang]);
+}, [clubA2, lang]);
 
 const club2DateText = useMemo(() => {
+  if (!clubB1B2?.starts_at_utc) return "";
   return formatUtcForViewer(
-    "2026-03-27T14:00:00Z",   // 2026-03-25T11:00:00Z = 18:00 (Tbilisi Time) - 4 (UTC)
+    clubB1B2.starts_at_utc,
     lang === "ru" ? "ru-RU" : "en-US"
   );
-}, [lang]);
+}, [clubB1B2, lang]);
 
   const switchLang = (next) => {
     setLang(next);
@@ -1650,14 +1652,14 @@ function pathToTab(pathname) {
     if (i >= 0 && i < TABS_ORDER.length - 1) navigate(TAB_TO_PATH[TABS_ORDER[i + 1]]);
   }, [tab, navigate]);
 
-  const swipeHandlers = useSwipeTabs({
-    enabled: isMobile && !isPlaying,
-    onPrev: goPrevTab,
-    onNext: goNextTab,
-    thresholdPx: 45,
-    lockPx: 12,
-    restraintPx: 40,
-  });
+const swipeHandlers = useSwipeTabs({
+  enabled: isMobile && !isPlaying && !showPaymentSuccess,
+  onPrev: goPrevTab,
+  onNext: goNextTab,
+  thresholdPx: 45,
+  lockPx: 12,
+  restraintPx: 40,
+});
 
 const showAbout = tab === "about";
 const showLitClub = tab === "lit-club";
@@ -1985,18 +1987,23 @@ onApprove: async (data) => {
       throw new Error(result?.error || "Capture failed");
     }
 
-    savePaidClubToStorage(result);
+const normalizedResult = {
+  ...result,
+  level: "a2",
+};
+
+savePaidClubToStorage(normalizedResult, "a2");
 
 try {
-  sessionStorage.setItem("payment_success_data", JSON.stringify(result));
+  sessionStorage.setItem("payment_success_data", JSON.stringify(normalizedResult));
 } catch (error) {
   console.error("Failed to save payment success data:", error);
 }
 
-    setPaidClubs((prev) => ({
-      ...prev,
-      [result.club_id]: result,
-    }));
+setPaidClubs((prev) => ({
+  ...prev,
+  [normalizedResult.club_id]: normalizedResult,
+}));
 
     setShowPaymentSuccess(true);
     navigate("/payment-success");
@@ -2239,18 +2246,23 @@ onApprove: async (data) => {
       throw new Error(result?.error || "Capture failed");
     }
 
-    savePaidClubToStorage(result);
+const normalizedResult = {
+  ...result,
+  level: "b1b2",
+};
+
+savePaidClubToStorage(normalizedResult, "b1b2");
 
 try {
-  sessionStorage.setItem("payment_success_data", JSON.stringify(result));
+  sessionStorage.setItem("payment_success_data", JSON.stringify(normalizedResult));
 } catch (error) {
   console.error("Failed to save payment success data:", error);
 }
 
-    setPaidClubs((prev) => ({
-      ...prev,
-      [result.club_id]: result,
-    }));
+setPaidClubs((prev) => ({
+  ...prev,
+  [normalizedResult.club_id]: normalizedResult,
+}));
 
     setShowPaymentSuccess(true);
     navigate("/payment-success");
