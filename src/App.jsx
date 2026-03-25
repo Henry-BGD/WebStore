@@ -1312,19 +1312,22 @@ const LIT_CLUB_B1B2_SAMPLE = (
 
   const [lang, setLang] = useState(() => detectLanguage());
   const t = (key) => I18N[lang]?.[key] ?? I18N.en[key] ?? key;
+
   const club1DateText = useMemo(() => {
+  if (!clubA2?.starts_at_utc) return "";
   return formatUtcForViewer(
-    "2026-03-25T11:00:00Z", // 2026-03-25T11:00:00Z = 15:00 (Tbilisi Time) - 4 (UTC)
+    clubA2.starts_at_utc,
     lang === "ru" ? "ru-RU" : "en-US"
   );
-}, [lang]);
+}, [clubA2, lang]);
 
 const club2DateText = useMemo(() => {
+  if (!clubB1B2?.starts_at_utc) return "";
   return formatUtcForViewer(
-    "2026-03-27T14:00:00Z",   // 2026-03-25T11:00:00Z = 18:00 (Tbilisi Time) - 4 (UTC)
+    clubB1B2.starts_at_utc,
     lang === "ru" ? "ru-RU" : "en-US"
   );
-}, [lang]);
+}, [clubB1B2, lang]);
 
   const switchLang = (next) => {
     setLang(next);
