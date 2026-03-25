@@ -1134,7 +1134,7 @@ async function safeReadJson(response) {
   }
 }
 
-function savePaidClubToStorage(data) {
+function savePaidClubToStorage(data, level) {
   try {
     const raw = localStorage.getItem("paid_clubs");
     const parsed = raw ? JSON.parse(raw) : {};
@@ -1143,7 +1143,7 @@ function savePaidClubToStorage(data) {
 
     parsed[data.club_id] = {
       ...data,
-      level: data.level || null,
+      level,
     };
 
     localStorage.setItem("paid_clubs", JSON.stringify(parsed));
@@ -1208,15 +1208,18 @@ const findPaidClubByLevel = useCallback(
   (level, currentClubId) => {
     if (!paidClubs || typeof paidClubs !== "object") return null;
 
-    if (currentClubId && paidClubs[currentClubId]?.zoom_link) {
-      return paidClubs[currentClubId];
+    if (currentClubId) {
+      const exact = paidClubs[currentClubId];
+      if (exact?.zoom_link) return exact;
     }
 
     const entries = Object.values(paidClubs);
 
-    return (
-      entries.find((item) => item?.level === level && item?.zoom_link) || null
+    const fallback = entries.find(
+      (item) => item?.level === level && typeof item?.zoom_link === "string" && item.zoom_link.trim()
     );
+
+    return fallback || null;
   },
   [paidClubs]
 );
@@ -1982,18 +1985,23 @@ onApprove: async (data) => {
       throw new Error(result?.error || "Capture failed");
     }
 
-    savePaidClubToStorage(result);
+const normalizedResult = {
+  ...result,
+  level: "a2",
+};
+
+savePaidClubToStorage(normalizedResult, "a2");
 
 try {
-  sessionStorage.setItem("payment_success_data", JSON.stringify(result));
+  sessionStorage.setItem("payment_success_data", JSON.stringify(normalizedResult));
 } catch (error) {
   console.error("Failed to save payment success data:", error);
 }
 
-    setPaidClubs((prev) => ({
-      ...prev,
-      [result.club_id]: result,
-    }));
+setPaidClubs((prev) => ({
+  ...prev,
+  [normalizedResult.club_id]: normalizedResult,
+}));
 
     setShowPaymentSuccess(true);
     navigate("/payment-success");
@@ -2236,18 +2244,23 @@ onApprove: async (data) => {
       throw new Error(result?.error || "Capture failed");
     }
 
-    savePaidClubToStorage(result);
+const normalizedResult = {
+  ...result,
+  level: "b1b2",
+};
+
+savePaidClubToStorage(normalizedResult, "b1b2");
 
 try {
-  sessionStorage.setItem("payment_success_data", JSON.stringify(result));
+  sessionStorage.setItem("payment_success_data", JSON.stringify(normalizedResult));
 } catch (error) {
   console.error("Failed to save payment success data:", error);
 }
 
-    setPaidClubs((prev) => ({
-      ...prev,
-      [result.club_id]: result,
-    }));
+setPaidClubs((prev) => ({
+  ...prev,
+  [normalizedResult.club_id]: normalizedResult,
+}));
 
     setShowPaymentSuccess(true);
     navigate("/payment-success");
