@@ -1650,14 +1650,14 @@ function pathToTab(pathname) {
     if (i >= 0 && i < TABS_ORDER.length - 1) navigate(TAB_TO_PATH[TABS_ORDER[i + 1]]);
   }, [tab, navigate]);
 
-  const swipeHandlers = useSwipeTabs({
-    enabled: isMobile && !isPlaying,
-    onPrev: goPrevTab,
-    onNext: goNextTab,
-    thresholdPx: 45,
-    lockPx: 12,
-    restraintPx: 40,
-  });
+const swipeHandlers = useSwipeTabs({
+  enabled: isMobile && !isPlaying && !showPaymentSuccess,
+  onPrev: goPrevTab,
+  onNext: goNextTab,
+  thresholdPx: 45,
+  lockPx: 12,
+  restraintPx: 40,
+});
 
 const showAbout = tab === "about";
 const showLitClub = tab === "lit-club";
