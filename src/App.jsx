@@ -357,13 +357,6 @@ lit_club_desc: "This is a literature club for adults where we practice reading a
 
 lit_club_1_title: "Level A2 (1.5 hours)",
 
-lit_club_1_books_prefix: "Reading the short story",
-lit_club_1_books_title: "“The Shark”",
-lit_club_1_books_author: "by Leo Tolstoy",
-lit_club_2_books_prefix: "Reading the short story",
-lit_club_2_books_title: "“The Green Lamp”",
-lit_club_2_books_author: "by Alexander Grin",
-    
 lit_club_timezone_note: "Time is shown in your local time zone",
 
 lit_club_1_point_1: "Perfect if you already have some basic speaking and reading skills.",
@@ -385,7 +378,7 @@ lit_club_sold_out_2: "Please wait for the next club meeting.",
 lit_club_more_info: "Additional Information",
 
 lit_club_what_read_q: "What will we read?",
-lit_club_1_what_read_a: 'The short story "The Shark" by Leo Tolstoy.',
+lit_club_1_what_read_a: 'The short story "Two Brothers" by Leo Tolstoy.',
 lit_club_2_what_read_a: 'The short story "The Green Lamp" by Alexander Grin.',
 
 lit_club_more_0_q: "Do I need to read anything before the club?",
@@ -454,13 +447,6 @@ lit_club_telegram: "Телеграм",
 lit_club_desc: "Это литературный клуб для взрослых, где мы улучшаем навыки чтения и разговора, читая и обсуждая русскую литературу на русском языке.",
 
 lit_club_1_title: "Уровень A2 (1,5 часа)",
-
-lit_club_1_books_prefix: "Читаем рассказ",
-lit_club_1_books_title: "«Акула»",
-lit_club_1_books_author: "(Лев Толстой)",
-lit_club_2_books_prefix: "Читаем рассказ",
-lit_club_2_books_title: "«Зелёная лампа»",
-lit_club_2_books_author: "(Александр Грин)",
     
 lit_club_timezone_note: "Время показано в вашем часовом поясе",
  
@@ -483,7 +469,7 @@ lit_club_sold_out_2: "Пожалуйста, подождите следующу�
 lit_club_more_info: "Дополнительная информация",
 
 lit_club_what_read_q: "Что мы будем читать?",
-lit_club_1_what_read_a: "Рассказ «Акула» (Лев Толстой).",
+lit_club_1_what_read_a: "Рассказ «Два брата» (Лев Толстой).",
 lit_club_2_what_read_a: "Рассказ «Зелёная лампа» (Александр Грин).",
 
 lit_club_more_0_q: "Надо ли что-то читать перед клубом?",
