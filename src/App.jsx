@@ -2961,7 +2961,7 @@ const TAB_FROM_PATH = (p) => {
                 <div className="text-center">
 
                   <p className="text-lg sm:text-xl text-blue-600 font-medium flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 text-center sm:text-left">
-                  <span className="flex items-center justify-center gap-1 w-full text-center mx-auto">
+                  <span className="flex items-center justify-center gap-2 w-full text-center mx-auto">
                       <Clock className="w-4 h-4 opacity-70" />
                   
                       {/* строка 1 (mobile) */}
@@ -2998,16 +2998,16 @@ const TAB_FROM_PATH = (p) => {
               <div className="pt-1 mt-1 sm:pt-3 sm:mt-2">
 
 {!hasPaidA2 && !clubsLoading && clubA2?.is_payable ? (
-  <label className="mt-2 mb-3 flex items-start gap-2 text-sm text-slate-700 dark:text-slate-300">
+  <label className="mt-2 mb-3 flex items-center justify-center gap-2 w-full text-center text-sm text-slate-700 dark:text-slate-300 select-none cursor-pointer">
     <input
       type="checkbox"
       checked={marketingOptInA2}
       onChange={(e) => setMarketingOptInA2(e.target.checked)}
       className="mt-0.5"
     />
-    <span>{t("lit_club_marketing_opt_in")}</span>
+    <span className="max-w-md">{t("lit_club_marketing_opt_in")}</span>
   </label>
-) : null}               
+) : null}             
 
 {hasPaidA2 ? (
   <ClubZoomLinkBox lang={lang} zoomLink={paidA2Data.zoom_link} />
@@ -3119,7 +3119,7 @@ const TAB_FROM_PATH = (p) => {
               <div className="text-center">
 
                 <p className="text-lg sm:text-xl text-blue-600 font-medium flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 text-center sm:text-left leading-tight sm:leading-normal">
-                 <span className="flex items-center justify-center gap-1 w-full text-center mx-auto">
+                 <span className="flex items-center justify-center gap-2 w-full text-center mx-auto">
                     <Clock className="w-4 h-4 opacity-70" />
                 
                     <span>
@@ -3146,14 +3146,14 @@ const TAB_FROM_PATH = (p) => {
               <div className="pt-1 mt-1 sm:pt-3 sm:mt-2">
 
 {!hasPaidB1B2 && !clubsLoading && clubB1B2?.is_payable ? (
-  <label className="mt-2 mb-3 flex items-start gap-2 text-sm text-slate-700 dark:text-slate-300">
+  <label className="mt-2 mb-3 flex items-center justify-center gap-2 w-full text-center text-sm text-slate-700 dark:text-slate-300 select-none cursor-pointer">
     <input
       type="checkbox"
       checked={marketingOptInB1B2}
       onChange={(e) => setMarketingOptInB1B2(e.target.checked)}
       className="mt-0.5"
     />
-    <span>{t("lit_club_marketing_opt_in")}</span>
+    <span className="max-w-md">{t("lit_club_marketing_opt_in")}</span>
   </label>
 ) : null}
 
