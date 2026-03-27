@@ -2961,7 +2961,7 @@ const TAB_FROM_PATH = (p) => {
                 <div className="text-center">
 
                   <p className="text-lg sm:text-xl text-blue-600 font-medium flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 text-center sm:text-left">
-                  <span className="flex items-center justify-center gap-2 w-full text-center mx-auto">
+                    <span className="flex items-center gap-2">
                       <Clock className="w-4 h-4 opacity-70" />
                   
                       {/* строка 1 (mobile) */}
@@ -3119,7 +3119,7 @@ const TAB_FROM_PATH = (p) => {
               <div className="text-center">
 
                 <p className="text-lg sm:text-xl text-blue-600 font-medium flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 text-center sm:text-left leading-tight sm:leading-normal">
-                 <span className="flex items-center justify-center gap-2 w-full text-center mx-auto">
+                 <span className="flex items-center gap-2">
                     <Clock className="w-4 h-4 opacity-70" />
                 
                     <span>
