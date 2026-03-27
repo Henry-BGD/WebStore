@@ -2881,7 +2881,7 @@ const TAB_FROM_PATH = (p) => {
   className={`min-w-0 shrink font-extrabold tracking-tight leading-[1.12] truncate pb-1 ${
     lang === "ru"
       ? "text-[20px] sm:text-3xl md:text-4xl"
-      : "text-[24px] sm:text-3xl md:text-4xl"
+      : "text-[20px] sm:text-3xl md:text-4xl"
   }`}
 >
     {t("lit_club_title")}
