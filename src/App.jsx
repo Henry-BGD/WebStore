@@ -372,6 +372,8 @@ lit_club_2_point_4: "Meeting on Zoom.",
 lit_club_2_point_5: "During the reading and discussion, your mistakes will be written in a document.",
 lit_club_2_point_6: "After the club, you will receive this document (with corrected mistakes) and the text we read",
 
+lit_club_marketing_opt_in: "Receive emails about discounts on clubs and books.",
+
 lit_club_sold_out_1: "Unfortunately, all spots are taken.",
 lit_club_sold_out_2: "Please wait for the next club meeting.",
 
@@ -462,6 +464,8 @@ lit_club_2_point_3: "Максимум 4 ученика (+ ведущий клу�
 lit_club_2_point_4: "Встреча в Zoom.",
 lit_club_2_point_5: "Во время чтения и ответов на вопросы ваши ошибки будут записаны в документ.",
 lit_club_2_point_6: "После клуба вы получите этот документ (с исправленными ошибками) и текст, который мы читали.",
+
+lit_club_marketing_opt_in: "Я хочу получать письма о скидках на клубы и книги.",
 
 lit_club_sold_out_1: "К сожалению, все места заняты.",
 lit_club_sold_out_2: "Пожалуйста, подождите следующую встречу клуба.",
@@ -1167,6 +1171,9 @@ const [showPaymentSuccess, setShowPaymentSuccess] = useState(false);
 const [clubA2, setClubA2] = useState(null);
 const [clubB1B2, setClubB1B2] = useState(null);
 const [clubsLoading, setClubsLoading] = useState(true);
+
+const [marketingOptInA2, setMarketingOptInA2] = useState(false);
+const [marketingOptInB1B2, setMarketingOptInB1B2] = useState(false);
 
     useEffect(() => {
     try {
@@ -1949,12 +1956,13 @@ onApprove: async (data) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        orderID: data.orderID,
-        clubId: clubA2.id,
-        language: lang === "ru" ? "ru" : "en",
-        timeZone,
-      }),
+          body: JSON.stringify({
+            orderID: data.orderID,
+            clubId: clubA2.id,
+            language: lang === "ru" ? "ru" : "en",
+            timeZone,
+            marketingOptIn: marketingOptInA2,
+          }),
     });
 
     const result = await safeReadJson(response);
@@ -1990,6 +1998,8 @@ setPaidClubs((prev) => ({
   ...prev,
   [normalizedResult.club_id]: normalizedResult,
 }));
+
+setMarketingOptInA2(false);
 
     setShowPaymentSuccess(true);
     navigate("/payment-success");
@@ -2208,13 +2218,14 @@ onApprove: async (data) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        orderID: data.orderID,
-        clubId: clubB1B2.id,
-        language: lang === "ru" ? "ru" : "en",
-        timeZone,
-      }),
-    });
+      
+          body: JSON.stringify({
+            orderID: data.orderID,
+            clubId: clubB1B2.id,
+            language: lang === "ru" ? "ru" : "en",
+            timeZone,
+            marketingOptIn: marketingOptInB1B2,
+          }),
 
     const result = await safeReadJson(response);
 
@@ -2249,6 +2260,8 @@ setPaidClubs((prev) => ({
   ...prev,
   [normalizedResult.club_id]: normalizedResult,
 }));
+
+setMarketingOptInB1B2(false);
 
     setShowPaymentSuccess(true);
     navigate("/payment-success");
@@ -2983,6 +2996,18 @@ const TAB_FROM_PATH = (p) => {
               
               <div className="pt-1 mt-1 sm:pt-3 sm:mt-2">
 
+{!hasPaidA2 && !clubsLoading && clubA2?.is_payable ? (
+  <label className="mt-2 mb-3 flex items-start gap-2 text-sm text-slate-700 dark:text-slate-300">
+    <input
+      type="checkbox"
+      checked={marketingOptInA2}
+      onChange={(e) => setMarketingOptInA2(e.target.checked)}
+      className="mt-0.5"
+    />
+    <span>{t("lit_club_marketing_opt_in")}</span>
+  </label>
+) : null}               
+
 {hasPaidA2 ? (
   <ClubZoomLinkBox lang={lang} zoomLink={paidA2Data.zoom_link} />
 ) : clubsLoading ? (
@@ -3118,6 +3143,18 @@ const TAB_FROM_PATH = (p) => {
             </ul>
 
               <div className="pt-1 mt-1 sm:pt-3 sm:mt-2">
+
+{!hasPaidB1B2 && !clubsLoading && clubB1B2?.is_payable ? (
+  <label className="mt-2 mb-3 flex items-start gap-2 text-sm text-slate-700 dark:text-slate-300">
+    <input
+      type="checkbox"
+      checked={marketingOptInB1B2}
+      onChange={(e) => setMarketingOptInB1B2(e.target.checked)}
+      className="mt-0.5"
+    />
+    <span>{t("lit_club_marketing_opt_in")}</span>
+  </label>
+) : null}
 
 {hasPaidB1B2 ? (
   <ClubZoomLinkBox lang={lang} zoomLink={paidB1B2Data.zoom_link} />
