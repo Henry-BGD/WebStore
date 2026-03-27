@@ -74,13 +74,51 @@ function buildEmailContent({ language, clubTitle, clubTimeText, zoomLink, payerN
   };
 }
 
+async function saveMarketingContact({
+  email,
+  language,
+  source = "club_checkout",
+}) {
+  if (!email) return;
+
+  const normalizedEmail = String(email).trim().toLowerCase();
+  if (!normalizedEmail) return;
+
+  const consentText =
+    language === "ru"
+      ? "Я хочу получать письма о скидках на клубы и книги."
+      : "Receive emails about discounts on clubs and books.";
+
+  const now = new Date().toISOString();
+
+  const { error } = await supabaseAdmin
+    .from("marketing_contacts")
+    .upsert(
+      {
+        email: normalizedEmail,
+        subscribed: true,
+        source,
+        language,
+        consent_text: consentText,
+        consent_version: "v1",
+        consented_at: now,
+        updated_at: now,
+      },
+      { onConflict: "email" }
+    );
+
+  if (error) {
+    console.error("Failed to save marketing contact:", error);
+  }
+}
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
   try {
-    const { orderID, clubId, language, timeZone } = req.body || {};
+    const { orderID, clubId, language, timeZone, marketingOptIn } = req.body || {};
 
     if (!orderID || !clubId) {
       return res.status(400).json({
@@ -207,6 +245,14 @@ export default async function handler(req, res) {
       safeTimeZone
     );
 
+    if (marketingOptIn && payerEmail) {
+      await saveMarketingContact({
+        email: payerEmail,
+        language: lang,
+        source: "club_checkout",
+      });
+    }
+
     if (payerEmail) {
       const emailContent = buildEmailContent({
         language: lang,
@@ -233,6 +279,7 @@ return res.status(200).json({
   success: true,
   booking_id: booking.id,
   club_id: club.id,
+  level: club.level,
   zoom_link: club.zoom_link,
   club_title: club.title,
   club_time_text: clubTimeText,
@@ -242,6 +289,7 @@ return res.status(200).json({
       ? "Оплата подтверждена 🎉 Ссылка Zoom также отправлена на вашу почту."
       : "Payment successful 🎉 Your Zoom link has also been sent to your email.",
 });
+    
   } catch (err) {
     return res.status(500).json({
       error: "Unexpected server error",
