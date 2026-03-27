@@ -2226,6 +2226,7 @@ onApprove: async (data) => {
             timeZone,
             marketingOptIn: marketingOptInB1B2,
           }),
+      });
 
     const result = await safeReadJson(response);
 
