@@ -2998,15 +2998,17 @@ const TAB_FROM_PATH = (p) => {
               <div className="pt-1 mt-1 sm:pt-3 sm:mt-2">
 
 {!hasPaidA2 && !clubsLoading && clubA2?.is_payable ? (
-  <label className="mt-2 mb-3 flex items-center justify-center gap-2 w-full text-center text-sm text-slate-700 dark:text-slate-300 select-none cursor-pointer">
-    <input
-      type="checkbox"
-      checked={marketingOptInA2}
-      onChange={(e) => setMarketingOptInA2(e.target.checked)}
-      className="mt-0.5"
-    />
-    <span className="max-w-md">{t("lit_club_marketing_opt_in")}</span>
-  </label>
+<label className="mt-2 mb-3 flex items-center justify-center gap-2 w-full text-center text-sm text-slate-700 dark:text-slate-300 select-none cursor-pointer">
+  <input
+    type="checkbox"
+    checked={marketingOptInA2}
+    onChange={(e) => setMarketingOptInA2(e.target.checked)}
+    className="mt-0.5"
+  />
+  <span className="text-xs sm:text-sm max-w-md">
+    {t("lit_club_marketing_opt_in")}
+  </span>
+</label>
 ) : null}             
 
 {hasPaidA2 ? (
@@ -3153,7 +3155,9 @@ const TAB_FROM_PATH = (p) => {
       onChange={(e) => setMarketingOptInB1B2(e.target.checked)}
       className="mt-0.5"
     />
-    <span className="max-w-md">{t("lit_club_marketing_opt_in")}</span>
+<span className="text-xs sm:text-sm max-w-md">
+  {t("lit_club_marketing_opt_in")}
+</span>
   </label>
 ) : null}
 
