@@ -364,11 +364,11 @@ lit_club_1_point_3: "Maximum 4 people (+ club host)",
 lit_club_1_point_4: "Meeting on Zoom",
 
 lit_club_2_title: "Level B1 - B2 (2 hours)",
-
-lit_club_2_point_1: "Perfect for intermediate-level learners.",
+lit_club_2_point_1: "Perfect for intermediate-level learners",
+  
 lit_club_2_point_2: "Club plan: introductions and questions (~20 min), reading by roles (~45 min), discussion of the text (~55 min).",
-lit_club_2_point_3: "Maximum 4 people (+ club host).",
-lit_club_2_point_4: "Meeting on Zoom.",
+lit_club_2_point_3: "Maximum 4 people (+ club host)",
+lit_club_2_point_4: "Meeting on Zoom",
 lit_club_2_point_5: "During the reading and discussion, your mistakes will be written in a document.",
 lit_club_2_point_6: "After the club, you will receive this document (with corrected mistakes) and the text we read",
 
@@ -458,10 +458,10 @@ lit_club_1_point_4: "Встреча в Zoom",
 
 lit_club_2_title: "Уровень B1 - B2 (2 часа)",
 
-lit_club_2_point_1: "Идеально подходит для учеников среднего уровня.",
+lit_club_2_point_1: "Идеально подходит для учеников среднего уровня",
 lit_club_2_point_2: "План клуба: знакомство и ответы на вопросы (~20 минут), чтение по ролям (~45 минут), обсуждение текста (~55 минут).",
-lit_club_2_point_3: "Максимум 4 ученика (+ ведущий клуба).",
-lit_club_2_point_4: "Встреча в Zoom.",
+lit_club_2_point_3: "Максимум 4 ученика (+ ведущий клуба)",
+lit_club_2_point_4: "Встреча в Zoom",
 lit_club_2_point_5: "Во время чтения и ответов на вопросы ваши ошибки будут записаны в документ.",
 lit_club_2_point_6: "После клуба вы получите этот документ (с исправленными ошибками) и текст, который мы читали.",
 
