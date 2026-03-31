@@ -1175,6 +1175,8 @@ const [clubsLoading, setClubsLoading] = useState(true);
 const [marketingOptInA2, setMarketingOptInA2] = useState(false);
 const [marketingOptInB1B2, setMarketingOptInB1B2] = useState(false);
 
+const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
+
     useEffect(() => {
     try {
       const raw = localStorage.getItem("paid_clubs");
@@ -1646,7 +1648,7 @@ function pathToTab(pathname) {
   }, [tab, navigate]);
 
 const swipeHandlers = useSwipeTabs({
-  enabled: isMobile && !isPlaying && !showPaymentSuccess,
+  enabled: isMobile && !isPlaying && !showPaymentSuccess && !isCheckoutLoading,
   onPrev: goPrevTab,
   onNext: goNextTab,
   thresholdPx: 45,
@@ -1948,6 +1950,8 @@ if (!response.ok) {
 },
 
 onApprove: async (data) => {
+  setIsCheckoutLoading(true);
+
   try {
     const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
@@ -1956,24 +1960,26 @@ onApprove: async (data) => {
       headers: {
         "Content-Type": "application/json",
       },
-          body: JSON.stringify({
-            orderID: data.orderID,
-            clubId: clubA2.id,
-            language: lang === "ru" ? "ru" : "en",
-            timeZone,
-            marketingOptIn: marketingOptInA2,
-          }),
+      body: JSON.stringify({
+        orderID: data.orderID,
+        clubId: clubA2.id,
+        language: lang === "ru" ? "ru" : "en",
+        timeZone,
+        marketingOptIn: marketingOptInA2,
+      }),
     });
 
     const result = await safeReadJson(response);
 
     if (!response.ok) {
       if (result?.error === "CLUB_SOLD_OUT") {
+        setIsCheckoutLoading(false);
         await handleClubSoldOut();
         return;
       }
 
       if (result?.error === "CLUB_NOT_OPEN") {
+        setIsCheckoutLoading(false);
         await handleClubNotOpen();
         return;
       }
@@ -1981,29 +1987,31 @@ onApprove: async (data) => {
       throw new Error(result?.error || "Capture failed");
     }
 
-const normalizedResult = {
-  ...result,
-  level: "a2",
-};
+    const normalizedResult = {
+      ...result,
+      level: "a2",
+    };
 
-savePaidClubToStorage(normalizedResult, "a2");
+    savePaidClubToStorage(normalizedResult, "a2");
 
-try {
-  sessionStorage.setItem("payment_success_data", JSON.stringify(normalizedResult));
-} catch (error) {
-  console.error("Failed to save payment success data:", error);
-}
+    try {
+      sessionStorage.setItem("payment_success_data", JSON.stringify(normalizedResult));
+    } catch (error) {
+      console.error("Failed to save payment success data:", error);
+    }
 
-setPaidClubs((prev) => ({
-  ...prev,
-  [normalizedResult.club_id]: normalizedResult,
-}));
+    setPaidClubs((prev) => ({
+      ...prev,
+      [normalizedResult.club_id]: normalizedResult,
+    }));
 
-setMarketingOptInA2(false);
+    setMarketingOptInA2(false);
 
+    setIsCheckoutLoading(false);
     setShowPaymentSuccess(true);
     navigate("/payment-success");
   } catch (error) {
+    setIsCheckoutLoading(false);
     console.error("Capture error:", error);
 
     if (
@@ -2210,6 +2218,8 @@ if (!response.ok) {
 },
 
 onApprove: async (data) => {
+  setIsCheckoutLoading(true);
+
   try {
     const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
@@ -2218,25 +2228,26 @@ onApprove: async (data) => {
       headers: {
         "Content-Type": "application/json",
       },
-      
-          body: JSON.stringify({
-            orderID: data.orderID,
-            clubId: clubB1B2.id,
-            language: lang === "ru" ? "ru" : "en",
-            timeZone,
-            marketingOptIn: marketingOptInB1B2,
-          }),
-      });
+      body: JSON.stringify({
+        orderID: data.orderID,
+        clubId: clubB1B2.id,
+        language: lang === "ru" ? "ru" : "en",
+        timeZone,
+        marketingOptIn: marketingOptInB1B2,
+      }),
+    });
 
     const result = await safeReadJson(response);
 
     if (!response.ok) {
       if (result?.error === "CLUB_SOLD_OUT") {
+        setIsCheckoutLoading(false);
         await handleClubSoldOut();
         return;
       }
 
       if (result?.error === "CLUB_NOT_OPEN") {
+        setIsCheckoutLoading(false);
         await handleClubNotOpen();
         return;
       }
@@ -2244,29 +2255,31 @@ onApprove: async (data) => {
       throw new Error(result?.error || "Capture failed");
     }
 
-const normalizedResult = {
-  ...result,
-  level: "b1b2",
-};
+    const normalizedResult = {
+      ...result,
+      level: "b1b2",
+    };
 
-savePaidClubToStorage(normalizedResult, "b1b2");
+    savePaidClubToStorage(normalizedResult, "b1b2");
 
-try {
-  sessionStorage.setItem("payment_success_data", JSON.stringify(normalizedResult));
-} catch (error) {
-  console.error("Failed to save payment success data:", error);
-}
+    try {
+      sessionStorage.setItem("payment_success_data", JSON.stringify(normalizedResult));
+    } catch (error) {
+      console.error("Failed to save payment success data:", error);
+    }
 
-setPaidClubs((prev) => ({
-  ...prev,
-  [normalizedResult.club_id]: normalizedResult,
-}));
+    setPaidClubs((prev) => ({
+      ...prev,
+      [normalizedResult.club_id]: normalizedResult,
+    }));
 
-setMarketingOptInB1B2(false);
+    setMarketingOptInB1B2(false);
 
+    setIsCheckoutLoading(false);
     setShowPaymentSuccess(true);
     navigate("/payment-success");
   } catch (error) {
+    setIsCheckoutLoading(false);
     console.error("Capture error:", error);
 
     if (
@@ -3440,6 +3453,22 @@ const TAB_FROM_PATH = (p) => {
       </footer>
 
       <Analytics />
+
+      {isCheckoutLoading ? (
+        <div className="fixed inset-0 z-[999] bg-black/40 backdrop-blur-sm flex items-center justify-center px-4">
+          <div className="w-full max-w-sm rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-xl px-6 py-5 text-center">
+            <div className="mx-auto mb-4 h-10 w-10 rounded-full border-4 border-slate-300 border-t-blue-600 animate-spin" />
+            <p className="text-base font-semibold text-slate-900 dark:text-slate-100">
+              {lang === "ru" ? "Обрабатываем оплату..." : "Processing payment..."}
+            </p>
+            <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
+              {lang === "ru"
+                ? "Пожалуйста, не закрывайте страницу."
+                : "Please do not close the page."}
+            </p>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
