@@ -359,9 +359,9 @@ lit_club_1_title: "Level A2 (1.5 hours)",
 
 lit_club_timezone_note: "Time is shown in your local time zone",
 
-lit_club_1_point_1: "Perfect if you already have some basic speaking and reading skills.",
-lit_club_1_point_3: "Maximum 4 people (+ club host).",
-lit_club_1_point_4: "Meeting on Zoom.",
+lit_club_1_point_1: "Perfect if you already have some basic speaking and reading skills",
+lit_club_1_point_3: "Maximum 4 people (+ club host)",
+lit_club_1_point_4: "Meeting on Zoom",
 
 lit_club_2_title: "Level B1 - B2 (2 hours)",
 
@@ -372,7 +372,7 @@ lit_club_2_point_4: "Meeting on Zoom.",
 lit_club_2_point_5: "During the reading and discussion, your mistakes will be written in a document.",
 lit_club_2_point_6: "After the club, you will receive this document (with corrected mistakes) and the text we read",
 
-lit_club_marketing_opt_in: "Receive emails about discounts on clubs and books.",
+lit_club_marketing_opt_in: "Receive emails about discounts on clubs and books",
 
 lit_club_sold_out_1: "Unfortunately, all spots are taken.",
 lit_club_sold_out_2: "Please wait for the next club meeting.",
@@ -452,9 +452,9 @@ lit_club_1_title: "Уровень A2 (1,5 часа)",
     
 lit_club_timezone_note: "Время показано в вашем часовом поясе",
  
-lit_club_1_point_1: "Подойдёт вам, если вы уже умеете немного говорить и читать.",
-lit_club_1_point_3: "Максимум 4 ученика (+ ведущий клуба).",
-lit_club_1_point_4: "Встреча в Zoom.",
+lit_club_1_point_1: "Подойдёт вам, если вы уже умеете немного говорить и читать",
+lit_club_1_point_3: "Максимум 4 ученика (+ ведущий клуба)",
+lit_club_1_point_4: "Встреча в Zoom",
 
 lit_club_2_title: "Уровень B1 - B2 (2 часа)",
 
@@ -465,7 +465,7 @@ lit_club_2_point_4: "Встреча в Zoom.",
 lit_club_2_point_5: "Во время чтения и ответов на вопросы ваши ошибки будут записаны в документ.",
 lit_club_2_point_6: "После клуба вы получите этот документ (с исправленными ошибками) и текст, который мы читали.",
 
-lit_club_marketing_opt_in: "Я хочу получать письма о скидках на клубы и книги.",
+lit_club_marketing_opt_in: "Я хочу получать письма о скидках на клубы и книги",
 
 lit_club_sold_out_1: "К сожалению, все места заняты.",
 lit_club_sold_out_2: "Пожалуйста, подождите следующую встречу клуба.",
