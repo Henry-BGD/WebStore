@@ -54,3 +54,12 @@ body {
     display: none;
   }
 }
+
+/* ================================
+   Paypal-button
+================================ */
+#paypal-button-container-a2,
+#paypal-button-container-b1b2 {
+  background-color: transparent !important;
+  border: none !important;
+}

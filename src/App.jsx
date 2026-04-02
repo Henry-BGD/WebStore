@@ -3,8 +3,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/Card.j
 import { Button } from "./components/ui/Button.jsx";
 import { Input } from "./components/ui/Input.jsx";
 import { Badge } from "./components/ui/Badge.jsx";
-import { ExternalLink, Download, Play, Pause, X, Search, Sun, Moon } from "lucide-react";
+import { ExternalLink, Download, Play, Pause, X, Search, Sun, Moon, ChevronDown, Clock, Send, ChevronLeft, ChevronRight } from "lucide-react";
 import { Analytics } from "@vercel/analytics/react";
+import PaymentSuccess from "./PaymentSuccess.jsx";
 
 // ================== LAYOUT ==================
 const CONTAINER = "w-full max-w-6xl mx-auto px-4 sm:px-8";
@@ -35,14 +36,15 @@ function useSwipeTabs({
   const [isDragging, setIsDragging] = useState(false);
 
   const shouldIgnoreTarget = (target) => {
-    // ВАЖНО: НЕ игнорим [data-no-swipe] — иначе кнопки снова станут "не-свайпабельны"
     try {
-      return !!target?.closest?.('input, textarea, select, [role="slider"], input[type="range"]');
+      return !!target?.closest?.(
+        'input, textarea, select, [role="slider"], input[type="range"]'
+      );
     } catch {
       return false;
     }
   };
-
+  
   const stopTracking = useCallback(() => {
     tracking.current = false;
     axisLock.current = null;
@@ -222,7 +224,7 @@ const PRODUCTS = [
     externalUrl: "https://www.amazon.com/dp/B0GMCCFMQQ",
     marketplace: "amazon",
     badges: ["RU-EN", "Paper Book", "Audio"],
-    description: "Word-by-word translation, stress marks, grammar explanations, exercises, audio included.",
+    description: "Word-by-word translation, stress marks, grammar explanations, exercises, audio included",
     keywords: [
       "лев",
       "толстой",
@@ -264,7 +266,7 @@ const PRODUCTS = [
     externalUrl: "",
     marketplace: "amazon",
     badges: ["RU-EN", "Paper Book", "Audio"],
-    description: "Coming soon.",
+    description: "Coming soon",
     disabled: true,
     keywords: [
       "антон",
@@ -345,8 +347,67 @@ const I18N = {
     name: "Genndy Bogdanov",
     tagline: "",
     nav_about: "About",
+    nav_lit_club: "Russian Literature Club",
     nav_products: "Store",
     nav_audio: "Audiobooks",
+
+lit_club_title: "Russian Literature Club",
+lit_club_telegram: "Telegram",
+lit_club_desc: "This is a literature club for adults where we practice reading and speaking Russian through Russian literature.",
+
+lit_club_1_title: "Level A2 (1.5 hours)",
+
+lit_club_timezone_note: "Time is shown in your local time zone",
+
+lit_club_1_point_1: "Perfect if you already have some basic speaking and reading skills",
+lit_club_1_point_3: "Maximum 4 people (+ club host)",
+lit_club_1_point_4: "Meeting on Zoom",
+
+lit_club_2_title: "Level B1 - B2 (2 hours)",
+lit_club_2_point_1: "Perfect for intermediate-level learners",
+  
+lit_club_2_point_2: "Club plan: introductions and questions (~20 min), reading by roles (~45 min), discussion of the text (~55 min).",
+lit_club_2_point_3: "Maximum 4 people (+ club host)",
+lit_club_2_point_4: "Meeting on Zoom",
+lit_club_2_point_5: "During the reading and discussion, your mistakes will be written in a document.",
+lit_club_2_point_6: "After the club, you will receive this document (with corrected mistakes) and the text we read",
+
+lit_club_marketing_opt_in: "Receive emails about discounts on clubs and books",
+
+lit_club_sold_out_1: "Unfortunately, all spots are taken.",
+lit_club_sold_out_2: "Please wait for the next club meeting.",
+
+lit_club_more_info: "Additional Information",
+
+lit_club_what_read_q: "What will we read?",
+lit_club_1_what_read_a: 'The short story "Two Brothers" by Leo Tolstoy.',
+lit_club_2_what_read_a: 'The short story "The Green Lamp" by Alexander Grin.',
+
+lit_club_more_0_q: "Do I need to read anything before the club?",
+lit_club_more_0_a: "No. We will read the text together during the meeting.",
+
+lit_club_more_01_q: "What if I do not understand some words while reading during the club?",
+lit_club_more_01_a: "The club host will help explain unfamiliar words and sentences, and will also correct pronunciation and reading mistakes.",
+
+lit_club_more_1_q: "How does the club work?",
+lit_club_more_1_a: "First, we introduce ourselves (~15 min), then we read by roles (~30 min), and after that we discuss the text (~45 min).",
+
+lit_club_more_1_b_q: "How does the club work?",
+lit_club_more_1_b_a: "First, we introduce ourselves (~20 min), then we read by roles (~45 min), and after that we discuss the text (~55 min).",
+
+
+lit_club_more_15_q: "What materials will I receive after the club meeting?",
+
+      lit_club_1_more_15_a:
+        "After the club, you will receive a document with the Russian text (with stress marks) and its English translation.",
+      
+      lit_club_2_more_15_a:
+        "After the club, you will receive a document with the text we read during the meeting and its English translation.",
+
+lit_club_more_2_q: "Please check the date and time carefully.",
+lit_club_more_2_a: "Payments are non-refundable after booking. ⚠️",
+
+lit_club_more_3_q: "Approximate level of the text we will read and discuss during the club:",
 
     about_title: "Hi everyone! I’m Genndy. I’m a Russian language teacher and the author of books",
     about_p1:
@@ -379,9 +440,68 @@ const I18N = {
     name: "Genndy Bogdanov",
     tagline: "",
     nav_about: "Обо мне",
+    nav_lit_club: "Русский литературный клуб",
     nav_products: "Магазин",
     nav_audio: "Аудиокниги",
 
+lit_club_title: "Русский литературный клуб",
+lit_club_telegram: "Телеграм",
+lit_club_desc: "Это литературный клуб для взрослых, где мы улучшаем навыки чтения и разговора, читая и обсуждая русскую литературу на русском языке.",
+
+lit_club_1_title: "Уровень A2 (1,5 часа)",
+    
+lit_club_timezone_note: "Время показано в вашем часовом поясе",
+ 
+lit_club_1_point_1: "Подойдёт вам, если вы уже умеете немного говорить и читать",
+lit_club_1_point_3: "Максимум 4 ученика (+ ведущий клуба)",
+lit_club_1_point_4: "Встреча в Zoom",
+
+lit_club_2_title: "Уровень B1 - B2 (2 часа)",
+
+lit_club_2_point_1: "Идеально подходит для учеников среднего уровня",
+lit_club_2_point_2: "План клуба: знакомство и ответы на вопросы (~20 минут), чтение по ролям (~45 минут), обсуждение текста (~55 минут).",
+lit_club_2_point_3: "Максимум 4 ученика (+ ведущий клуба)",
+lit_club_2_point_4: "Встреча в Zoom",
+lit_club_2_point_5: "Во время чтения и ответов на вопросы ваши ошибки будут записаны в документ.",
+lit_club_2_point_6: "После клуба вы получите этот документ (с исправленными ошибками) и текст, который мы читали.",
+
+lit_club_marketing_opt_in: "Я хочу получать письма о скидках на клубы и книги",
+
+lit_club_sold_out_1: "К сожалению, все места заняты.",
+lit_club_sold_out_2: "Пожалуйста, подождите следующую встречу клуба.",
+
+lit_club_more_info: "Дополнительная информация",
+
+lit_club_what_read_q: "Что мы будем читать?",
+lit_club_1_what_read_a: "Рассказ «Два брата» (Лев Толстой).",
+lit_club_2_what_read_a: "Рассказ «Зелёная лампа» (Александр Грин).",
+
+lit_club_more_0_q: "Надо ли что-то читать перед клубом?",
+lit_club_more_0_a: "Нет. Мы прочитаем текст вместе во время встречи.",
+
+lit_club_more_01_q: "Что если я не пойму некоторые слова во время чтения в клубе?",
+lit_club_more_01_a: "Ведущий клуба поможет разобраться с непонятными словами и предложениями, поправит произношение и ошибки чтения.",
+
+lit_club_more_1_q: "Как проходит клуб?",
+lit_club_more_1_a: "Сначала мы знакомимся (~15 минут), потом читаем по ролям (~30 минут), а потом обсуждаем текст (~45 минут).",
+
+lit_club_more_1_b_q: "Как проходит клуб?",
+lit_club_more_1_b_a: "Сначала мы знакомимся (~20 минут), потом читаем по ролям (~45 минут), а потом обсуждаем текст (~55 минут).",
+    
+lit_club_more_15_q: "Какие материалы я получу после встречи клуба?",
+
+    lit_club_1_more_15_a:
+      "После клуба вы получите документ с текстом на русском языке (с ударениями) и его переводом на английский язык.",
+    
+    lit_club_2_more_15_a:
+      "После клуба вы получите документ с текстом на русском языке и его переводом на английский язык.",
+    
+
+lit_club_more_2_q: "Пожалуйста, внимательно посмотрите на дату и время.",
+lit_club_more_2_a: "После оплаты деньги не возвращаются. ⚠️",
+
+lit_club_more_3_q: "Примерный уровень текста, который мы будем читать и обсуждать во время встречи клуба:",
+    
     about_title: "Всем привет, друзья! Меня зовут Геннадий. Я\u00A0преподаватель русского языка и автор книг",
     about_p1: "Я помогаю ученикам разных уровней быстрее осваивать русский язык. Более 1000 проведённых уроков и высокий рейтинг.",
     contacts: "Контакты",
@@ -436,11 +556,15 @@ function applyThemeToHtml(theme) {
 }
 
 // ================== UI HELPERS ==================
-function NavPill({ active, onClick, children, size = "md", className = "", ...props }) {
+const NavPill = React.forwardRef(function NavPill(
+  { active, onClick, children, size = "md", className = "", ...props },
+  ref
+) {
   const padding = size === "sm" ? "px-3 py-1.5 text-xs" : "px-5 py-2.5 text-sm";
 
   return (
     <button
+      ref={ref}
       onClick={onClick}
       type="button"
       {...props}
@@ -460,7 +584,7 @@ function NavPill({ active, onClick, children, size = "md", className = "", ...pr
       {children}
     </button>
   );
-}
+});
 
 // Link that looks like a button (no <button> inside <a>)
 function LinkButton({ href, children, className = "", disabled = false, title, "aria-label": ariaLabel }) {
@@ -911,7 +1035,261 @@ function TabsSlider({ isMobile, activeIndex, dragX, isDragging, children }) {
 }
 
 // ================== APP ==================
+function ClubExtraInfo({ title, children }) {
+  const [open, setOpen] = useState(false);
+
+  const toggleOpen = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setOpen((v) => !v);
+  };
+
+  return (
+    <div className="pt-2 mt-2 border-t border-slate-200 dark:border-slate-800">
+      <button
+        type="button"
+        data-no-swipe="true"
+        aria-expanded={open}
+        onClick={toggleOpen}
+        className={[
+          "w-full flex items-center justify-between gap-3",
+          "rounded-xl px-4 py-1.5 min-h-[34px]",
+          "bg-slate-200 text-slate-700 hover:bg-slate-300",
+          "dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700",
+          "transition",
+          "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
+          "dark:focus-visible:ring-blue-500/40 dark:focus-visible:ring-offset-slate-950",
+        ].join(" ")}
+      >
+        <span className="text-xs sm:text-sm font-medium text-center flex-1 leading-none">
+          {title}
+        </span>
+
+        <ChevronDown
+          className={[
+            "w-4 h-4 flex-none transition-transform duration-200",
+            open ? "rotate-180" : "rotate-0",
+          ].join(" ")}
+        />
+      </button>
+
+      <div
+        className={[
+          "grid transition-all duration-300 ease-in-out",
+          open ? "grid-rows-[1fr] opacity-100 mt-2" : "grid-rows-[0fr] opacity-0 mt-0",
+        ].join(" ")}
+      >
+        <div className="overflow-hidden">
+          <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 px-4 py-4 text-sm sm:text-[15px] leading-relaxed text-slate-700 dark:text-slate-300 space-y-4">
+            {children}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
+
+// ---TimeZone---
+function getTimeZoneLabel(date, locale = "en-US") {
+  try {
+    const parts = new Intl.DateTimeFormat(locale, {
+      timeZoneName: "short",
+    }).formatToParts(date);
+
+    return parts.find((p) => p.type === "timeZoneName")?.value || "";
+  } catch {
+    return "";
+  }
+}
+
+function formatUtcForViewer(isoString, locale = "en-US") {
+  const date = new Date(isoString);
+
+  const formatter = new Intl.DateTimeFormat(locale, {
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
+
+  const tzLabel = getTimeZoneLabel(date, locale);
+  return tzLabel ? `${formatter.format(date)} (${tzLabel})` : formatter.format(date);
+}
+
+async function safeReadJson(response) {
+  try {
+    return await response.json();
+  } catch {
+    return null;
+  }
+}
+
+function savePaidClubToStorage(data, level) {
+  try {
+    const raw = localStorage.getItem("paid_clubs");
+    const parsed = raw ? JSON.parse(raw) : {};
+
+    if (!data?.club_id) return;
+
+    parsed[data.club_id] = {
+      ...data,
+      level,
+    };
+
+    localStorage.setItem("paid_clubs", JSON.stringify(parsed));
+  } catch (error) {
+    console.error("Failed to save paid club to localStorage:", error);
+  }
+}
+  
+function ClubZoomLinkBox({ lang, zoomLink }) {
+  if (!zoomLink) return null;
+
+  return (
+    <div className="mt-2 flex items-center justify-center">
+      <div className="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 px-4 py-4 text-center text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed">
+        <p className="font-semibold mb-2">
+          {lang === "ru" ? "Ссылка на встречу клуба:" : "Club meeting link:"}
+        </p>
+
+        <a
+          href={zoomLink}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-600 dark:text-blue-400 underline break-all"
+        >
+          {zoomLink}
+        </a>
+      </div>
+    </div>
+  );
+}
+
+// ---LitClub---
+const [showPaymentSuccess, setShowPaymentSuccess] = useState(false);
+
+const [clubA2, setClubA2] = useState(null);
+const [clubB1B2, setClubB1B2] = useState(null);
+const [clubsLoading, setClubsLoading] = useState(true);
+
+const [marketingOptInA2, setMarketingOptInA2] = useState(false);
+const [marketingOptInB1B2, setMarketingOptInB1B2] = useState(false);
+
+const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
+
+    useEffect(() => {
+    try {
+      const raw = localStorage.getItem("paid_clubs");
+      const parsed = raw ? JSON.parse(raw) : {};
+      setPaidClubs(parsed);
+    } catch (error) {
+      console.error("Failed to load paid clubs from localStorage:", error);
+      setPaidClubs({});
+    }
+  }, []);
+
+const [paypalSdkReady, setPaypalSdkReady] = useState(() => {
+  if (typeof window === "undefined") return false;
+  return !!window.paypal;
+});
+
+const [paidClubs, setPaidClubs] = useState({});
+
+const paypalA2Rendered = useRef(false);
+const paypalB1B2Rendered = useRef(false);
+
+const findPaidClubByLevel = useCallback(
+  (level, currentClubId) => {
+    if (!paidClubs || typeof paidClubs !== "object") return null;
+
+    if (currentClubId) {
+      const exact = paidClubs[currentClubId];
+      if (exact?.zoom_link) return exact;
+    }
+
+    const entries = Object.values(paidClubs);
+
+    const fallback = entries.find(
+      (item) => item?.level === level && typeof item?.zoom_link === "string" && item.zoom_link.trim()
+    );
+
+    return fallback || null;
+  },
+  [paidClubs]
+);
+
+const paidA2Data = findPaidClubByLevel("a2", clubA2?.id);
+const hasPaidA2 = !!paidA2Data?.zoom_link;
+
+const paidB1B2Data = findPaidClubByLevel("b1b2", clubB1B2?.id);
+const hasPaidB1B2 = !!paidB1B2Data?.zoom_link;
+
+const clubA2PriceBadge =
+  clubA2?.price_usd != null ? `$${clubA2.price_usd}` : "";
+
+const clubB1B2PriceBadge =
+  clubB1B2?.price_usd != null ? `$${clubB1B2.price_usd}` : "";
+
+const LIT_CLUB_A2_SAMPLE = (
+  <div className="mt-2 space-y-3 text-[9px] sm:text-[10px] leading-snug text-slate-800 dark:text-slate-200">
+    <p>
+      Бы́ли брат и сестра́ — Ва́ся и Ка́тя; и у них была́ ко́шка. Весно́й ко́шка пропа́ла.
+      Де́ти иска́ли её <strong>везде́</strong>, но не могли́ найти́.
+    </p>
+
+    <p>
+      Оди́н раз они́ игра́ли <strong>во́зле амба́ра</strong> и услы́шали — над голово́й
+      что́-то <strong>мяу́чит</strong> то́нким го́лосом.
+    </p>
+
+    <p>
+      Ва́ся влез по ле́стнице под кры́шу <strong>амба́ра</strong>. А Ка́тя стоя́ла внизу́
+      и всё спра́шивала:
+    </p>
+
+    <p>— Нашёл? Нашёл?</p>
+
+    <div className="pt-1 space-y-1">
+      <p><strong>везде́</strong> - everywhere</p>
+      <p><strong>во́зле</strong> - near</p>
+      <p><strong>амба́р</strong> - barn</p>
+      <p><strong>мяу́кать / замяу́кать</strong> - to meow</p>
+    </div>
+  </div>
+);
+
+const LIT_CLUB_B1B2_SAMPLE = (
+  <div className="mt-2 space-y-3 text-[9px] sm:text-[10px] leading-snug text-slate-800 dark:text-slate-200">
+    <p>
+      Шестой час вечера. Один из достаточно известных русских учёных — будем
+      называть его просто учёным — сидит у себя в кабинете и нервно кусает ногти.
+    </p>
+
+    <p>
+      — Это просто <strong>возмутительно</strong>! — говорит он, то и дело
+      посматривая на часы. — Это верх неуважения к чужому времени и труду.
+      В Англии такой субъект не заработал бы ни <strong>гроша</strong>, умер бы
+      с голода! Ну, погоди же, придёшь ты…
+    </p>
+
+    <p>
+      И, чувствуя потребность излить на что-нибудь свой гнев и нетерпение,
+      учёный подходит к двери, ведущей в комнату жены, и стучится.
+    </p>
+
+    <p>
+      — Послушай, Катя, — говорит он <strong>негодующим</strong> голосом. —
+      Если увидишь Петра Данилыча, то передай ему, что порядочные люди так не делают!
+    </p>
+
+    <div className="pt-1 space-y-1">
+      <p><strong>возмутительно</strong> = неправильно</p>
+      <p><strong>гроши</strong> - очень маленькая сумма денег</p>
+      <p><strong>негодующий</strong> = недовольный, злой</p>
+    </div>
+  </div>
+);
+  
   // ---- language ----
   const detectLanguage = () => {
     try {
@@ -928,6 +1306,22 @@ export default function App() {
 
   const [lang, setLang] = useState(() => detectLanguage());
   const t = (key) => I18N[lang]?.[key] ?? I18N.en[key] ?? key;
+ 
+const club1DateText = useMemo(() => {
+  if (!clubA2?.starts_at_utc) return "";
+  return formatUtcForViewer(
+    clubA2.starts_at_utc,
+    lang === "ru" ? "ru-RU" : "en-US"
+  );
+}, [clubA2, lang]);
+
+const club2DateText = useMemo(() => {
+  if (!clubB1B2?.starts_at_utc) return "";
+  return formatUtcForViewer(
+    clubB1B2.starts_at_utc,
+    lang === "ru" ? "ru-RU" : "en-US"
+  );
+}, [clubB1B2, lang]);
 
   const switchLang = (next) => {
     setLang(next);
@@ -975,21 +1369,32 @@ export default function App() {
   };
 
   // ---- tabs ----
-  const detectTab = () => {
-    try {
-      const saved = localStorage.getItem("tab");
-      if (saved === "about" || saved === "products" || saved === "free-audio") return saved;
-    } catch {}
-    return "about";
-  };
+  const tabsScrollRef = useRef(null);
+  const tabBtnRefs = useRef({});
+  
+ const detectTab = () => {
+  try {
+    const saved = localStorage.getItem("tab");
+    if (
+      saved === "about" ||
+      saved === "lit-club" ||
+      saved === "products" ||
+      saved === "free-audio"
+    ) {
+      return saved;
+    }
+  } catch {}
+  return "about";
+};
 
   const [tab, setTab] = useState(() => detectTab());
 
-  useEffect(() => {
+    useEffect(() => {
     try {
       localStorage.setItem("tab", tab);
     } catch {}
-    window.scrollTo({ top: 0, behavior: "smooth" });
+  
+    window.scrollTo(0, 0);
   }, [tab]);
 
   useEffect(() => {
@@ -1163,6 +1568,19 @@ function downloadAllAudio() {
   }, [audioBookId, stopAudio]);
 
   // ---- mobile detection (for swipe + easter placement) ----
+const mobileTabClass = useCallback(
+  (tabKey, extra = "") =>
+    [
+      "flex-none text-center origin-center",
+      "transition-all duration-300 ease-out",
+          tab === tabKey
+        ? "opacity-100 px-3"
+        : "opacity-60 px-3",
+      extra,
+    ].join(" "),
+  [tab]
+);
+  
   const [isMobile, setIsMobile] = useState(() => {
     if (typeof window === "undefined") return false;
     return window.matchMedia("(max-width: 768px)").matches;
@@ -1183,20 +1601,22 @@ function downloadAllAudio() {
     };
   }, []);
 
-  const TABS_ORDER = ["about", "products", "free-audio"];
+  const TABS_ORDER = ["about", "lit-club", "products", "free-audio"];
 
-  const TAB_TO_PATH = {
-    about: "/about",
-    products: "/store",
-    "free-audio": "/audio",
-  };
+const TAB_TO_PATH = {
+  about: "/about",
+  "lit-club": "/literature-club",
+  products: "/store",
+  "free-audio": "/audio",
+};
 
-  function pathToTab(pathname) {
-    if (/^\/(about)?\/?$/i.test(pathname)) return "about";
-    if (/^\/(store|products)\/?$/i.test(pathname)) return "products";
-    if (/^\/audio(\/.*)?$/i.test(pathname)) return "free-audio";
-    return "about";
-  }
+function pathToTab(pathname) {
+  if (/^\/(about)?\/?$/i.test(pathname)) return "about";
+  if (/^\/(literature-club|lit-club)\/?$/i.test(pathname)) return "lit-club";
+  if (/^\/(store|products)\/?$/i.test(pathname)) return "products";
+  if (/^\/audio(\/.*)?$/i.test(pathname)) return "free-audio";
+  return "about";
+}
 
   function parseAudioSlug(pathname) {
     const m = pathname.match(/^\/audio(?:\/([^\/?#]+))?\/?$/i);
@@ -1227,23 +1647,110 @@ function downloadAllAudio() {
     if (i >= 0 && i < TABS_ORDER.length - 1) navigate(TAB_TO_PATH[TABS_ORDER[i + 1]]);
   }, [tab, navigate]);
 
-  const swipeHandlers = useSwipeTabs({
-    enabled: isMobile && !isPlaying,
-    onPrev: goPrevTab,
-    onNext: goNextTab,
-    thresholdPx: 45,
-    lockPx: 12,
-    restraintPx: 40,
-  });
+const swipeHandlers = useSwipeTabs({
+  enabled: isMobile && !isPlaying && !showPaymentSuccess && !isCheckoutLoading,
+  onPrev: goPrevTab,
+  onNext: goNextTab,
+  thresholdPx: 45,
+  lockPx: 12,
+  restraintPx: 40,
+});
 
-  const showAbout = tab === "about";
-  const showProducts = tab === "products";
-  const showAudio = tab === "free-audio";
+const showAbout = tab === "about";
+const showLitClub = tab === "lit-club";
+const showProducts = tab === "products";
+const showAudio = tab === "free-audio";
 
   // ✅ active index for animated slider
   const activeIndex = useMemo(() => TABS_ORDER.indexOf(tab), [tab]);
 
+      useEffect(() => {
+        if (!isMobile) return;
+      
+        const container = tabsScrollRef.current;
+        const activeBtn = tabBtnRefs.current[tab];
+        if (!container || !activeBtn) return;
+      
+        const containerWidth = container.clientWidth;
+        const scrollWidth = container.scrollWidth;
+      
+        const targetLeft =
+          activeBtn.offsetLeft + activeBtn.offsetWidth / 2 - containerWidth / 2;
+      
+        const maxScroll = Math.max(0, scrollWidth - containerWidth);
+        const clamped = Math.max(0, Math.min(targetLeft, maxScroll));
+      
+        requestAnimationFrame(() => {
+          container.scrollTo({
+            left: clamped,
+            behavior: "smooth",
+          });
+        });
+      }, [tab, isMobile, lang]);
+  
+  // ================== PPPlata ==================
+const loadClubs = useCallback(async () => {
+  try {
+    setClubsLoading(true);
+
+    const [a2Res, b1b2Res] = await Promise.all([
+      fetch("/api/club/current?level=a2", { cache: "no-store" }),
+      fetch("/api/club/current?level=b1b2", { cache: "no-store" }),
+    ]);
+
+    const a2Data = await safeReadJson(a2Res);
+    const b1b2Data = await safeReadJson(b1b2Res);
+
+    if (a2Res.ok) setClubA2(a2Data);
+    if (b1b2Res.ok) setClubB1B2(b1b2Data);
+  } catch (error) {
+    console.error("Failed to load clubs:", error);
+  } finally {
+    setClubsLoading(false);
+  }
+}, []);
+
+const getSoldOutMessage = useCallback(() => {
+  return lang === "ru"
+    ? "К сожалению, все места уже заняты. Пожалуйста, подождите следующую встречу клуба."
+    : "Unfortunately, all spots are already taken. Please wait for the next club meeting.";
+}, [lang]);
+
+const handleClubSoldOut = useCallback(async () => {
+  alert(getSoldOutMessage());
+  await loadClubs();
+}, [getSoldOutMessage, loadClubs]);
+
+const getClubClosedMessage = useCallback(() => {
+  return lang === "ru"
+    ? "Запись в этот клуб уже закрыта."
+    : "Booking for this club is already closed.";
+}, [lang]);
+
+const handleClubNotOpen = useCallback(async () => {
+  alert(getClubClosedMessage());
+  await loadClubs();
+}, [getClubClosedMessage, loadClubs]);
+
+useEffect(() => {
+  let cancelled = false;
+
+  const run = async () => {
+    if (cancelled) return;
+    await loadClubs();
+  };
+
+  run();
+
+  return () => {
+    cancelled = true;
+  };
+}, [loadClubs]);
+  
   // ================== EASTER EGG STATE ==================
+  const [showSwipeHint, setShowSwipeHint] = useState(false);
+  const swipeHintTimerRef = useRef(null);
+  
   const [eggText, setEggText] = useState("");
   const [eggVisible, setEggVisible] = useState(false);
 
@@ -1261,6 +1768,640 @@ function downloadAllAudio() {
   const hideEgg = useCallback(() => {
     setEggVisible(false);
   }, []);
+
+  const triggerSwipeHint = useCallback(() => {
+  if (!isMobile) return;
+
+  setShowSwipeHint(true);
+
+  if (swipeHintTimerRef.current) {
+    clearTimeout(swipeHintTimerRef.current);
+  }
+
+  swipeHintTimerRef.current = setTimeout(() => {
+    setShowSwipeHint(false);
+  }, 2200);
+}, [isMobile]);
+
+  // PP Helper (PP Button)
+useEffect(() => {
+  if (tab !== "lit-club") return;
+
+  if (typeof window === "undefined") return;
+
+  if (window.paypal) {
+    setPaypalSdkReady(true);
+    return;
+  }
+
+  const existing = document.getElementById("paypal-sdk");
+
+  if (existing) {
+    const handleLoad = () => setPaypalSdkReady(true);
+    const handleError = () => {
+      console.error("Failed to load PayPal SDK");
+      setPaypalSdkReady(false);
+    };
+
+    existing.addEventListener("load", handleLoad, { once: true });
+    existing.addEventListener("error", handleError, { once: true });
+
+    return () => {
+      existing.removeEventListener("load", handleLoad);
+      existing.removeEventListener("error", handleError);
+    };
+  }
+
+  const clientId = import.meta.env.VITE_PAYPAL_CLIENT_ID;
+  if (!clientId) {
+    console.error("Missing VITE_PAYPAL_CLIENT_ID");
+    return;
+  }
+
+  const script = document.createElement("script");
+  script.id = "paypal-sdk";
+  script.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(clientId)}&currency=USD&components=buttons`;
+  script.async = true;
+  script.defer = true;
+
+  const handleLoad = () => {
+    setPaypalSdkReady(true);
+  };
+
+  const handleError = () => {
+    console.error("Failed to load PayPal SDK");
+    setPaypalSdkReady(false);
+  };
+
+  script.addEventListener("load", handleLoad, { once: true });
+  script.addEventListener("error", handleError, { once: true });
+
+  document.head.appendChild(script);
+
+  return () => {
+    script.removeEventListener("load", handleLoad);
+    script.removeEventListener("error", handleError);
+  };
+}, [tab]);
+
+  useEffect(() => {
+  return () => {
+    if (swipeHintTimerRef.current) clearTimeout(swipeHintTimerRef.current);
+  };
+}, []);
+
+// Render of the PP Button A2
+useEffect(() => {
+  if (!clubA2?.id || !clubA2?.is_payable) return;
+
+  const containerId = "paypal-button-container-a2";
+  const shellId = "paypal-shell-a2";
+
+  const resetA2Buttons = () => {
+  const container = document.getElementById(containerId);
+  const shell = document.getElementById(shellId);
+
+  if (container) {
+    container.innerHTML = "";
+  }
+
+  if (shell) {
+    shell.classList.remove("paypal-ready");
+  }
+
+  paypalA2Rendered.current = false;
+};
+
+  const markReadyWhenIframeLoads = () => {
+    const shell = document.getElementById(shellId);
+    const container = document.getElementById(containerId);
+    if (!shell || !container) return;
+
+    const iframe = container.querySelector("iframe");
+    if (!iframe) return;
+
+    const show = () => shell.classList.add("paypal-ready");
+
+    if (iframe.dataset.readyBound === "1") return;
+    iframe.dataset.readyBound = "1";
+
+    iframe.addEventListener("load", show, { once: true });
+
+    setTimeout(show, 250);
+  };
+
+  const renderA2 = () => {
+    const container = document.getElementById(containerId);
+    const shell = document.getElementById(shellId);
+
+    if (!container || !shell) return;
+    if (!window.paypal) return;
+
+    if (container.childElementCount > 0) {
+      paypalA2Rendered.current = true;
+      markReadyWhenIframeLoads();
+      return;
+    }
+
+    shell.classList.remove("paypal-ready");
+
+    window.paypal
+      .Buttons({
+        style: {
+          layout: "vertical",
+          color: "gold",
+          shape: "rect",
+          label: "paypal",
+          tagline: false,
+        },
+
+createOrder: async () => {
+  const response = await fetch("/api/paypal/create-order", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      clubId: clubA2.id,
+    }),
+  });
+
+  const data = await safeReadJson(response);
+
+if (!response.ok) {
+  if (data?.error === "CLUB_SOLD_OUT") {
+    await handleClubSoldOut();
+    throw new Error("CLUB_SOLD_OUT");
+  }
+
+  if (data?.error === "CLUB_NOT_OPEN") {
+    await handleClubNotOpen();
+    throw new Error("CLUB_NOT_OPEN");
+  }
+
+  throw new Error(data?.error || "Failed to create PayPal order");
+}
+
+  if (!data?.orderID) {
+    throw new Error("Missing PayPal order ID");
+  }
+
+  return data.orderID;
+},
+
+onApprove: async (data) => {
+  setIsCheckoutLoading(true);
+
+  try {
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+    const response = await fetch("/api/paypal/capture-order", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        orderID: data.orderID,
+        clubId: clubA2.id,
+        language: lang === "ru" ? "ru" : "en",
+        timeZone,
+        marketingOptIn: marketingOptInA2,
+      }),
+    });
+
+    const result = await safeReadJson(response);
+
+    if (!response.ok) {
+      if (result?.error === "CLUB_SOLD_OUT") {
+        setIsCheckoutLoading(false);
+        await handleClubSoldOut();
+        return;
+      }
+
+      if (result?.error === "CLUB_NOT_OPEN") {
+        setIsCheckoutLoading(false);
+        await handleClubNotOpen();
+        return;
+      }
+
+      throw new Error(result?.error || "Capture failed");
+    }
+
+    const normalizedResult = {
+      ...result,
+      level: "a2",
+    };
+
+    savePaidClubToStorage(normalizedResult, "a2");
+
+    try {
+      sessionStorage.setItem("payment_success_data", JSON.stringify(normalizedResult));
+    } catch (error) {
+      console.error("Failed to save payment success data:", error);
+    }
+
+    setPaidClubs((prev) => ({
+      ...prev,
+      [normalizedResult.club_id]: normalizedResult,
+    }));
+
+    setMarketingOptInA2(false);
+
+    setIsCheckoutLoading(false);
+    setShowPaymentSuccess(true);
+    navigate("/payment-success");
+  } catch (error) {
+    setIsCheckoutLoading(false);
+    console.error("Capture error:", error);
+
+    if (
+      String(error?.message) === "CLUB_SOLD_OUT" ||
+      String(error?.message) === "CLUB_NOT_OPEN"
+    ) {
+      return;
+    }
+
+    alert(lang === "ru" ? "Ошибка после оплаты" : "Error after payment");
+  }
+},
+
+onCancel: () => {
+  console.log("PayPal popup was closed by user");
+
+  resetA2Buttons();
+
+  setTimeout(() => {
+    ensureA2Rendered();
+  }, 0);
+},
+
+onError: (err) => {
+  console.error("PayPal error:", err);
+
+  const text = String(err?.message || err || "").toLowerCase();
+
+  const looksLikeUserClosed =
+    text.includes("popup") ||
+    text.includes("closed") ||
+    text.includes("window closed") ||
+    text.includes("cancel") ||
+    text.includes("user closed") ||
+    text.includes("zoid destroyed before props");
+
+  const isKnownClubState =
+    text.includes("club_sold_out") ||
+    text.includes("club_not_open") ||
+    text.includes("sold_out") ||
+    text.includes("sold out");
+
+if (looksLikeUserClosed) {
+  resetA2Buttons();
+
+  setTimeout(() => {
+    ensureA2Rendered();
+  }, 0);
+
+  return;
+}
+
+if (isKnownClubState) {
+  return;
+}
+
+  const message =
+    lang === "ru"
+      ? "Не удалось завершить оплату PayPal. Попробуйте ещё раз."
+      : "PayPal could not complete the payment. Please try again.";
+
+  alert(message);
+},
+        
+      })
+      .render(`#${containerId}`)
+      .then(() => {
+        paypalA2Rendered.current = true;
+        markReadyWhenIframeLoads();
+      })
+      .catch((err) => {
+        console.error("PayPal render A2 failed:", err);
+      });
+  };
+
+const ensureA2Rendered = () => {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  if (!paypalSdkReady || !window.paypal) {
+    return;
+  }
+
+  if (!paypalA2Rendered.current || container.childElementCount === 0) {
+    renderA2();
+  } else {
+    markReadyWhenIframeLoads();
+  }
+};
+
+  ensureA2Rendered();
+
+  const onPageShow = () => ensureA2Rendered();
+  const onVisibility = () => {
+    if (document.visibilityState === "visible") ensureA2Rendered();
+  };
+
+  window.addEventListener("pageshow", onPageShow);
+  document.addEventListener("visibilitychange", onVisibility);
+
+  return () => {
+    window.removeEventListener("pageshow", onPageShow);
+    document.removeEventListener("visibilitychange", onVisibility);
+  };
+}, [clubA2, lang, navigate, handleClubSoldOut, handleClubNotOpen, paypalSdkReady]);
+
+// Render of the PP Button B1-B2
+useEffect(() => {
+  if (!clubB1B2?.id || !clubB1B2?.is_payable) return;
+
+  const containerId = "paypal-button-container-b1b2";
+  const shellId = "paypal-shell-b1b2";
+
+    const resetB1B2Buttons = () => {
+    const container = document.getElementById(containerId);
+    const shell = document.getElementById(shellId);
+
+    if (container) {
+      container.innerHTML = "";
+    }
+
+    if (shell) {
+      shell.classList.remove("paypal-ready");
+    }
+
+    paypalB1B2Rendered.current = false;
+  };
+
+  const markReadyWhenIframeLoads = () => {
+    const shell = document.getElementById(shellId);
+    const container = document.getElementById(containerId);
+    if (!shell || !container) return;
+
+    const iframe = container.querySelector("iframe");
+    if (!iframe) return;
+
+    const show = () => shell.classList.add("paypal-ready");
+
+    if (iframe.dataset.readyBound === "1") return;
+    iframe.dataset.readyBound = "1";
+
+    iframe.addEventListener("load", show, { once: true });
+
+    setTimeout(show, 250);
+  };
+
+  const renderB1B2 = () => {
+    const container = document.getElementById(containerId);
+    const shell = document.getElementById(shellId);
+
+    if (!container || !shell) return;
+    if (!window.paypal) return;
+
+    if (container.childElementCount > 0) {
+      paypalB1B2Rendered.current = true;
+      markReadyWhenIframeLoads();
+      return;
+    }
+
+    shell.classList.remove("paypal-ready");
+
+    window.paypal
+      .Buttons({
+        style: {
+          layout: "vertical",
+          color: "gold",
+          shape: "rect",
+          label: "paypal",
+          tagline: false,
+        },
+
+  createOrder: async () => {
+  const response = await fetch("/api/paypal/create-order", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      clubId: clubB1B2.id,
+    }),
+  });
+
+  const data = await safeReadJson(response);
+
+if (!response.ok) {
+  if (data?.error === "CLUB_SOLD_OUT") {
+    await handleClubSoldOut();
+    throw new Error("CLUB_SOLD_OUT");
+  }
+
+  if (data?.error === "CLUB_NOT_OPEN") {
+    await handleClubNotOpen();
+    throw new Error("CLUB_NOT_OPEN");
+  }
+
+  throw new Error(data?.error || "Failed to create PayPal order");
+}
+
+  if (!data?.orderID) {
+    throw new Error("Missing PayPal order ID");
+  }
+
+  return data.orderID;
+},
+
+onApprove: async (data) => {
+  setIsCheckoutLoading(true);
+
+  try {
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+    const response = await fetch("/api/paypal/capture-order", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        orderID: data.orderID,
+        clubId: clubB1B2.id,
+        language: lang === "ru" ? "ru" : "en",
+        timeZone,
+        marketingOptIn: marketingOptInB1B2,
+      }),
+    });
+
+    const result = await safeReadJson(response);
+
+    if (!response.ok) {
+      if (result?.error === "CLUB_SOLD_OUT") {
+        setIsCheckoutLoading(false);
+        await handleClubSoldOut();
+        return;
+      }
+
+      if (result?.error === "CLUB_NOT_OPEN") {
+        setIsCheckoutLoading(false);
+        await handleClubNotOpen();
+        return;
+      }
+
+      throw new Error(result?.error || "Capture failed");
+    }
+
+    const normalizedResult = {
+      ...result,
+      level: "b1b2",
+    };
+
+    savePaidClubToStorage(normalizedResult, "b1b2");
+
+    try {
+      sessionStorage.setItem("payment_success_data", JSON.stringify(normalizedResult));
+    } catch (error) {
+      console.error("Failed to save payment success data:", error);
+    }
+
+    setPaidClubs((prev) => ({
+      ...prev,
+      [normalizedResult.club_id]: normalizedResult,
+    }));
+
+    setMarketingOptInB1B2(false);
+
+    setIsCheckoutLoading(false);
+    setShowPaymentSuccess(true);
+    navigate("/payment-success");
+  } catch (error) {
+    setIsCheckoutLoading(false);
+    console.error("Capture error:", error);
+
+    if (
+      String(error?.message) === "CLUB_SOLD_OUT" ||
+      String(error?.message) === "CLUB_NOT_OPEN"
+    ) {
+      return;
+    }
+
+    alert(lang === "ru" ? "Ошибка после оплаты" : "Error after payment");
+  }
+},
+
+onCancel: () => {
+  console.log("PayPal popup was closed by user");
+
+  resetB1B2Buttons();
+
+  setTimeout(() => {
+    ensureB1B2Rendered();
+  }, 0);
+},
+
+onError: (err) => {
+  console.error("PayPal error:", err);
+
+  const text = String(err?.message || err || "").toLowerCase();
+
+  const looksLikeUserClosed =
+    text.includes("popup") ||
+    text.includes("closed") ||
+    text.includes("window closed") ||
+    text.includes("cancel") ||
+    text.includes("user closed") ||
+    text.includes("zoid destroyed before props");
+
+  const isKnownClubState =
+    text.includes("club_sold_out") ||
+    text.includes("club_not_open") ||
+    text.includes("sold_out") ||
+    text.includes("sold out");
+
+if (looksLikeUserClosed) {
+  resetB1B2Buttons();
+
+  setTimeout(() => {
+    ensureB1B2Rendered();
+  }, 0);
+
+  return;
+}
+
+if (isKnownClubState) {
+  return;
+}
+
+  const message =
+    lang === "ru"
+      ? "Не удалось завершить оплату PayPal. Попробуйте ещё раз."
+      : "PayPal could not complete the payment. Please try again.";
+
+  alert(message);
+},
+        
+      })
+      .render(`#${containerId}`)
+      .then(() => {
+        paypalB1B2Rendered.current = true;
+        markReadyWhenIframeLoads();
+      })
+      .catch((err) => {
+        console.error("PayPal render B1-B2 failed:", err);
+      });
+  };
+
+const ensureB1B2Rendered = () => {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  if (!paypalSdkReady || !window.paypal) {
+    return;
+  }
+
+  if (!paypalB1B2Rendered.current || container.childElementCount === 0) {
+    renderB1B2();
+  } else {
+    markReadyWhenIframeLoads();
+  }
+};
+
+  ensureB1B2Rendered();
+
+  const onPageShow = () => ensureB1B2Rendered();
+  const onVisibility = () => {
+    if (document.visibilityState === "visible") ensureB1B2Rendered();
+  };
+
+  window.addEventListener("pageshow", onPageShow);
+  document.addEventListener("visibilitychange", onVisibility);
+
+  return () => {
+    window.removeEventListener("pageshow", onPageShow);
+    document.removeEventListener("visibilitychange", onVisibility);
+  };
+}, [clubB1B2, lang, navigate, handleClubSoldOut, handleClubNotOpen, paypalSdkReady]);
+
+
+  useEffect(() => {
+  if (typeof window === "undefined") return;
+
+  const syncPaymentSuccessFromUrl = () => {
+    const path = window.location.pathname || "/";
+    setShowPaymentSuccess(path === "/payment-success");
+  };
+
+  syncPaymentSuccessFromUrl();
+  window.addEventListener("popstate", syncPaymentSuccessFromUrl);
+
+  return () => {
+    window.removeEventListener("popstate", syncPaymentSuccessFromUrl);
+  };
+}, []);
 
   // auto-hide timer
   const eggTimerRef = useRef(null);
@@ -1286,12 +2427,13 @@ function downloadAllAudio() {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const TAB_FROM_PATH = (p) => {
-      if (/^\/(about)?\/?$/i.test(p)) return "about";
-      if (/^\/(store|products)\/?$/i.test(p)) return "products";
-      if (/^\/audio(\/.*)?$/i.test(p)) return "free-audio";
-      return "about";
-    };
+const TAB_FROM_PATH = (p) => {
+  if (/^\/(about)?\/?$/i.test(p)) return "about";
+  if (/^\/(literature-club|lit-club)\/?$/i.test(p)) return "lit-club";
+  if (/^\/(store|products)\/?$/i.test(p)) return "products";
+  if (/^\/audio(\/.*)?$/i.test(p)) return "free-audio";
+  return "about";
+};
 
     const AUDIO_SLUG_FROM_PATH = (p) => {
       const m = p.match(/^\/audio(?:\/([^\/?#]+))?\/?$/i);
@@ -1490,7 +2632,7 @@ function downloadAllAudio() {
 
       <audio ref={audioRef} preload="none" />
 
-      <header className="sticky top-0 z-50 bg-white/80 dark:bg-slate-950/75 backdrop-blur border-b border-slate-200 dark:border-slate-800">
+      <header className="sticky top-0 z-50 relative bg-white/80 dark:bg-slate-950/75 backdrop-blur border-b border-slate-200 dark:border-slate-800">
         <div className="w-full">
           <div className={`${CONTAINER} py-3 flex items-center justify-between gap-4 ${TOPBAR_H}`}>
             <div className="flex items-center gap-3 min-w-0">
@@ -1516,12 +2658,30 @@ function downloadAllAudio() {
                 <p className="font-semibold leading-tight truncate">{t("name")}</p>
                 <p className="text-xs opacity-70 truncate">{t("tagline")}</p>
               </div>
+              
             </div>
 
             {/* Desktop toast: BETWEEN name and language buttons */}
             <div className="flex-1 hidden md:flex justify-center min-w-0">
               {eggText ? <Toast variant="desktop" /> : null}
             </div>
+
+              {isMobile && showSwipeHint ? (
+                <div className="absolute left-1/2 top-8 z-[70] -translate-x-1/2 -translate-y-1/2 pointer-events-none md:hidden">
+                  <div
+                    className={[
+                      "rounded-full px-4 py-1.5",
+                      "text-[13px] font-semibold whitespace-nowrap",
+                      "bg-white/95 text-slate-900 border border-slate-200 shadow-md",
+                      "dark:bg-slate-900/95 dark:text-slate-100 dark:border-slate-700",
+                      "backdrop-blur",
+                      "transition-all duration-200",
+                    ].join(" ")}
+                  >
+                    {lang === "ru" ? "Свайпайте влево и вправо" : "Swipe left and right"}
+                  </div>
+                </div>
+              ) : null}
 
             <div className="flex items-center gap-2 shrink-0">
               <NavPill size="sm" active={lang === "ru"} onClick={() => switchLang("ru")}>
@@ -1534,31 +2694,122 @@ function downloadAllAudio() {
           </div>
         </div>
 
-        <nav className="border-t border-slate-200 dark:border-slate-800">
-          <div className="w-full">
-            <div className={`${CONTAINER} py-3`}>
-              <div className="flex w-full items-center gap-2 sm:gap-3 overflow-x-hidden sm:overflow-x-auto no-scrollbar">
-                <NavPill active={showAbout} onClick={() => navigate("/about")} className="flex-1 text-center sm:flex-none">
-                  {t("nav_about")}
-                </NavPill>
+      <nav className="border-t border-slate-200 dark:border-slate-800">
+        <div className="w-full">
+          <div className={`${CONTAINER} py-3`}>
+            {/* DESKTOP */}
+            <div className="hidden md:flex w-full items-center gap-3 overflow-x-auto no-scrollbar">
+              <NavPill active={showAbout} onClick={() => navigate("/about")} className="flex-none text-center">
+                {t("nav_about")}
+              </NavPill>
+      
+              <NavPill active={showLitClub} onClick={() => navigate("/literature-club")} className="flex-none text-center">
+                {t("nav_lit_club")}
+              </NavPill>
+      
+              <NavPill active={showProducts} onClick={() => navigate("/store")} className="flex-none text-center">
+                {t("nav_products")}
+              </NavPill>
+      
+              <NavPill
+                active={showAudio}
+                onMouseEnter={prefetchAudiobooksOnce}
+                onFocus={prefetchAudiobooksOnce}
+                onClick={() => navigate("/audio")}
+                className="flex-none text-center"
+              >
+                {t("nav_audio")}
+              </NavPill>
+            </div>
+      
+            {/* MOBILE */}
+            <div className="md:hidden relative flex items-center min-w-0">
+              <div className="pointer-events-none absolute left-0 top-0 bottom-0 z-[26] w-20 bg-gradient-to-r from-white to-transparent dark:from-slate-950 dark:to-transparent" />
+              <div className="pointer-events-none absolute right-0 top-0 bottom-0 z-[26] w-20 bg-gradient-to-l from-white to-transparent dark:from-slate-950 dark:to-transparent" />
+                 
+              {activeIndex > 0 ? (
+                    <div className="pointer-events-none absolute left-0 top-1/2 -translate-y-1/2 z-[40] md:hidden">
+                      <ChevronLeft className="w-4 h-4 text-slate-400 dark:text-slate-500" />
+                    </div>
+                  ) : null}     
+      
+                        <div
+                          ref={tabsScrollRef}
+                          className="flex-1 min-w-0 overflow-x-auto no-scrollbar scroll-smooth"
+                        >
+                          <div className="flex items-center gap-[4px] w-max py-1 px-[22vw]">
+                          
+                      <NavPill
+                        ref={(el) => {
+                          tabBtnRefs.current.about = el;
+                        }}
+                        active={showAbout}
+                        onClick={() => {
+                          navigate("/about");
+                          triggerSwipeHint();
+                        }}
+                        className={mobileTabClass("about", "px-3 py-1.5 text-[13px]")}
+                      >
+                        {t("nav_about")}
+                      </NavPill>
+                  
+                      <NavPill
+                        ref={(el) => {
+                          tabBtnRefs.current["lit-club"] = el;
+                        }}
+                        active={showLitClub}
+                        onClick={() => {
+                          navigate("/literature-club");
+                          triggerSwipeHint();
+                        }}
+                        className={mobileTabClass("lit-club", "px-3 py-1.5 text-[13px]")}
+                      >
+                        {t("nav_lit_club")}
+                      </NavPill>
+                  
+                      <NavPill
+                        ref={(el) => {
+                          tabBtnRefs.current.products = el;
+                        }}
+                        active={showProducts}
+                        onClick={() => {
+                          navigate("/store");
+                          triggerSwipeHint();
+                        }}
+                        className={mobileTabClass("products", "px-3 py-1.5 text-[13px]")}
+                      >
+                        {t("nav_products")}
+                      </NavPill>
+                  
+                      <NavPill
+                        ref={(el) => {
+                          tabBtnRefs.current["free-audio"] = el;
+                        }}
+                        active={showAudio}
+                        onMouseEnter={prefetchAudiobooksOnce}
+                        onFocus={prefetchAudiobooksOnce}
+                        onClick={() => {
+                          navigate("/audio");
+                          triggerSwipeHint();
+                        }}
+                        className={mobileTabClass("free-audio", "px-3 py-1.5 text-[13px]")}
+                      >
+                        {t("nav_audio")}
+                      </NavPill>
+                    </div>
+                  </div>
 
-                <NavPill active={showProducts} onClick={() => navigate("/store")} className="flex-1 text-center sm:flex-none">
-                  {t("nav_products")}
-                </NavPill>
-
-                <NavPill
-                  active={showAudio}
-                  onMouseEnter={prefetchAudiobooksOnce}
-                  onFocus={prefetchAudiobooksOnce}
-                  onClick={() => navigate("/audio")}
-                  className="flex-1 text-center sm:flex-none"
-                >
-                  {t("nav_audio")}
-                </NavPill>
-              </div>
+                {activeIndex < TABS_ORDER.length - 1 ? (
+                  <div className="pointer-events-none absolute right-0 top-1/2 -translate-y-1/2 z-[40] md:hidden">
+                    <ChevronRight className="w-4 h-4 text-slate-400 dark:text-slate-500" />
+                  </div>
+                ) : null}
+              
             </div>
           </div>
-        </nav>
+        </div>
+      </nav>
+        
       </header>
 
       {/* ✅ Mobile toast: moved DOWN to center of screen, auto-sized, centered text */}
@@ -1569,28 +2820,40 @@ function downloadAllAudio() {
           </div>
         </div>
       ) : null}
-
-      <main
-        id="content"
-        className={`flex-1 ${CONTAINER} py-4 sm:py-8`}
-        onPointerDown={swipeHandlers.onPointerDown}
-        onPointerMove={swipeHandlers.onPointerMove}
-        onPointerUp={swipeHandlers.onPointerUp}
-        onPointerCancel={swipeHandlers.onPointerCancel}
-        onClickCapture={swipeHandlers.onClickCapture}
-        // Важно: разрешаем вертикальный скролл, но НЕ даём браузеру "жрать" горизонтальные жесты
-        style={{ touchAction: isMobile ? "pan-y" : "auto" }}
-      >
+        
         {/* ✅ Animated tab content slider (mobile) */}
-        <TabsSlider
-          isMobile={isMobile}
-          activeIndex={activeIndex}
-          dragX={swipeHandlers.dragX}
-          isDragging={swipeHandlers.isDragging}
-        >
+          <main
+            id="content"
+            className={`flex-1 ${CONTAINER} py-1 sm:py-3`}
+            onPointerDown={swipeHandlers.onPointerDown}
+            onPointerMove={swipeHandlers.onPointerMove}
+            onPointerUp={swipeHandlers.onPointerUp}
+            onPointerCancel={swipeHandlers.onPointerCancel}
+            onClickCapture={swipeHandlers.onClickCapture}
+// Важно: разрешаем вертикальный скролл, но НЕ даём браузеру "жрать" горизонтальные жесты
+            style={{ touchAction: isMobile ? "pan-y" : "auto" }}
+          >
+            {showPaymentSuccess ? (
+              <PaymentSuccess
+                lang={lang}
+
+              onBack={() => {
+                setShowPaymentSuccess(false);
+                navigate("/literature-club");
+              }}
+                
+              />
+            ) : (
+              <TabsSlider
+                isMobile={isMobile}
+                activeIndex={activeIndex}
+                dragX={swipeHandlers.dragX}
+                isDragging={swipeHandlers.isDragging}
+              >
+ 
           {/* ABOUT */}
           <section hidden={!showAbout} aria-hidden={!showAbout}>
-            <div className="grid md:grid-cols-3 gap-6 sm:gap-8 items-start">
+            <div className="grid md:grid-cols-3 gap-4 sm:gap-5 items-start">
               <div className="md:col-span-2 space-y-4">
                 <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight break-words">{t("about_title")}</h1>
                 <p className="leading-relaxed text-slate-700 dark:text-slate-300">{t("about_p1")}</p>
@@ -1600,16 +2863,6 @@ function downloadAllAudio() {
                 <CardTitle className="mb-2">{t("contacts")}</CardTitle>
                 <div className="text-sm space-y-1 text-slate-700 dark:text-slate-300">
                   <p>E-mail: genndybogdanov@gmail.com</p>
-                  <p>
-                    <a
-                      className="underline hover:text-slate-900 dark:hover:text-white break-all"
-                      href="https://substack.com/@gbogdanov"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Substack
-                    </a>
-                  </p>
                 </div>
               </Card>
 
@@ -1632,10 +2885,10 @@ function downloadAllAudio() {
                       <h3 className="text-lg sm:text-xl font-semibold leading-snug">{t("learn_with_me")}</h3>
 
                       <div className="mt-3 flex flex-col gap-2 w-full max-w-[260px]">
-                        <ExternalLinkChip href="https://preply.com/en/?pref=ODkzOTkyOQ==&id=1759522486.457389&ep=w1">
+                        <ExternalLinkChip href="https://preply.in/GENNADII6EN1261045210?ts=17728229">
                           Preply
                         </ExternalLinkChip>
-                        <ExternalLinkChip href="https://www.italki.com/affshare?ref=af11775706">italki</ExternalLinkChip>
+                        <ExternalLinkChip href="https://www.italki.com/en/teacher/11775706?lv=1">italki</ExternalLinkChip>
                       </div>
                     </div>
                   </div>
@@ -1644,6 +2897,367 @@ function downloadAllAudio() {
             </div>
           </section>
 
+    {/* RUSSIAN LITERATURE CLUB */}
+<section hidden={!showLitClub} aria-hidden={!showLitClub}>
+  <div className="grid md:grid-cols-3 gap-x-4 gap-y-2 sm:gap-x-4 sm:gap-y-2 items-start">
+    
+      <div className="md:col-span-3 space-y-1.5">
+
+<div className="flex items-center gap-2 min-w-0 flex-nowrap">
+<h1
+  className={`min-w-0 shrink font-extrabold tracking-tight leading-[1.12] truncate pb-1 ${
+    lang === "ru"
+      ? "text-[20px] sm:text-3xl md:text-4xl"
+      : "text-[20px] sm:text-3xl md:text-4xl"
+  }`}
+>
+    {t("lit_club_title")}
+  </h1>
+
+  <a
+    href="https://t.me/russianlitclub"
+    target="_blank"
+    rel="noopener noreferrer"
+    aria-label={t("lit_club_telegram")}
+    title={t("lit_club_telegram")}
+    className={[
+      "inline-flex items-center justify-center shrink-0 rounded-full border",
+      "px-2.5 py-1.5",
+      "text-[11px] sm:text-sm font-medium whitespace-nowrap",
+      "border-slate-200 bg-white text-slate-800 hover:bg-slate-50",
+      "dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800/70",
+      "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
+      "dark:focus-visible:ring-blue-500/40 dark:focus-visible:ring-offset-slate-950",
+      "transition",
+      // gap только там, где показываем текст
+      lang === "ru" ? "gap-0 sm:gap-1.5" : "gap-1.5",
+    ].join(" ")}
+  >
+    <Send className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+    <span className={lang === "ru" ? "hidden sm:inline" : ""}>
+      {t("lit_club_telegram")}
+    </span>
+  </a>
+</div>
+      
+        <p className="text-base leading-relaxed text-slate-700 dark:text-slate-300 mb-6 sm:mb-8">
+          {t("lit_club_desc")}
+        </p>
+      </div>
+
+    <div className="md:col-span-3 grid md:grid-cols-2 gap-4 mt-6 sm:mt-8 items-start">
+      {/* CLUB 1 */}
+      <div>
+        <div className="text-center mb-1">
+          <div className="flex items-center justify-center gap-2 flex-wrap">
+            <h3 className="text-2xl sm:text-3xl font-semibold">
+              {t("lit_club_1_title")}
+            </h3>
+        
+            <span
+              className="
+                inline-flex items-center rounded-full border
+                border-slate-200 dark:border-slate-700
+                bg-white dark:bg-slate-900
+                px-3 py-1 text-sm sm:text-base font-semibold
+                text-slate-800 dark:text-slate-100
+                shadow-sm
+              "
+            >
+              {clubA2PriceBadge}
+            </span>
+          </div>
+        </div>
+          <Card className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl">
+            <div className="p-4 flex flex-col divide-y divide-slate-200 dark:divide-slate-800">
+              <div className="pt-0 pb-0">
+                <div className="text-center">
+
+                  <p className="text-lg sm:text-xl text-blue-600 font-medium flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 text-center sm:text-left">
+                    <span className="flex items-center gap-2">
+                      <Clock className="w-4 h-4 opacity-70" />
+                  
+                      {/* строка 1 (mobile) */}
+                      <span className="sm:hidden">
+                        {lang === "ru" ? "Ближайший клуб:" : "Next club:"}
+                      </span>
+                  
+                      {/* строка 1 (desktop) */}
+                      <span className="hidden sm:inline">
+                        {lang === "ru" ? "Ближайший клуб:" : "Next club:"}
+                      </span>
+                    </span>
+                  
+                    {/* строка 2 */}
+                    <span>
+                      {club1DateText}
+                    </span>
+                  </p>
+          
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+                    {t("lit_club_timezone_note")}
+                  </p>
+
+
+        {/* PAYPAL BUTTON */}
+                </div>
+              </div>
+            <ul className="pt-2 list-disc pl-5 text-base leading-snug text-slate-700 dark:text-slate-300 space-y-0">
+              <li>{t("lit_club_1_point_1")}</li>
+              <li>{t("lit_club_1_point_3")}</li>
+              <li>{t("lit_club_1_point_4")}</li>
+            </ul>
+              
+              <div className="pt-1 mt-1 sm:pt-3 sm:mt-2">
+
+{!hasPaidA2 && !clubsLoading && clubA2?.is_payable ? (
+<label className="mt-2 mb-3 flex items-center justify-center gap-2 w-full text-center text-sm text-slate-700 dark:text-slate-300 select-none cursor-pointer">
+  <input
+    type="checkbox"
+    checked={marketingOptInA2}
+    onChange={(e) => setMarketingOptInA2(e.target.checked)}
+    className="mt-0.5"
+  />
+  <span className="text-xs sm:text-sm max-w-md">
+    {t("lit_club_marketing_opt_in")}
+  </span>
+</label>
+) : null}             
+
+{hasPaidA2 ? (
+  <ClubZoomLinkBox lang={lang} zoomLink={paidA2Data.zoom_link} />
+) : clubsLoading ? (
+  <div className="h-[110px]" />
+) : clubA2?.is_payable ? (
+  <div
+    className="paypal-shell paypal-shell-embedded"
+    id="paypal-shell-a2"
+    style={{ colorScheme: "none" }}
+  >
+    <div
+      id="paypal-button-container-a2"
+      className="max-w-[420px] mx-auto"
+    />
+  </div>
+) : (
+  <div className="relative">
+    <div className="opacity-0 pointer-events-none select-none hidden sm:block">
+      <div className="max-w-[420px] mx-auto">
+        <div className="rounded-md h-[39px] bg-yellow-400" />
+        <div className="h-5" />
+        <div className="rounded-md h-[39px] bg-slate-800" />
+        <div className="h-5" />
+        <div className="h-5 flex items-center justify-center">
+          <span className="text-sm">Powered by PayPal</span>
+        </div>
+      </div>
+    </div>
+
+    <div className="mt-2 flex items-center justify-center sm:mt-0 sm:absolute sm:inset-0">
+      <div className="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 px-4 py-2 sm:py-4 text-center text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed">
+        <span>{t("lit_club_sold_out_1")}</span>
+        <br />
+        <span>{t("lit_club_sold_out_2")}</span>
+      </div>
+    </div>
+  </div>
+)}
+
+            </div>
+              <ClubExtraInfo title={t("lit_club_more_info")}>
+                <div>
+                  <p className="font-semibold">{t("lit_club_what_read_q")}</p>
+                  <p>{t("lit_club_1_what_read_a")}</p>
+                </div>
+              
+                <div>
+                  <p className="font-semibold">{t("lit_club_more_0_q")}</p>
+                  <p>{t("lit_club_more_0_a")}</p>
+                </div>
+              
+                <div>
+                  <p className="font-semibold">{t("lit_club_more_01_q")}</p>
+                  <p>{t("lit_club_more_01_a")}</p>
+                </div>
+              
+                <div>
+                  <p className="font-semibold">{t("lit_club_more_1_q")}</p>
+                  <p>{t("lit_club_more_1_a")}</p>
+                </div>
+              
+                <div>
+                  <p className="font-semibold">{t("lit_club_more_15_q")}</p>
+                  <p>{t("lit_club_1_more_15_a")}</p>
+                </div>
+              
+                <div>
+                  <p className="font-semibold">{t("lit_club_more_2_q")}</p>
+                  <p>{t("lit_club_more_2_a")}</p>
+                </div>
+              
+                <div>
+                  <p className="font-semibold">{t("lit_club_more_3_q")}</p>
+                  {LIT_CLUB_A2_SAMPLE}
+                </div>
+              </ClubExtraInfo>
+              
+          </div>
+        </Card>
+      </div>
+
+      {/* CLUB 2 */}
+      <div>
+        <div className="text-center mb-1">
+          <div className="flex items-center justify-center gap-2 flex-wrap">
+            <h3 className="text-2xl sm:text-3xl font-semibold">
+              {t("lit_club_2_title")}
+            </h3>
+        
+            <span
+              className="
+                inline-flex items-center rounded-full border
+                border-slate-200 dark:border-slate-700
+                bg-white dark:bg-slate-900
+                px-3 py-1 text-sm sm:text-base font-semibold
+                text-slate-800 dark:text-slate-100
+                shadow-sm
+              "
+            >
+              {clubB1B2PriceBadge}
+            </span>
+          </div>
+        </div>
+
+        <Card className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl">
+          <div className="p-4 flex flex-col divide-y divide-slate-200 dark:divide-slate-800">
+            <div className="pt-0 pb-0">
+              <div className="text-center">
+
+                <p className="text-lg sm:text-xl text-blue-600 font-medium flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 text-center sm:text-left leading-tight sm:leading-normal">
+                 <span className="flex items-center gap-2">
+                    <Clock className="w-4 h-4 opacity-70" />
+                
+                    <span>
+                      {lang === "ru" ? "Ближайший клуб:" : "Next club:"}
+                    </span>
+                  </span>
+                
+                  <span>{club2DateText}</span>
+                </p>
+              
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+                  {t("lit_club_timezone_note")}
+                </p>
+
+              </div>
+            </div>
+
+            <ul className="pt-2 list-disc pl-5 text-base leading-snug text-slate-700 dark:text-slate-300 space-y-0">
+              <li>{t("lit_club_2_point_1")}</li>
+              <li>{t("lit_club_2_point_3")}</li>
+              <li>{t("lit_club_2_point_4")}</li>
+            </ul>
+
+              <div className="pt-1 mt-1 sm:pt-3 sm:mt-2">
+
+{!hasPaidB1B2 && !clubsLoading && clubB1B2?.is_payable ? (
+  <label className="mt-2 mb-3 flex items-center justify-center gap-2 w-full text-center text-sm text-slate-700 dark:text-slate-300 select-none cursor-pointer">
+    <input
+      type="checkbox"
+      checked={marketingOptInB1B2}
+      onChange={(e) => setMarketingOptInB1B2(e.target.checked)}
+      className="mt-0.5"
+    />
+<span className="text-xs sm:text-sm max-w-md">
+  {t("lit_club_marketing_opt_in")}
+</span>
+  </label>
+) : null}
+
+{hasPaidB1B2 ? (
+  <ClubZoomLinkBox lang={lang} zoomLink={paidB1B2Data.zoom_link} />
+) : clubsLoading ? (
+  <div className="h-[110px]" />
+) : clubB1B2?.is_payable ? (
+  <div
+    className="paypal-shell paypal-shell-embedded"
+    id="paypal-shell-b1b2"
+    style={{ colorScheme: "none" }}
+  >
+    <div
+      id="paypal-button-container-b1b2"
+      className="max-w-[420px] mx-auto"
+    />
+  </div>
+) : (
+  <div className="relative">
+    <div className="opacity-0 pointer-events-none select-none hidden sm:block">
+      <div className="max-w-[420px] mx-auto">
+        <div className="rounded-md h-[39px] bg-yellow-400" />
+        <div className="h-5" />
+        <div className="rounded-md h-[39px] bg-slate-800" />
+        <div className="h-5" />
+        <div className="h-5 flex items-center justify-center">
+          <span className="text-sm">Powered by PayPal</span>
+        </div>
+      </div>
+    </div>
+
+    <div className="mt-2 flex items-center justify-center sm:mt-0 sm:absolute sm:inset-0">
+      <div className="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 px-4 py-2 sm:py-4 text-center text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed">
+        <span>{t("lit_club_sold_out_1")}</span>
+        <br />
+        <span>{t("lit_club_sold_out_2")}</span>
+      </div>
+    </div>
+  </div>
+)}
+                
+            </div>
+                <ClubExtraInfo title={t("lit_club_more_info")}>
+                  <div>
+                    <p className="font-semibold">{t("lit_club_what_read_q")}</p>
+                    <p>{t("lit_club_2_what_read_a")}</p>
+                  </div>
+                
+                  <div>
+                    <p className="font-semibold">{t("lit_club_more_0_q")}</p>
+                    <p>{t("lit_club_more_0_a")}</p>
+                  </div>
+                
+                  <div>
+                    <p className="font-semibold">{t("lit_club_more_01_q")}</p>
+                    <p>{t("lit_club_more_01_a")}</p>
+                  </div>
+                
+                  <div>
+                    <p className="font-semibold">{t("lit_club_more_1_b_q")}</p>
+                    <p>{t("lit_club_more_1_b_a")}</p>
+                  </div>
+                
+                  <div>
+                    <p className="font-semibold">{t("lit_club_more_15_q")}</p>
+                    <p>{t("lit_club_2_more_15_a")}</p>
+                  </div>
+                
+                  <div>
+                    <p className="font-semibold">{t("lit_club_more_2_q")}</p>
+                    <p>{t("lit_club_more_2_a")}</p>
+                  </div>
+                
+                  <div>
+                    <p className="font-semibold">{t("lit_club_more_3_q")}</p>
+                    {LIT_CLUB_B1B2_SAMPLE}
+                  </div>
+                </ClubExtraInfo>
+            
+          </div>
+        </Card>
+      </div>
+    </div>
+  </div>
+</section>
+          
           {/* PRODUCTS */}
           <section hidden={!showProducts} aria-hidden={!showProducts}>
             <div className="space-y-4 sm:space-y-6">
@@ -1806,6 +3420,7 @@ function downloadAllAudio() {
             </div>
           </section>
         </TabsSlider>
+            )}
       </main>
 
       <footer className="mt-auto border-t border-slate-200 dark:border-slate-800">
@@ -1838,6 +3453,22 @@ function downloadAllAudio() {
       </footer>
 
       <Analytics />
+
+      {isCheckoutLoading ? (
+        <div className="fixed inset-0 z-[999] bg-black/40 backdrop-blur-sm flex items-center justify-center px-4">
+          <div className="w-full max-w-sm rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-xl px-6 py-5 text-center">
+            <div className="mx-auto mb-4 h-10 w-10 rounded-full border-4 border-slate-300 border-t-blue-600 animate-spin" />
+            <p className="text-base font-semibold text-slate-900 dark:text-slate-100">
+              {lang === "ru" ? "Обрабатываем оплату..." : "Processing payment..."}
+            </p>
+            <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
+              {lang === "ru"
+                ? "Пожалуйста, не закрывайте страницу."
+                : "Please do not close the page."}
+            </p>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
