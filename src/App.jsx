@@ -221,7 +221,7 @@ const PRODUCTS = [
     kind: "A1-B1 Level",
     price: 9.99,
     image: "/Product_Leo.webp",
-    externalUrl: "https://www.amazon.com/dp/B0GMCCFMQQ",
+    externalUrl: "https://www.amazon.com/dp/B0GMCCFMQQ?maas=maas_adg_1C606C53B96C89859FF20C0F27D27E5E_afap_abs&ref_=aa_maas&tag=maas",
     marketplace: "amazon",
     badges: ["RU-EN", "Paper Book", "Audio"],
     description: "Word-by-word translation, stress marks, grammar explanations, exercises, audio included",
