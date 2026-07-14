@@ -1525,31 +1525,35 @@ const showAbout = tab === "about";
 const showProducts = tab === "products";
 const showAudio = tab === "free-audio";
 
-  // ✅ active index for animated slider
-  const activeIndex = useMemo(() => TABS_ORDER.indexOf(tab), [tab]);
+// ✅ active index for animated slider
+const activeIndex = useMemo(() => TABS_ORDER.indexOf(tab), [tab]);
 
-      useEffect(() => {
-        if (!isMobile) return;
-      
-        const container = tabsScrollRef.current;
-        const activeBtn = tabBtnRefs.current[tab];
-        if (!container || !activeBtn) return;
-      
-        const containerWidth = container.clientWidth;
-        const scrollWidth = container.scrollWidth;
-      
-        const targetLeft =
-          activeBtn.offsetLeft + activeBtn.offsetWidth / 2 - containerWidth / 2;
-      
-        const maxScroll = Math.max(0, scrollWidth - containerWidth);
-        const clamped = Math.max(0, Math.min(targetLeft, maxScroll));
-      
-requestAnimationFrame(() => {
-  container.scrollTo({
-    left: clamped,
-    behavior: "auto",
+useEffect(() => {
+  if (!isMobile) return;
+
+  const container = tabsScrollRef.current;
+  const activeBtn = tabBtnRefs.current[tab];
+
+  if (!container || !activeBtn) return;
+
+  const containerWidth = container.clientWidth;
+  const scrollWidth = container.scrollWidth;
+
+  const targetLeft =
+    activeBtn.offsetLeft +
+    activeBtn.offsetWidth / 2 -
+    containerWidth / 2;
+
+  const maxScroll = Math.max(0, scrollWidth - containerWidth);
+  const clamped = Math.max(0, Math.min(targetLeft, maxScroll));
+
+  requestAnimationFrame(() => {
+    container.scrollTo({
+      left: clamped,
+      behavior: "auto",
+    });
   });
-});
+}, [tab, isMobile, lang]);
   
   
   // ================== EASTER EGG STATE ==================
