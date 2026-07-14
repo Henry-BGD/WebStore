@@ -219,14 +219,14 @@ const PRODUCTS = [
   // or replace externalUrl with the final file URL.
   {
     id: "prod-free-water-spirit",
-    title: 'Short Story "The Water Spirit" by Leo Tolstoy',
+    title: '"The Peasant and the Water Spirit" by Leo Tolstoy',
     kind: "A1 Level",
     price: 0,
     isFree: true,
     promo: true,
     actionType: "download",
-    image: "/Product_Leo.webp",
-    externalUrl: "/downloads/The_Water_Spirit_by_Leo_Tolstoy.pdf",
+    image: "/Product_Leo_Free.webp",
+    externalUrl: "/downloads/The_Water_Spirit_by_Leo_Tolstoy.zip",
     marketplace: "download",
     badges: ["RU-EN", "PDF", "Audio"],
     description: "Word-by-word translation, stress marks, grammar explanations, exercises, audio included",
