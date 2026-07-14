@@ -14,22 +14,12 @@ function useSwipeTabs({
   enabled,
   onPrev,
   onNext,
-  thresholdPx = 60,
-  lockPx = 10,
-  restraintPx = 40,
+  thresholdPx = 45,
 }) {
   const startX = useRef(0);
   const startY = useRef(0);
   const tracking = useRef(false);
-  const axisLock = useRef(null);
-  const latestDx = useRef(0);
-  const rafRef = useRef(0);
 
-  const [dragX, setDragX] = useState(0);
-  const [isDragging, setIsDragging] = useState(false);
-
-  // Не начинаем свайп, если пользователь нажал
-  // на кнопку, ссылку, поле ввода или другой интерактивный элемент.
   const shouldIgnoreTarget = (target) => {
     try {
       return !!target?.closest?.(
@@ -51,145 +41,53 @@ function useSwipeTabs({
     }
   };
 
-  const stopTracking = useCallback(() => {
-    tracking.current = false;
-    axisLock.current = null;
-    latestDx.current = 0;
-
-    if (rafRef.current) {
-      cancelAnimationFrame(rafRef.current);
-      rafRef.current = 0;
-    }
-
-    setDragX(0);
-    setIsDragging(false);
-  }, []);
-
-  const setDragXRaf = useCallback((x) => {
-    if (rafRef.current) return;
-
-    rafRef.current = requestAnimationFrame(() => {
-      rafRef.current = 0;
-      setDragX(x);
-    });
-  }, []);
-
-  const onPointerDown = useCallback(
+  const onTouchStart = useCallback(
     (e) => {
-      if (!enabled) return;
-      if (e.pointerType !== "touch") return;
-      if (e.isPrimary === false) return;
+      tracking.current = false;
 
-      // Кнопки и ссылки должны работать как кнопки и ссылки,
-      // а не запускать свайп.
+      if (!enabled) return;
+      if (e.touches.length !== 1) return;
       if (shouldIgnoreTarget(e.target)) return;
 
-      startX.current = e.clientX;
-      startY.current = e.clientY;
-      latestDx.current = 0;
-
+      const touch = e.touches[0];
+      startX.current = touch.clientX;
+      startY.current = touch.clientY;
       tracking.current = true;
-      axisLock.current = null;
-
-      setDragX(0);
-      setIsDragging(true);
     },
     [enabled]
   );
 
-  const onPointerMove = useCallback(
+  const onTouchEnd = useCallback(
     (e) => {
-      if (!enabled || !tracking.current) return;
-      if (e.pointerType !== "touch") return;
-
-      const dx = e.clientX - startX.current;
-      const dy = e.clientY - startY.current;
-
-      if (!axisLock.current) {
-        const absX = Math.abs(dx);
-        const absY = Math.abs(dy);
-
-        if (absX < lockPx && absY < lockPx) return;
-
-        axisLock.current = absX > absY ? "x" : "y";
-      }
-
-      // Пользователь начал прокручивать страницу вертикально.
-      if (axisLock.current === "y") {
-        stopTracking();
-        return;
-      }
-
-      // Дополнительная защита от диагонального вертикального движения.
-      if (
-        Math.abs(dy) > restraintPx &&
-        Math.abs(dy) > Math.abs(dx)
-      ) {
-        stopTracking();
-        return;
-      }
-
-      latestDx.current = dx;
-
-      // Небольшой эффект сопротивления при перетаскивании.
-      setDragXRaf(dx * 0.85);
-    },
-    [
-      enabled,
-      lockPx,
-      restraintPx,
-      setDragXRaf,
-      stopTracking,
-    ]
-  );
-
-  const onPointerUp = useCallback(
-    (e) => {
-      if (e.pointerType !== "touch") return;
-
-      if (rafRef.current) {
-        cancelAnimationFrame(rafRef.current);
-        rafRef.current = 0;
-      }
-
-      if (!tracking.current) {
-        setDragX(0);
-        setIsDragging(false);
-        return;
-      }
-
-      const dx = latestDx.current;
-      const wasHorizontalSwipe = axisLock.current === "x";
-
+      if (!tracking.current) return;
       tracking.current = false;
-      axisLock.current = null;
-      latestDx.current = 0;
 
-      setIsDragging(false);
-      setDragX(0);
+      const touch = e.changedTouches?.[0];
+      if (!touch) return;
 
-      if (!enabled || !wasHorizontalSwipe) return;
+      const dx = touch.clientX - startX.current;
+      const dy = touch.clientY - startY.current;
+      const absX = Math.abs(dx);
+      const absY = Math.abs(dy);
 
-      if (dx > thresholdPx) {
-        onPrev?.();
-      } else if (dx < -thresholdPx) {
-        onNext?.();
-      }
+      // Это должен быть именно заметный горизонтальный жест.
+      if (absX < thresholdPx) return;
+      if (absX <= absY) return;
+
+      if (dx > 0) onPrev?.();
+      else onNext?.();
     },
-    [enabled, onPrev, onNext, thresholdPx]
+    [onPrev, onNext, thresholdPx]
   );
 
-  const onPointerCancel = useCallback(() => {
-    stopTracking();
-  }, [stopTracking]);
+  const onTouchCancel = useCallback(() => {
+    tracking.current = false;
+  }, []);
 
   return {
-    onPointerDown,
-    onPointerMove,
-    onPointerUp,
-    onPointerCancel,
-    dragX,
-    isDragging,
+    onTouchStart,
+    onTouchEnd,
+    onTouchCancel,
   };
 }
 
@@ -1110,64 +1008,17 @@ function pickRandom(arr) {
   return arr[i];
 }
 
-// ================== TABS SLIDER (ANIMATED) ==================
-// ✅ Makes the content "slide" on mobile with smooth transition.
-// Keeps desktop behavior unchanged.
-function TabsSlider({ isMobile, activeIndex, dragX, isDragging, children }) {
-  const count = React.Children.count(children);
-  const safeIndex = Math.min(Math.max(activeIndex, 0), Math.max(count - 1, 0));
-
-  // ✅ 1. ref на контейнер
-  const hostRef = React.useRef(null);
-  const [hostW, setHostW] = React.useState(1);
-
-  // ✅ 2. измеряем РЕАЛЬНУЮ ширину слайдера
-  React.useEffect(() => {
-    if (!isMobile) return;
-    const el = hostRef.current;
-    if (!el) return;
-
-    const update = () => setHostW(el.clientWidth || 1);
-    update();
-
-    const ro = new ResizeObserver(update);
-    ro.observe(el);
-
-    return () => ro.disconnect();
-  }, [isMobile]);
-
-  // ❗ ВАЖНО: проценты считаем от hostW, а не от window
-  const dragPct = isMobile ? (dragX / hostW) * 100 : 0;
-
-  const basePct = -safeIndex * 100;
-  const translatePct = basePct + (isMobile ? dragPct : 0);
-
-  return (
-    <div ref={hostRef} className="relative w-full overflow-hidden p-2">
-      <div
-        className={["flex w-full", isMobile ? "" : "block"].join(" ")}
-        style={
-          isMobile
-            ? {
-                transform: `translate3d(${translatePct}%, 0, 0)`,
-                transition: isDragging ? "none" : "transform 260ms cubic-bezier(0.22, 0.61, 0.36, 1)",
-                willChange: "transform",
-              }
-            : undefined
-        }
-      >
-        {React.Children.map(children, (child, i) => (
-          <div
-            key={i}
-            className={isMobile ? "w-full flex-none" : i === safeIndex ? "block" : "hidden"}
-            aria-hidden={isMobile ? false : i !== safeIndex}
-          >
-            {child}
-          </div>
-        ))}
-      </div>
-    </div>
+// ================== TABS CONTENT ==================
+// On mobile, render only the active page. There is no transformed layer,
+// pointer capture, drag animation, or delayed click suppression.
+function TabsSlider({ activeIndex, children }) {
+  const items = React.Children.toArray(children);
+  const safeIndex = Math.min(
+    Math.max(activeIndex, 0),
+    Math.max(items.length - 1, 0)
   );
+
+  return <div className="relative w-full p-2">{items[safeIndex] ?? null}</div>;
 }
 
 // ================== APP ==================
@@ -1525,35 +1376,32 @@ const showAbout = tab === "about";
 const showProducts = tab === "products";
 const showAudio = tab === "free-audio";
 
-// ✅ active index for animated slider
-const activeIndex = useMemo(() => TABS_ORDER.indexOf(tab), [tab]);
+  // ✅ active index for animated slider
+  const activeIndex = useMemo(() => TABS_ORDER.indexOf(tab), [tab]);
 
-useEffect(() => {
-  if (!isMobile) return;
-
-  const container = tabsScrollRef.current;
-  const activeBtn = tabBtnRefs.current[tab];
-
-  if (!container || !activeBtn) return;
-
-  const containerWidth = container.clientWidth;
-  const scrollWidth = container.scrollWidth;
-
-  const targetLeft =
-    activeBtn.offsetLeft +
-    activeBtn.offsetWidth / 2 -
-    containerWidth / 2;
-
-  const maxScroll = Math.max(0, scrollWidth - containerWidth);
-  const clamped = Math.max(0, Math.min(targetLeft, maxScroll));
-
-  requestAnimationFrame(() => {
-    container.scrollTo({
-      left: clamped,
-      behavior: "auto",
-    });
+      useEffect(() => {
+        if (!isMobile) return;
+      
+        const container = tabsScrollRef.current;
+        const activeBtn = tabBtnRefs.current[tab];
+        if (!container || !activeBtn) return;
+      
+        const containerWidth = container.clientWidth;
+        const scrollWidth = container.scrollWidth;
+      
+        const targetLeft =
+          activeBtn.offsetLeft + activeBtn.offsetWidth / 2 - containerWidth / 2;
+      
+        const maxScroll = Math.max(0, scrollWidth - containerWidth);
+        const clamped = Math.max(0, Math.min(targetLeft, maxScroll));
+      
+requestAnimationFrame(() => {
+  container.scrollTo({
+    left: clamped,
+    behavior: "auto",
   });
-}, [tab, isMobile, lang]);
+});
+      }, [tab, isMobile, lang]);
   
   
   // ================== EASTER EGG STATE ==================
@@ -2001,24 +1849,16 @@ const TAB_FROM_PATH = (p) => {
         </div>
       ) : null}
         
-        {/* ✅ Animated tab content slider (mobile) */}
+        {/* Stable mobile tab content: swipe changes page after finger release */}
           <main
             id="content"
             className={`flex-1 ${CONTAINER} py-1 sm:py-3`}
-            onPointerDown={swipeHandlers.onPointerDown}
-            onPointerMove={swipeHandlers.onPointerMove}
-            onPointerUp={swipeHandlers.onPointerUp}
-            onPointerCancel={swipeHandlers.onPointerCancel}
-            onLostPointerCapture={swipeHandlers.onLostPointerCapture}
-
+            onTouchStart={swipeHandlers.onTouchStart}
+            onTouchEnd={swipeHandlers.onTouchEnd}
+            onTouchCancel={swipeHandlers.onTouchCancel}
             style={{ touchAction: isMobile ? "pan-y" : "auto" }}
           >
-              <TabsSlider
-                isMobile={isMobile}
-                activeIndex={activeIndex}
-                dragX={swipeHandlers.dragX}
-                isDragging={swipeHandlers.isDragging}
-              >
+              <TabsSlider activeIndex={activeIndex}>
  
           {/* ABOUT */}
           <section hidden={!showAbout} aria-hidden={!showAbout}>
