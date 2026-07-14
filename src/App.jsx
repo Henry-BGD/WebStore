@@ -781,6 +781,24 @@ function WhatsAppIcon({ className = "" }) {
 }
 
 function ContactHelpBlock({ className = "", card = false }) {
+  const [emailCopied, setEmailCopied] = useState(false);
+
+  const copyEmail = async () => {
+    try {
+      await navigator.clipboard.writeText(CONTACT_EMAIL);
+      setEmailCopied(true);
+
+      setTimeout(() => {
+        setEmailCopied(false);
+      }, 2000);
+    } catch (error) {
+      console.error("Could not copy e-mail:", error);
+
+      // Запасной вариант для старых браузеров
+      window.prompt("Copy this e-mail address:", CONTACT_EMAIL);
+    }
+  };
+  
   const contactButtonClass = [
     "inline-flex items-center justify-center gap-1.5",
     "rounded-full border border-slate-300 bg-white",
@@ -855,23 +873,44 @@ function ContactHelpBlock({ className = "", card = false }) {
           <span>WhatsApp</span>
         </a>
 
-        <a
-          href={`mailto:${CONTACT_EMAIL}`}
-          className={contactButtonClass}
-          aria-label="Send me an e-mail"
-          title="Write an e-mail"
-          data-no-swipe="true"
-        >
-          <Mail
-            className={
-              card
-                ? "h-[15px] w-[15px] text-blue-600"
-                : "h-4 w-4 text-blue-600"
-            }
-            strokeWidth={1.9}
-          />
-          <span>E-mail</span>
-        </a>
+      {/* MOBILE: открыть приложение для почты */}
+<a
+  href={`mailto:${CONTACT_EMAIL}`}
+  className={[contactButtonClass, "md:hidden"].join(" ")}
+  aria-label="Send me an e-mail"
+  title="Write an e-mail"
+  data-no-swipe="true"
+>
+  <Mail
+    className={
+      card
+        ? "h-[15px] w-[15px] text-blue-600"
+        : "h-4 w-4 text-blue-600"
+    }
+    strokeWidth={1.9}
+  />
+  <span>E-mail</span>
+</a>
+
+{/* DESKTOP: скопировать адрес */}
+<button
+  type="button"
+  onClick={copyEmail}
+  className={[contactButtonClass, "hidden md:inline-flex"].join(" ")}
+  aria-label="Copy my e-mail address"
+  title={`Copy ${CONTACT_EMAIL}`}
+  data-no-swipe="true"
+>
+  <Mail
+    className={
+      card
+        ? "h-[15px] w-[15px] text-blue-600"
+        : "h-4 w-4 text-blue-600"
+    }
+    strokeWidth={1.9}
+  />
+  <span>{emailCopied ? "E-mail copied!" : "Copy e-mail"}</span>
+</button>
       </div>
     </div>
   );
