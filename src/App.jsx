@@ -295,6 +295,8 @@ const PRODUCTS = [
       "book",
       "audio",
       "bilingual",
+      "а2",
+      "a2",
       "russian",
     ],
   },
