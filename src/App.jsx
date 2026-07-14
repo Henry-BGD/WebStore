@@ -226,10 +226,10 @@ const PRODUCTS = [
     promo: true,
     actionType: "download",
     image: "/Product_Leo_Free.webp",
-    externalUrl: "/downloads/The_Water_Spirit_by_Leo_Tolstoy.zip",
+    externalUrl: "/The_Water_Spirit_by_Leo_Tolstoy.pdf",
     marketplace: "download",
-    badges: ["RU-EN", "PDF", "Audio"],
-    description: "Word-by-word translation, stress marks, grammar explanations, exercises, audio included",
+    badges: ["RU-EN", "PDF"],
+    description: "Word-by-word translation, stress marks, grammar explanations. Audio and exercises coming soon!",
     keywords: [
       "водяной",
       "рассказ водяной",
