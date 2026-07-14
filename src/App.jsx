@@ -303,7 +303,7 @@ const PRODUCTS = [
     title: "Russian Short Stories by Leo Tolstoy",
     kind: "A2-B1 Level",
     price: 9.99,
-    image: "/Product_Leo.webp",
+    image: "/Product_Leo_2.webp",
     externalUrl: "",
     marketplace: "amazon",
     badges: ["RU-EN", "Paper Book", "Audio"],
