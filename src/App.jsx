@@ -659,25 +659,20 @@ function WhatsAppIcon({ className = "" }) {
 }
 
 function ContactHelpBlock({ className = "", card = false }) {
-  const contactButtonClass = card
-    ? [
-        "inline-flex items-center justify-center gap-1.5",
-        "rounded-full border border-slate-300 bg-white",
-        "px-3 py-1.5 text-[12px] font-semibold leading-none text-slate-800",
-        "shadow-sm transition",
-        "hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700",
-        "active:scale-[0.97] active:bg-blue-100",
-        "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300",
-        "dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100",
-        "dark:hover:border-blue-700 dark:hover:bg-blue-950/40 dark:hover:text-blue-300",
-      ].join(" ")
-    : [
-        "inline-flex items-center gap-2 rounded-lg px-2 py-1",
-        "text-sm font-semibold text-slate-800 transition",
-        "hover:bg-slate-100 hover:text-blue-600",
-        "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300",
-        "dark:text-slate-100 dark:hover:bg-slate-800 dark:hover:text-blue-400",
-      ].join(" ");
+  const contactButtonClass = [
+    "inline-flex items-center justify-center gap-1.5",
+    "rounded-full border border-slate-300 bg-white",
+    card
+      ? "px-3 py-1.5 text-[12px]"
+      : "px-3.5 py-1.5 text-[13px]",
+    "font-semibold leading-none text-slate-800",
+    "shadow-sm transition",
+    "hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 hover:shadow",
+    "active:scale-[0.97] active:bg-blue-100",
+    "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300",
+    "dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100",
+    "dark:hover:border-blue-700 dark:hover:bg-blue-950/40 dark:hover:text-blue-300",
+  ].join(" ");
 
   return (
     <div
@@ -699,16 +694,24 @@ function ContactHelpBlock({ className = "", card = false }) {
           "font-medium text-slate-700 dark:text-slate-300",
           card
             ? "max-w-[310px] text-[11px] leading-[1.35]"
-            : "text-sm leading-relaxed",
+            : "text-[13px] leading-tight",
         ].join(" ")}
       >
-        Questions or problems? Just send me a message — I’m always happy to help!
+        {card ? (
+          <>
+            Questions or problems? Just send me a message —
+            <br />
+            I’m always happy to help!
+          </>
+        ) : (
+          <>Questions or problems? Just send me a message — I’m always happy to help!</>
+        )}
       </p>
 
       <div
         className={[
           "flex flex-wrap items-center justify-center",
-          card ? "mt-2 gap-2" : "mt-2.5 gap-x-5 gap-y-2",
+          card ? "mt-2 gap-2" : "mt-1.5 gap-2.5",
         ].join(" ")}
       >
         <a
@@ -720,7 +723,13 @@ function ContactHelpBlock({ className = "", card = false }) {
           title="Open WhatsApp chat"
           data-no-swipe="true"
         >
-          <WhatsAppIcon className={card ? "h-[15px] w-[15px] text-emerald-600" : "h-[18px] w-[18px]"} />
+          <WhatsAppIcon
+            className={
+              card
+                ? "h-[15px] w-[15px] text-emerald-600"
+                : "h-4 w-4 text-emerald-600"
+            }
+          />
           <span>WhatsApp</span>
         </a>
 
@@ -732,7 +741,11 @@ function ContactHelpBlock({ className = "", card = false }) {
           data-no-swipe="true"
         >
           <Mail
-            className={card ? "h-[15px] w-[15px] text-blue-600" : "h-[18px] w-[18px]"}
+            className={
+              card
+                ? "h-[15px] w-[15px] text-blue-600"
+                : "h-4 w-4 text-blue-600"
+            }
             strokeWidth={1.9}
           />
           <span>E-mail</span>
@@ -2240,14 +2253,14 @@ const TAB_FROM_PATH = (p) => {
       </main>
 
       <footer className="mt-auto border-t border-slate-200 dark:border-slate-800">
-        <div className={`${CONTAINER} py-5`}>
+        <div className={`${CONTAINER} py-3`}>
           <div className="grid grid-cols-[auto_1fr_auto] items-center gap-4 md:gap-6">
             <div className="text-xs text-slate-500 dark:text-slate-500">
               © {new Date().getFullYear()} Genndy Bogdanov
             </div>
 
             {/* Desktop only: contact help in the footer on every tab */}
-            <ContactHelpBlock className="hidden md:block min-w-0" />
+            <ContactHelpBlock className="hidden md:block min-w-0 self-start -mt-0.5" />
 
             <div className="flex justify-end">
               <button
