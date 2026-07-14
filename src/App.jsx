@@ -765,7 +765,7 @@ const CONTACT_EMAIL = "genndybogdanov@gmail.com";
 // Replace the placeholder below with your WhatsApp number in international format:
 // country code + number, without +, spaces, brackets or dashes.
 // Example: https://wa.me/995555123456
-const WHATSAPP_URL = "https://wa.me/REPLACE_WITH_YOUR_NUMBER";
+const WHATSAPP_URL = "https://wa.me/message/SFENMVQETTOIH1";
 
 function WhatsAppIcon({ className = "" }) {
   return (
@@ -2149,7 +2149,6 @@ const TAB_FROM_PATH = (p) => {
             onPointerMove={swipeHandlers.onPointerMove}
             onPointerUp={swipeHandlers.onPointerUp}
             onPointerCancel={swipeHandlers.onPointerCancel}
-            onLostPointerCapture={swipeHandlers.onLostPointerCapture}
 
             style={{ touchAction: isMobile ? "pan-y" : "auto" }}
           >
