@@ -1258,13 +1258,11 @@ export default function App() {
 
   const [tab, setTab] = useState(() => detectTab());
 
-    useEffect(() => {
-    try {
-      localStorage.setItem("tab", tab);
-    } catch {}
-  
-    window.scrollTo(0, 0);
-  }, [tab]);
+useEffect(() => {
+  try {
+    localStorage.setItem("tab", tab);
+  } catch {}
+}, [tab]);
 
   useEffect(() => {
     document.title = lang === "ru" ? "Геннадий Богданов — русский язык" : "Genndy Bogdanov — Learn Russian";
@@ -1546,13 +1544,12 @@ const showAudio = tab === "free-audio";
         const maxScroll = Math.max(0, scrollWidth - containerWidth);
         const clamped = Math.max(0, Math.min(targetLeft, maxScroll));
       
-        requestAnimationFrame(() => {
-          container.scrollTo({
-            left: clamped,
-            behavior: "smooth",
-          });
-        });
-      }, [tab, isMobile, lang]);
+requestAnimationFrame(() => {
+  container.scrollTo({
+    left: clamped,
+    behavior: "auto",
+  });
+});
   
   
   // ================== EASTER EGG STATE ==================
@@ -1925,10 +1922,10 @@ const TAB_FROM_PATH = (p) => {
                     </div>
                   ) : null}     
       
-                        <div
-                          ref={tabsScrollRef}
-                          className="flex-1 min-w-0 overflow-x-auto no-scrollbar scroll-smooth"
-                        >
+<div
+  ref={tabsScrollRef}
+  className="flex-1 min-w-0 overflow-x-auto no-scrollbar"
+>
                           <div className="flex items-center gap-[4px] w-max py-1 px-[22vw]">
                           
                       <NavPill
