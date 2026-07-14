@@ -219,7 +219,7 @@ const PRODUCTS = [
   // or replace externalUrl with the final file URL.
   {
     id: "prod-free-water-spirit",
-    title: '"The Peasant and the Water Spirit" by Leo Tolstoy',
+    title: 'Story "The Water Spirit" by Leo Tolstoy',
     kind: "A1 Level",
     price: 0,
     isFree: true,
