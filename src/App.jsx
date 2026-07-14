@@ -659,40 +659,82 @@ function WhatsAppIcon({ className = "" }) {
 }
 
 function ContactHelpBlock({ className = "", card = false }) {
+  const contactButtonClass = card
+    ? [
+        "inline-flex items-center justify-center gap-1.5",
+        "rounded-full border border-slate-300 bg-white",
+        "px-3 py-1.5 text-[12px] font-semibold leading-none text-slate-800",
+        "shadow-sm transition",
+        "hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700",
+        "active:scale-[0.97] active:bg-blue-100",
+        "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300",
+        "dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100",
+        "dark:hover:border-blue-700 dark:hover:bg-blue-950/40 dark:hover:text-blue-300",
+      ].join(" ")
+    : [
+        "inline-flex items-center gap-2 rounded-lg px-2 py-1",
+        "text-sm font-semibold text-slate-800 transition",
+        "hover:bg-slate-100 hover:text-blue-600",
+        "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300",
+        "dark:text-slate-100 dark:hover:bg-slate-800 dark:hover:text-blue-400",
+      ].join(" ");
+
   return (
     <div
       className={[
         "text-center",
         card
-          ? "rounded-2xl border border-slate-200 bg-slate-50 px-5 py-5 dark:border-slate-800 dark:bg-slate-900/60"
+          ? [
+              "mx-auto w-fit max-w-full",
+              "rounded-xl border border-slate-200 bg-slate-50",
+              "px-3 py-2.5",
+              "dark:border-slate-800 dark:bg-slate-900/60",
+            ].join(" ")
           : "",
         className,
       ].join(" ")}
     >
-      <p className="text-sm font-medium leading-relaxed text-slate-700 dark:text-slate-300">
+      <p
+        className={[
+          "font-medium text-slate-700 dark:text-slate-300",
+          card
+            ? "max-w-[310px] text-[11px] leading-[1.35]"
+            : "text-sm leading-relaxed",
+        ].join(" ")}
+      >
         Questions or problems? Just send me a message — I’m always happy to help!
       </p>
 
-      <div className="mt-2.5 flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
+      <div
+        className={[
+          "flex flex-wrap items-center justify-center",
+          card ? "mt-2 gap-2" : "mt-2.5 gap-x-5 gap-y-2",
+        ].join(" ")}
+      >
         <a
           href={WHATSAPP_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 rounded-lg px-2 py-1 text-sm font-semibold text-slate-800 transition hover:bg-slate-100 hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 dark:text-slate-100 dark:hover:bg-slate-800 dark:hover:text-blue-400"
+          className={contactButtonClass}
           aria-label="Write to me on WhatsApp"
+          title="Open WhatsApp chat"
           data-no-swipe="true"
         >
-          <WhatsAppIcon className="h-[18px] w-[18px]" />
+          <WhatsAppIcon className={card ? "h-[15px] w-[15px] text-emerald-600" : "h-[18px] w-[18px]"} />
           <span>WhatsApp</span>
         </a>
 
         <a
           href={`mailto:${CONTACT_EMAIL}`}
-          className="inline-flex items-center gap-2 rounded-lg px-2 py-1 text-sm font-semibold text-slate-800 transition hover:bg-slate-100 hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 dark:text-slate-100 dark:hover:bg-slate-800 dark:hover:text-blue-400"
+          className={contactButtonClass}
           aria-label="Send me an e-mail"
+          title="Write an e-mail"
           data-no-swipe="true"
         >
-          <Mail className="h-[18px] w-[18px]" strokeWidth={1.9} />
+          <Mail
+            className={card ? "h-[15px] w-[15px] text-blue-600" : "h-[18px] w-[18px]"}
+            strokeWidth={1.9}
+          />
           <span>E-mail</span>
         </a>
       </div>
