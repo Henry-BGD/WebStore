@@ -1,5 +1,5 @@
 import React, { useMemo, useRef, useState, useEffect, useCallback } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/Card.jsx";
+import { Card, CardContent, CardTitle } from "./components/ui/Card.jsx";
 import { Button } from "./components/ui/Button.jsx";
 import { Input } from "./components/ui/Input.jsx";
 import { Badge } from "./components/ui/Badge.jsx";
@@ -336,9 +336,6 @@ function useSwipeTabs({
 
 // ================== DATA ==================
 const PRODUCTS = [
-  // Free sample: place the PDF at
-  // public/downloads/The_Water_Spirit_by_Leo_Tolstoy.pdf
-  // or replace externalUrl with the final file URL.
   {
     id: "prod-free-water-spirit",
     title: 'Story "The Water Spirit" by Leo Tolstoy',
@@ -516,12 +513,6 @@ const PRODUCTS = [
   },
 ];
 
-const AUDIO_ROUTE_MAP = {
-  tolstoy: "tolstoy-short-stories",
-  // chekhov: "chekhov-short-stories",
-  // добавить новое
-};
-
 const AUDIO_BOOKS = [
   {
     id: "tolstoy-short-stories",
@@ -559,7 +550,6 @@ const AUDIO_BOOKS = [
 const I18N = {
   en: {
     name: "Genndy Bogdanov",
-    tagline: "",
     nav_about: "About",
     nav_products: "Store",
     nav_audio: "Audiobooks",
@@ -596,7 +586,6 @@ const I18N = {
 
   ru: {
     name: "Genndy Bogdanov",
-    tagline: "",
     nav_about: "Обо мне",
     nav_products: "Магазин",
     nav_audio: "Аудиокниги",
@@ -762,9 +751,6 @@ function ExternalLinkChip({ href, children, className = "" }) {
 
 const CONTACT_EMAIL = "genndybogdanov@gmail.com";
 
-// Replace the placeholder below with your WhatsApp number in international format:
-// country code + number, without +, spaces, brackets or dashes.
-// Example: https://wa.me/995555123456
 const WHATSAPP_URL = "https://wa.me/message/SFENMVQETTOIH1";
 
 function WhatsAppIcon({ className = "" }) {
@@ -1658,18 +1644,6 @@ const TAB_TO_PATH = {
   "free-audio": "/audio",
 };
 
-function pathToTab(pathname) {
-  if (/^\/(about)?\/?$/i.test(pathname)) return "about";
-  if (/^\/(store|products)\/?$/i.test(pathname)) return "products";
-  if (/^\/audio(\/.*)?$/i.test(pathname)) return "free-audio";
-  return "about";
-}
-
-  function parseAudioSlug(pathname) {
-    const m = pathname.match(/^\/audio(?:\/([^\/?#]+))?\/?$/i);
-    return m ? (m[1] || "").toLowerCase() : null; // null => не audio
-  }
-
   const findBookIdBySlug = useCallback((slug) => {
     if (!slug) return null;
     const found = AUDIO_BOOKS.find((b) => (b.slug || "").toLowerCase() === slug.toLowerCase() && !b.disabled);
@@ -2007,7 +1981,7 @@ const TAB_FROM_PATH = (p) => {
 
       <audio ref={audioRef} preload="none" />
 
-      <header className="sticky top-0 z-50 relative bg-white/80 dark:bg-slate-950/75 backdrop-blur border-b border-slate-200 dark:border-slate-800">
+      <header className="sticky top-0 z-50 bg-white/80 dark:bg-slate-950/75 backdrop-blur border-b border-slate-200 dark:border-slate-800">
         <div className="w-full">
           <div className={`${CONTAINER} py-3 flex items-center justify-between gap-4 ${TOPBAR_H}`}>
             <div className="flex items-center gap-3 min-w-0">
@@ -2031,7 +2005,6 @@ const TAB_FROM_PATH = (p) => {
 
               <div className="min-w-0">
                 <p className="font-semibold leading-tight truncate">{t("name")}</p>
-                <p className="text-xs opacity-70 truncate">{t("tagline")}</p>
               </div>
               
             </div>
@@ -2209,7 +2182,7 @@ const TAB_FROM_PATH = (p) => {
               <Card className="p-5 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl">
                 <CardTitle className="mb-2">{t("contacts")}</CardTitle>
                 <div className="text-sm space-y-1 text-slate-700 dark:text-slate-300">
-                  <p>E-mail: genndybogdanov@gmail.com</p>
+                  <p>E-mail: {CONTACT_EMAIL}</p>
                 </div>
               </Card>
 
