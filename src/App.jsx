@@ -646,6 +646,32 @@ function applyThemeToHtml(theme) {
   root.style.colorScheme = theme;
 }
 
+// ================== GOOGLE ANALYTICS EVENTS ==================
+function trackCtaClick({
+  buttonName,
+  destinationUrl = "",
+  productId = "",
+  productTitle = "",
+  marketplace = "",
+  siteLanguage = "",
+}) {
+  if (
+    typeof window === "undefined" ||
+    typeof window.gtag !== "function"
+  ) {
+    return;
+  }
+
+  window.gtag("event", "cta_click", {
+    button_name: buttonName,
+    destination_url: destinationUrl,
+    product_id: productId,
+    product_title: productTitle,
+    marketplace,
+    site_language: siteLanguage,
+  });
+}
+
 // ================== UI HELPERS ==================
 const NavPill = React.forwardRef(function NavPill(
   { active, onClick, children, size = "md", className = "", ...props },
@@ -685,6 +711,7 @@ function LinkButton({
   disabled = false,
   title,
   download = false,
+  onClick,
   "aria-label": ariaLabel,
 }) {
   const base =
@@ -713,6 +740,7 @@ function LinkButton({
       download={download || undefined}
       target={download ? undefined : "_blank"}
       rel={download ? undefined : "noopener noreferrer"}
+      onClick={onClick}
       className={[base, enabledCls, className].join(" ")}
       title={title}
       aria-label={ariaLabel}
@@ -1200,6 +1228,18 @@ function ProductCard({ item, t, lang }) {
                 disabled={!canBuy}
                 aria-label={productBuyLabel(item, t)}
                 className="rounded-full px-5 py-2.5"
+                onClick={() =>
+                  trackCtaClick({
+                    buttonName: isDownload
+                      ? "download_free_materials"
+                      : `buy_on_${item.marketplace || "store"}`,
+                    destinationUrl: item.externalUrl,
+                    productId: item.id,
+                    productTitle: item.title,
+                    marketplace: item.marketplace,
+                    siteLanguage: lang,
+                  })
+                }
               >
                 {isDownload ? <Download className="w-4 h-4" /> : <ExternalLink className="w-4 h-4" />}
                 <span className="whitespace-nowrap">{productBuyLabel(item, t)}</span>
@@ -1584,6 +1624,16 @@ useEffect(() => {
 function downloadAllAudio() {
   const zip = selectedBook?.zipSrc;
   if (!zip) return;
+
+  trackCtaClick({
+    buttonName: "download_all_audio",
+    destinationUrl: zip,
+    productId: selectedBook.id,
+    productTitle: `${selectedBook.title} ${selectedBook.author || ""}`.trim(),
+    marketplace: "download",
+    siteLanguage: lang,
+  });
+
   window.location.href = zip;
 }
 
